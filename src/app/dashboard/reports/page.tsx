@@ -13,7 +13,7 @@ const chartConfig = {
 
 export default function Reports() {
     const total = useMemo(() => ({ count: chartData.reduce((acc, curr) => acc + curr.count, 0) }), []);
-    const formatted = new Intl.NumberFormat("en-IN").format(parseInt(total.count));
+    const formatted = new Intl.NumberFormat("en-IN").format(total.count);
 
     return (
         <>
