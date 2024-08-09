@@ -1,0 +1,43 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+enum Feature {
+    FEATURE1
+    FEATURE2
+    FEATURE3
+    FEATURE4
+}
+
+model Role {
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    title    String    @unique
+    features Feature[]
+    agents   Agent[]
+}
+
+model Agent {
+    id         String       @id @default(auto()) @map("_id") @db.ObjectId
+    email      String       @unique
+    name       String?
+    password   String
+    roleId     String       @db.ObjectId
+    role       Role         @relation(fields: [roleId], references: [id])
+    tempAccess TempAccess[]
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+}
+
+model TempAccess {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String   @db.ObjectId
+    agent     Agent    @relation(fields: [userId], references: [id])
+    feature   Feature
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+}
