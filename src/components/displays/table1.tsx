@@ -3,25 +3,135 @@
 
 "use client";
 import { DataTable } from "@/components/dataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 const data = [
-    { name: "Faircent", status: "ON", First: "2024-07-04", Last: "2024-07-19", Total: 9606, Accepted: 1580, Rejected: 8021 },
-    { name: "Upwards MarketPlace", status: "ON", First: "2024-07-05", Last: "2024-07-19", Total: 155878, Accepted: 42000, Rejected: 113878 },
-    { name: "Prefr", status: "OFF", First: "2024-07-01", Last: "2024-07-19", Total: 6377, Accepted: 1500, Rejected: 4877 },
-    { name: "Fibe", status: "ON", First: "2024-07-01", Last: "2024-07-19", Total: 155414, Accepted: 28695, Rejected: 126573 },
-    { name: "Cashe", status: "OFF", First: "2024-07-01", Last: "2024-07-19", Total: 93446, Accepted: 18860, Rejected: 74582 },
-    { name: "MoneyView", status: "ON", First: "2024-07-01", Last: "2024-07-19", Total: 225516, Accepted: 22502, Rejected: 203014 },
-    { name: "Upwards", status: "OFF", First: "2024-07-01", Last: "2024-07-19", Total: 20581, Accepted: 5980, Rejected: 14601 },
-    { name: "Mpocket", status: "OFF", First: "2024-07-05", Last: "2024-07-05", Total: 8, Accepted: 2, Rejected: 6 },
-    { name: "Payme", status: "ON", First: "2024-07-03", Last: "2024-07-19", Total: 11991, Accepted: 3500, Rejected: 8491 },
-    { name: "Zype", status: "ON", First: "2024-07-01", Last: "2024-07-19", Total: 18443, Accepted: 15379, Rejected: 3064 },
-    { name: "LendingKart", status: "ON", First: "2024-07-01", Last: "2024-07-19", Total: 2383, Accepted: 500, Rejected: 1883 },
-    { name: "LoanTap", status: "OFF", First: "2024-07-01", Last: "2024-07-19", Total: 54, Accepted: 25, Rejected: 29 },
-    { name: "Some Other Lender", status: "OFF", First: "2024-07-05", Last: "2024-07-19", Total: 15, Accepted: 42, Rejected: 101 },
+    {
+        name: "Faircent",
+        status: "ON",
+        First: "2024-07-04",
+        Last: "2024-07-19",
+        Total: 9606,
+        Accepted: 1580,
+        Rejected: 8021,
+    },
+    {
+        name: "Upwards MarketPlace",
+        status: "ON",
+        First: "2024-07-05",
+        Last: "2024-07-19",
+        Total: 155878,
+        Accepted: 42000,
+        Rejected: 113878,
+    },
+    {
+        name: "Prefr",
+        status: "OFF",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 6377,
+        Accepted: 1500,
+        Rejected: 4877,
+    },
+    {
+        name: "Fibe",
+        status: "ON",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 155414,
+        Accepted: 28695,
+        Rejected: 126573,
+    },
+    {
+        name: "Cashe",
+        status: "OFF",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 93446,
+        Accepted: 18860,
+        Rejected: 74582,
+    },
+    {
+        name: "MoneyView",
+        status: "ON",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 225516,
+        Accepted: 22502,
+        Rejected: 203014,
+    },
+    {
+        name: "Upwards",
+        status: "OFF",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 20581,
+        Accepted: 5980,
+        Rejected: 14601,
+    },
+    {
+        name: "Mpocket",
+        status: "OFF",
+        First: "2024-07-05",
+        Last: "2024-07-05",
+        Total: 8,
+        Accepted: 2,
+        Rejected: 6,
+    },
+    {
+        name: "Payme",
+        status: "ON",
+        First: "2024-07-03",
+        Last: "2024-07-19",
+        Total: 11991,
+        Accepted: 3500,
+        Rejected: 8491,
+    },
+    {
+        name: "Zype",
+        status: "ON",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 18443,
+        Accepted: 15379,
+        Rejected: 3064,
+    },
+    {
+        name: "LendingKart",
+        status: "ON",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 2383,
+        Accepted: 500,
+        Rejected: 1883,
+    },
+    {
+        name: "LoanTap",
+        status: "OFF",
+        First: "2024-07-01",
+        Last: "2024-07-19",
+        Total: 54,
+        Accepted: 25,
+        Rejected: 29,
+    },
+    {
+        name: "Some Other Lender",
+        status: "OFF",
+        First: "2024-07-05",
+        Last: "2024-07-19",
+        Total: 15,
+        Accepted: 42,
+        Rejected: 101,
+    },
 ];
 
 export type LenderData = {
@@ -37,12 +147,19 @@ export type LenderData = {
 export const columns: ColumnDef<LenderData>[] = [
     { accessorKey: "name", header: () => <div className="w-36 text-left">Name</div> },
     {
+        //  NOTE: Selection filters are MANUALLY added.
+        //  Refer to bottom of this page to get same fuction with auto generated filters.
+
         accessorKey: "status",
         header: ({ column }) => {
             const columnFilterValue = column.getFilterValue();
             return (
                 <div className="flex text-left">
-                    <select className="mr-2 rounded border" onChange={(e) => column.setFilterValue(e.target.value)} value={columnFilterValue?.toString()}>
+                    <select
+                        className="mr-2 rounded border"
+                        onChange={(e) => column.setFilterValue(e.target.value)}
+                        value={columnFilterValue?.toString()}
+                    >
                         <option value="">*</option>
                         <option value="ON">ON</option>
                         <option value="OFF">OFF</option>
@@ -116,7 +233,9 @@ export const columns: ColumnDef<LenderData>[] = [
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(JSON.stringify(row.original))}>Copy Lender Data</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(JSON.stringify(row.original))}>
+                        Copy Lender Data
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         ),
@@ -141,3 +260,34 @@ export function Table1() {
         </>
     );
 }
+
+//  AUTO GENERATED FILTERS
+/**************************
+ *     {
+ *	  accessorKey: "status",
+ *	  header: ({ column }) => {
+ *	      const sortedUniqueValues = useMemo(
+ *		  () => Array.from(column.getFacetedUniqueValues().keys()).sort().slice(0, 5000),
+ *		  [column.getFacetedUniqueValues()],
+ *	      );
+ *	      return (
+ *		  <div className="flex text-left">
+ *		      <select
+ *			  className="mr-2 rounded border"
+ *			  onChange={(e) => column.setFilterValue(e.target.value)}
+ *			  value={columnFilterValue?.toString()}
+ *		      >
+ *			  <option value="">*</option>
+ *			  {sortedUniqueValues.map((value) => (
+ *			      <option value={value} key={value}>
+ *				  {value}
+ *			      </option>
+ *			  ))}
+ *		      </select>
+ *		      Status
+ *		  </div>
+ *	      );
+ *	  },
+ *	  cell: ({ row }) => <div className="text-center">{row.getValue("status")}</div>,
+ *     }
+ *************************/

@@ -25,7 +25,7 @@ export default function Reports() {
                     </div>
                     <div className="flex">
                         <div className="flex flex-col justify-center gap-1 px-6 py-4 text-left even:border-l sm:border-l sm:px-8">
-                            <span className="text-muted-foreground text-xs">Total Leads Pushed</span>
+                            <span className="text-xs text-muted-foreground">Total Leads Pushed</span>
                             <span className="text-lg font-bold leading-none sm:text-3xl">{formatted}</span>
                         </div>
                     </div>

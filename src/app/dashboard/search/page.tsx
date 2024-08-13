@@ -52,7 +52,8 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
             <div className="justify-center py-10 text-center">
                 <h1 className="text-2xl font-bold">NOT FOUND</h1>
                 <Link href={"/"} className="text-sm">
-                    Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                    Create New Lead for{" "}
+                    <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                 </Link>
             </div>
         );
@@ -70,9 +71,16 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                                 {Object.entries(res.details)
                                     .filter(
                                         ([key]) =>
-                                            !["eformFilled", "partner", "applications", "phoneOtpExpire", "phoneOtp", "__v", "detailsFilled", "role"].includes(
-                                                key,
-                                            ),
+                                            ![
+                                                "eformFilled",
+                                                "partner",
+                                                "applications",
+                                                "phoneOtpExpire",
+                                                "phoneOtp",
+                                                "__v",
+                                                "detailsFilled",
+                                                "role",
+                                            ].includes(key),
                                     )
                                     .map(
                                         ([key, value]: any) =>
@@ -104,7 +112,9 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                                             value ? (
                                                 <TableRow key={key}>
                                                     <TableCell className="font-medium">{key}</TableCell>
-                                                    <TableCell className="max-w-xs truncate text-right">{value.toString()}</TableCell>
+                                                    <TableCell className="max-w-xs truncate text-right">
+                                                        {value.toString()}
+                                                    </TableCell>
                                                 </TableRow>
                                             ) : null,
                                         )}
@@ -118,7 +128,8 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                 <div className="justify-center py-10 text-center">
                     <h1 className="text-2xl font-bold">NOT FOUND</h1>
                     <Link href={"/"} className="text-sm">
-                        Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                        Create New Lead for{" "}
+                        <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                     </Link>
                 </div>
             )}

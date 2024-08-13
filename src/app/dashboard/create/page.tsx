@@ -61,7 +61,13 @@ export default function create() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="pincode">Pincode</Label>
-                            <Input id="pincode" pattern="\d{6}" placeholder="Enter your area's pincode" required className="bg-white" />
+                            <Input
+                                id="pincode"
+                                pattern="\d{6}"
+                                placeholder="Enter your area's pincode"
+                                required
+                                className="bg-white"
+                            />
                         </div>
                     </div>
 
@@ -79,7 +85,12 @@ export default function create() {
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
                             <Label htmlFor="empType">Employment Type</Label>
-                            <Input id="empType" placeholder="Select your employment type" required className="bg-white" />
+                            <Input
+                                id="empType"
+                                placeholder="Select your employment type"
+                                required
+                                className="bg-white"
+                            />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="company">Company Name</Label>

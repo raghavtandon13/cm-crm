@@ -1,7 +1,6 @@
 "use client";
 import fromAPI from "@/lib/api";
-import { useEffect, useState } from "react";
-import { Agent } from "@/lib/types";
+import { useUser } from "@/context/UserContext";
 import { Button, buttonVariants } from "./ui/button";
 import { Power } from "lucide-react";
 import {
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function UserProfile() {
-    const [user, setUser] = useState<Agent | null>(null);
+    const user = useUser();
 
     const handleLogout = async () => {
         try {
@@ -29,17 +28,6 @@ export default function UserProfile() {
             console.log(err);
         }
     };
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fromAPI.get("/agents/get");
-                setUser(response.data);
-            } catch {}
-        };
-
-        fetchUserData();
-    }, []);
 
     return (
         user && (
@@ -67,7 +55,10 @@ export default function UserProfile() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleLogout} className={buttonVariants({ variant: "destructive" })}>
+                            <AlertDialogAction
+                                onClick={handleLogout}
+                                className={buttonVariants({ variant: "destructive" })}
+                            >
                                 Log Out
                             </AlertDialogAction>
                         </AlertDialogFooter>
