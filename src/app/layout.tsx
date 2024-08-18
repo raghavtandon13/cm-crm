@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { connectToMongoDB } from "../../lib/db";
 import { UserProvider } from "@/context/UserContext";
+import Providers from "@/context/Query";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,10 +18,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     return (
         <html lang="en">
             <body className={`${inter.className} flex h-screen flex-col`}>
-                <UserProvider>
-                    <Navbar />
-                    <div className="flex-1 overflow-hidden">{children}</div>
-                </UserProvider>
+                <Providers>
+                    <UserProvider>
+                        <Navbar />
+                        <div className="flex-1 overflow-hidden">{children}</div>
+                        <Toaster />
+                    </UserProvider>
+                </Providers>
             </body>
         </html>
     );

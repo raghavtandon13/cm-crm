@@ -4,6 +4,8 @@ import User from "@/lib/users";
 import Image from "next/image";
 import Link from "next/link";
 import { CMUser } from "@/lib/types";
+import { buttonVariants } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 interface UserData {
     accounts: Record<string, any>[];
@@ -65,7 +67,16 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
             {res.accounts && res.details ? (
                 <>
                     <div className="items-center justify-center">
-                        <h1 className="py-10 font-bold">Personal Details</h1>
+                        <div className="py-10 flex justify-between">
+                            <h1 className="font-bold">Personal Details</h1>
+                            <Link
+                                className={`${buttonVariants({ variant: "outline" })}`}
+                                href={`/dashboard/create?phone=${phone}`}
+                            >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Edit
+                            </Link>
+                        </div>
                         <Table>
                             <TableBody>
                                 {Object.entries(res.details)

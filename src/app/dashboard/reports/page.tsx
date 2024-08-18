@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Table1 } from "@/components/displays/table1";
 import { chartData } from "@/lib/good";
+import { UsersTable } from "@/components/displays/usersTable";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -17,6 +18,7 @@ export default function Reports() {
 
     return (
         <>
+            <UsersTable />
             <Table1 />
             <Card>
                 <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">

@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
+import { CMUser } from "./types";
 
-const userSchema = new Schema(
+const userSchema = new Schema<CMUser>(
     {
         name: { type: String, trim: true },
         phone: { type: String, required: true, trim: true },
@@ -33,4 +34,5 @@ const userSchema = new Schema(
     { timestamps: true },
 );
 
-export default mongoose.models.User || mongoose.model("User", userSchema);
+const User: mongoose.Model<CMUser> = mongoose.models.User || mongoose.model<CMUser>("User", userSchema);
+export default User;

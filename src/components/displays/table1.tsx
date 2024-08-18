@@ -255,7 +255,7 @@ export function Table1() {
     return (
         <>
             <div className="my-2">
-                <DataTable columns={columns} data={data} />
+                <DataTable columns={columns} data={data} name="table1"/>
             </div>
         </>
     );

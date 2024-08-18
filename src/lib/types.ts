@@ -38,7 +38,6 @@ interface GoogleInfo {
     name?: string;
 }
 
-// types.ts
 export interface Role {
     id: string;
     title: string;
@@ -55,3 +54,20 @@ export interface Agent {
     createdAt: string;
     updatedAt: string;
 }
+
+//  FIX: add more stuff to Lead Type example Income
+
+export type Lead = {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    dob: string;
+    gender: string;
+    address: string;
+    pincode: string;
+    city: string;
+    state: string;
+    empType: "Salaried" | "Self-employed" | "No-employment";
+    company: string;
+};
