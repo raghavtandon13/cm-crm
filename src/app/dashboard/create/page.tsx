@@ -6,7 +6,7 @@ import fromAPI from "@/lib/api";
 import { CMUser, Lead } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -42,7 +42,6 @@ export default function Create() {
                     empType: cmudata.employment,
                     company: cmudata.company_name,
                 };
-                console.log(ldata);
                 return ldata;
             }
         },

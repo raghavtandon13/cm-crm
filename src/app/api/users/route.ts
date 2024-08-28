@@ -1,8 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
+import { connectToMongoDB } from "../../../../lib/db";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+    await connectToMongoDB();
     try {
         const pageParam = req.nextUrl.searchParams.get("page") as string;
         let page = parseInt(pageParam) || 1;

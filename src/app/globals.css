@@ -72,6 +72,7 @@
 
         background-color: #f7f7ff;
         opacity: 1;
-        background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #f7f7ff 40px), repeating-linear-gradient(#ebf5ff55, #ebf5ff);
+        background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #f7f7ff 40px),
+            repeating-linear-gradient(#ebf5ff55, #ebf5ff);
     }
 }

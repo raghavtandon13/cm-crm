@@ -3,10 +3,12 @@ import { db } from "../../../../../lib/db";
 import { NextResponse, NextRequest } from "next/server";
 import { CMUser, Lead } from "@/lib/types";
 import User from "@/lib/users";
+import { connectToMongoDB } from "../../../../../lib/db";
 
 const secret = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
+    await connectToMongoDB();
     const token = await req.headers.get("Authorization")?.split(" ")[1];
     if (!token) return NextResponse.json({ status: "failure", message: "No token provided" }, { status: 401 });
 
@@ -40,8 +42,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
         const assignment = await db.assignment.create({ data: { cmUserId: user._id as string, agentId: agent.id } });
-	console.log(user)
-	console.log(assignment)
 
         if (!assignment)
             return NextResponse.json({ status: "failure", message: "Could not create Assignment" }, { status: 500 });

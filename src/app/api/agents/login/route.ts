@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET as string;
 import { startOfDay } from "date-fns";
 
-
 export async function POST(req: NextRequest) {
     try {
         const { email, pass } = await req.json();

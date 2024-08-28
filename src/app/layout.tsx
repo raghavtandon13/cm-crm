@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "CM Agent Portal",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     connectToMongoDB();
     return (
         <html lang="en">

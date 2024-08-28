@@ -20,8 +20,20 @@ export default function DateSearch({ dates }: any) {
         <form className="mx-2 w-full items-center justify-center" onSubmit={handleSubmit}>
             <div className="flex flex-col justify-start gap-2 sm:flex-row">
                 <div className="flex  flex-col gap-2 sm:flex-row">
-                    <Input type="date" className="bg-white" value={startDate} onChange={(e) => setStartDate(e.target.value)} name="start" />
-                    <Input type="date" className="bg-white" value={endDate} onChange={(e) => setEndDate(e.target.value)} name="end" />
+                    <Input
+                        type="date"
+                        className="bg-white"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        name="start"
+                    />
+                    <Input
+                        type="date"
+                        className="bg-white"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        name="end"
+                    />
                 </div>
                 <Button className="bg-white" variant="outline">
                     <Search className="w-4" />
