@@ -71,3 +71,12 @@ export type Lead = {
     empType: "Salaried" | "Self-employed" | "No-employment";
     company: string;
 };
+
+export type Assignment = {
+    id: string;
+    cmUserId: string;
+    agentId: string;
+    assignedAt: Date;
+    status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+    agent: Agent;
+};

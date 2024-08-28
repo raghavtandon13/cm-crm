@@ -33,7 +33,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
                         <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" />
-                        <NavItem href="#" icon={Library} label="My Leads" />
+                        <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />
                         <NavItem href="/dashboard/search" icon={Search} label="Search" />
                         <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />
                         <NavItem href="#" icon={Users} label="Agents" />

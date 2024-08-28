@@ -25,16 +25,17 @@ model Role {
 
 // AGENTS Model
 model Agent {
-    id         String       @id @default(auto()) @map("_id") @db.ObjectId
-    email      String       @unique
-    name       String?
-    password   String
-    roleId     String       @db.ObjectId
-    role       Role         @relation(fields: [roleId], references: [id])
-    tempAccess TempAccess[]
-    createdAt  DateTime     @default(now())
-    updatedAt  DateTime     @updatedAt
-    Assignment Assignment[]
+    id              String            @id @default(auto()) @map("_id") @db.ObjectId
+    email           String            @unique
+    name            String?
+    password        String
+    roleId          String            @db.ObjectId
+    role            Role              @relation(fields: [roleId], references: [id])
+    tempAccess      TempAccess[]
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    Assignment      Assignment[]
+    agentAttendance AgentAttendance[]
 }
 
 // Temporary Access Model (NOT USED)
@@ -55,6 +56,16 @@ model Assignment {
     agent      Agent    @relation(fields: [agentId], references: [id])
     assignedAt DateTime @default(now())
     status     Status   @default(PENDING)
+}
+
+// AGENT ATTENDANCE Model
+model AgentAttendance {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    agentId    String   @db.ObjectId
+    agent      Agent    @relation(fields: [agentId], references: [id])
+    date       DateTime
+    loginTime  DateTime
+    logoutTime DateTime?
 }
 
 // Status Options for ASSIGNMENT

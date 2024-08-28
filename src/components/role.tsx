@@ -14,13 +14,16 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { Checkbox } from "./ui/checkbox";
 
 export default function UserProfile() {
     const user = useUser();
+    const [confirm, setConfirm] = useState(false);
 
     const handleLogout = async () => {
         try {
-            const response = await fromAPI.get("/agents/logout");
+            const response = await fromAPI.get(`/agents/logout?confirmLogout=${confirm}`);
             if (response.data.status === "success") {
                 window.location.href = "/";
             }
@@ -52,6 +55,17 @@ export default function UserProfile() {
                         <AlertDialogHeader>
                             <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
                             <AlertDialogDescription>Are you sure you want to log out?</AlertDialogDescription>
+                            <AlertDialogDescription>
+                                <div className="flex items-center">
+                                    Mark logout time?
+                                    <Checkbox
+                                        className="ml-2"
+                                        onCheckedChange={() => {
+                                            setConfirm(!confirm);
+                                        }}
+                                    />
+                                </div>
+                            </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>

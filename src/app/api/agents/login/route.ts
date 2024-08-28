@@ -3,16 +3,15 @@ import { db } from "../../../../../lib/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET as string;
+import { startOfDay } from "date-fns";
 
-//  NOTE: Should save login time.
 
 export async function POST(req: NextRequest) {
     try {
         const { email, pass } = await req.json();
 
-        const user = await db.agent.findUnique({
-            where: { email },
-        });
+        // Getting Agent
+        const user = await db.agent.findUnique({ where: { email } });
         if (!user) {
             return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
         }
@@ -22,6 +21,14 @@ export async function POST(req: NextRequest) {
         }
         const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: "10h" });
 
+        // Attendance
+        const today = startOfDay(new Date());
+        const existingAttendance = await db.agentAttendance.findFirst({ where: { agentId: user.id, date: today } });
+        if (!existingAttendance) {
+            await db.agentAttendance.create({ data: { agentId: user.id, date: today, loginTime: new Date() } });
+        }
+
+        // Response
         const response = NextResponse.json({ status: "success", message: "User logged in successfully" });
         response.cookies.set("cm-token", token);
 
