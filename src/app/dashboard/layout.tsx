@@ -3,6 +3,7 @@ import { useUser } from "@/context/UserContext";
 import { Library, LineChart, Search, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 type NavItemProps = {
     href: string;
@@ -41,7 +42,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                     </nav>
                 </div>
             </aside>
-            <main className="flex-1 overflow-y-auto p-4">{children}</main>
+            <main className="flex-1 overflow-y-auto p-4">
+                <Suspense>{children}</Suspense>
+            </main>
         </div>
     );
 }

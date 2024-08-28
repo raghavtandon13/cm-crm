@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
     try {
