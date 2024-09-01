@@ -70,6 +70,8 @@ export type Lead = {
     state: string;
     empType: "Salaried" | "Self-employed" | "No-employment";
     company: string;
+    salary: string;
+    pan: string;
 };
 
 export type Assignment = {

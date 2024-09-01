@@ -30,8 +30,9 @@ async function getData(phone: string): Promise<UserData | string> {
     }
 }
 
-export default async function Phone({ searchParams }: { searchParams: { phone: string } }) {
+export default async function Phone({ searchParams }: { searchParams: { phone: string; accountsOnly: string } }) {
     let phone = "";
+    let accountsOnly = false;
 
     if (searchParams.phone === undefined) {
         return (
@@ -47,6 +48,10 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
     if (searchParams.phone) {
         phone = searchParams.phone.toString();
     }
+
+    if (searchParams.accountsOnly) {
+        accountsOnly = searchParams.accountsOnly === "true";
+    }
     const res = await getData(phone);
 
     if (typeof res === "string") {
@@ -61,19 +66,44 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
         );
     }
 
+    if (accountsOnly) {
+        return res.accounts.map((account: any, index: any) => (
+            <div key={index} className="mx-auto mb-4 items-center justify-center rounded-xl bg-white px-4 py-8 shadow">
+                <div className="px-4">
+                    <p className="mb-4 ml-[-8px] w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">
+                        {account.name}
+                    </p>
+                    {Object.entries(account)
+                        .filter(([key]) => !["res", "req", "sent", "name", "status_code"].includes(key))
+                        .map(([key, value]: any, entryIndex, arr) =>
+                            value ? (
+                                <div key={key}>
+                                    <div className="flex justify-between">
+                                        <p className="flex-[1]">{key.toUpperCase()}:</p>
+                                        <pre className="flex-[4] w-full">{JSON.stringify(value, null, 1)}</pre>
+                                    </div>
+                                    {entryIndex < arr.length - 1 && <hr />}
+                                </div>
+                            ) : null,
+                        )}
+                </div>
+            </div>
+        ));
+    }
+
     return (
         <main className="flex flex-col items-stretch md:p-8 ">
             <UserSearch phone={phone} />
             {res.accounts && res.details ? (
                 <>
                     <div className="items-center justify-center">
-                        <div className="py-10 flex justify-between">
+                        <div className="flex justify-between py-10">
                             <h1 className="font-bold">Personal Details</h1>
                             <Link
                                 className={`${buttonVariants({ variant: "outline" })}`}
                                 href={`/dashboard/create?phone=${phone}`}
                             >
-                                <Pencil className="w-4 h-4 mr-2" />
+                                <Pencil className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
                         </div>

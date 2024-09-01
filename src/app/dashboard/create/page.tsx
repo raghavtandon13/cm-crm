@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import fromAPI from "@/lib/api";
 import { CMUser, Lead } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
+    const router = useRouter();
 
     const {
         handleSubmit,
@@ -41,6 +42,8 @@ export default function Create() {
                     state: cmudata.state,
                     empType: cmudata.employment,
                     company: cmudata.company_name,
+                    pan: cmudata.pan,
+                    salary: cmudata.income,
                 };
                 return ldata;
             }
@@ -56,19 +59,20 @@ export default function Create() {
         }
     }, [userData, setValue]);
 
-    const mutation = useMutation({
+    const { mutate, isPending } = useMutation({
         mutationFn: (data: Lead) => {
-            return fromAPI.post("https://api.example.com/leads", data);
+            return fromAPI.post("/agents/cmuser", data);
         },
-        onSuccess: () => {
+        onSuccess: (_, data: Lead) => {
             toast(phone ? "User updated successfully" : "User created successfully");
-            reset();
+            console.log("done");
+            router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`);
         },
         onError: (error) => console.error("Error creating lead:", error),
     });
 
     const onSubmit: SubmitHandler<Lead> = (data) => {
-        mutation.mutate(data);
+        mutate(data);
     };
 
     return (
@@ -105,7 +109,10 @@ export default function Create() {
                             control={control}
                             rules={{
                                 required: "Phone is required",
-                                pattern: { value: /^\d{10}$/, message: "Phone number must be a 10-digit number." },
+                                pattern: {
+                                    value: /^\d{10}$/,
+                                    message: "Phone number must be a 10-digit number.",
+                                },
                             }}
                             placeholder="98XXXXXXXX"
                         />
@@ -207,6 +214,31 @@ export default function Create() {
                         />
                     </div>
 
+                    <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
+                        <FormField
+                            label="Salary"
+                            name="salary"
+                            control={control}
+                            errors={errors}
+                            rules={{
+                                required: "Salary is required",
+                                pattern: { value: /^\d+$/, message: "Salary must be a number." },
+                            }}
+                            placeholder="Enter Salary"
+                        />
+
+                        <FormField
+                            label="PAN"
+                            name="pan"
+                            control={control}
+                            errors={errors}
+                            rules={{
+                                required: "PAN is required",
+                            }}
+                            placeholder="Enter PAN"
+                        />
+                    </div>
+
                     <div className="mt-4 flex gap-4">
                         <div className="hidden w-1/2 sm:flex"></div>
                         <div className="flex w-full gap-4 sm:w-1/2">
@@ -230,8 +262,8 @@ export default function Create() {
                             >
                                 Reset
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled={mutation.isPending}>
-                                {mutation.isPending
+                            <Button type="submit" className="w-full flex-1" disabled={isPending}>
+                                {isPending
                                     ? phone
                                         ? "Updating..."
                                         : "Creating..."
@@ -245,7 +277,9 @@ export default function Create() {
             </form>
         </>
     );
+    // }
 }
+
 const indiaStates = [
     "Andhra Pradesh",
     "Arunachal Pradesh",

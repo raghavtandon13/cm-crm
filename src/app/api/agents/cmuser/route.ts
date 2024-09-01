@@ -4,6 +4,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { CMUser, Lead } from "@/lib/types";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
+import axios from "axios";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -41,12 +42,21 @@ export async function POST(req: NextRequest) {
         if (!user)
             return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
+        const injectRes = await axios.post(
+            "https://credmantra.com/api/v1/leads/inject2",
+            { lead: data },
+            { headers: { "x-api-key": "vs65Cu06K1GB2qSdJejP", "Content-Type": "application/json" } },
+        );
+
         const assignment = await db.assignment.create({ data: { cmUserId: user._id as string, agentId: agent.id } });
 
         if (!assignment)
             return NextResponse.json({ status: "failure", message: "Could not create Assignment" }, { status: 500 });
 
-        return NextResponse.json({ status: "success", message: "User created successfully" }, { status: 201 });
+        return NextResponse.json(
+            { status: "success", message: "User created successfully", inject: injectRes.data },
+            { status: 201 },
+        );
     } catch (error) {
         console.error("Error creating new agent:", error);
         return NextResponse.json({ status: "failure", message: "Internal server error" }, { status: 500 });
