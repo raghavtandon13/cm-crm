@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
     if (!agent) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 403 });
 
     try {
-        const data: Lead = await req.json();
+        const data = (await req.json()) as Lead & { inject?: boolean };
+        const inject = data.inject === true ? true : false;
 
         let user = await User.findOne({ phone: data.phone });
 
@@ -68,11 +69,14 @@ export async function POST(req: NextRequest) {
         if (!user)
             return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
-        const injectRes = await axios.post(
-            "https://credmantra.com/api/v1/leads/inject2",
-            { lead: data },
-            { headers: { "x-api-key": "vs65Cu06K1GB2qSdJejP", "Content-Type": "application/json" } },
-        );
+	let injectRes = { data: {} };
+        if (inject) {
+            injectRes = await axios.post(
+                "https://credmantra.com/api/v1/leads/inject2",
+                { lead: data },
+                { headers: { "x-api-key": "vs65Cu06K1GB2qSdJejP", "Content-Type": "application/json" } },
+            );
+        }
 
         const assignment = await db.assignment.create({ data: { cmUserId: user._id as string, agentId: agent.id } });
 

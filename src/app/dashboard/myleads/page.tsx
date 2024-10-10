@@ -29,25 +29,11 @@ function Lead({ lead }: { lead: Assignment }) {
     return (
         cmuser && (
             <>
-                <div className="rounded-xl border bg-white px-4 py-2 shadow">
-                    <Table>
-                        <TableBody>
-                            <TableRow onClick={() => window.open(`/dashboard/search?phone=${cmuser.phone}`)}>
-                                <TableCell className="font-medium">Lead Phone</TableCell>
-                                <TableCell className="text-right">{cmuser.phone}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="font-medium">Lead Assigned At</TableCell>
-                                <TableCell className="text-right">{formatDate(lead.assignedAt)}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="font-medium">Lead Status</TableCell>
-                                <TableCell className="text-right">{lead.status}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </div>
-                <hr className="my-4" />
+                <TableRow className="pointer" onClick={() => window.open(`/dashboard/search?phone=${cmuser.phone}`)}>
+                    <TableCell className="text-center">{cmuser.phone}</TableCell>
+                    <TableCell className="text-center">{formatDate(lead.assignedAt)}</TableCell>
+                    <TableCell className="text-left">{lead.status}</TableCell>
+                </TableRow>
             </>
         )
     );
@@ -68,12 +54,21 @@ export default function MyLeads() {
                     <TableBody>
                         <TableRow>
                             <TableCell className="font-medium">Total Leads</TableCell>
-                            <TableCell className="text-right">{asgs?.length}</TableCell>
+                            <TableCell className="text-left">{asgs?.length}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
             </div>
-            {asgs?.map((asg) => <Lead key={asg.id} lead={asg} />)}
+            <div className="mb-4 rounded-xl border bg-white px-2 shadow">
+                <Table>
+                    <TableRow>
+                        <TableCell className="text-slate-600 text-center">Phone</TableCell>
+                        <TableCell className="text-slate-600 text-center">Date</TableCell>
+                        <TableCell className="text-slate-600 text-left">Status</TableCell>
+                    </TableRow>
+                    <TableBody>{asgs?.map((asg) => <Lead key={asg.id} lead={asg} />)}</TableBody>
+                </Table>
+            </div>
         </>
     );
 }

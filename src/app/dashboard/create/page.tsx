@@ -6,13 +6,14 @@ import fromAPI from "@/lib/api";
 import { CMUser, Lead } from "@/lib/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
     const router = useRouter();
+    const [inject, setInject] = useState<boolean | undefined>(true);
 
     const {
         handleSubmit,
@@ -60,19 +61,21 @@ export default function Create() {
     }, [userData, setValue]);
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: Lead) => {
+        mutationFn: (data: Lead & { inject?: boolean }) => {
             return fromAPI.post("/agents/cmuser", data);
         },
         onSuccess: (_, data: Lead) => {
             toast(phone ? "User updated successfully" : "User created successfully");
             console.log("done");
-            router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`);
+            !!inject
+                ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
+                : router.push(`/dashboard/search?phone=${data.phone}`);
         },
         onError: (error) => console.error("Error creating lead:", error),
     });
 
-    const onSubmit: SubmitHandler<Lead> = (data) => {
-        mutate(data);
+    const onSubmit: SubmitHandler<any> = (data) => {
+        mutate({ ...data, inject });
     };
 
     return (
@@ -262,7 +265,19 @@ export default function Create() {
                             >
                                 Reset
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled={isPending}>
+                            <Button
+                                type="submit"
+                                className="w-full flex-1"
+                                onClick={() => setInject(false)} // Set inject to false for "Save"
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="w-full flex-1"
+                                disabled={isPending}
+                                onClick={() => setInject(true)}
+                            >
                                 {isPending
                                     ? phone
                                         ? "Updating..."
