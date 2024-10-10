@@ -71,7 +71,7 @@ export default function Create() {
                 ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
                 : router.push(`/dashboard/search?phone=${data.phone}`);
         },
-        onError: (error) => {
+        onError: (error:any) => {
             console.error("Error creating lead:", error);
             toast(error.response.data.message || "Error creating lead");
         },
