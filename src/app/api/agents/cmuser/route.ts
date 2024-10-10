@@ -28,7 +28,18 @@ export async function POST(req: NextRequest) {
 
         let user = await User.findOne({ phone: data.phone });
 
+        let extraMsg = null;
         if (user) {
+            // check for assignment
+            const prevAsg = await db.assignment.findFirst({
+                where: { cmUserId: user._id as string },
+                include: { agent: true },
+            });
+
+            if (prevAsg) {
+                extraMsg = `Lead Already Assigned to ${prevAsg.agent?.name || "Unknown Agent"}`;
+            }
+
             // Update existing user
             user = await User.findOneAndUpdate(
                 { phone: data.phone },
@@ -69,7 +80,7 @@ export async function POST(req: NextRequest) {
         if (!user)
             return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
-	let injectRes = { data: {} };
+        let injectRes = { data: {} };
         if (inject) {
             injectRes = await axios.post(
                 "https://credmantra.com/api/v1/leads/inject2",
@@ -78,10 +89,18 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const assignment = await db.assignment.create({ data: { cmUserId: user._id as string, agentId: agent.id } });
+        let assignment = null;
+        if (!extraMsg) {
+            assignment = await db.assignment.create({
+                data: { cmUserId: user._id as string, agentId: agent.id },
+            });
+        }
 
         if (!assignment)
-            return NextResponse.json({ status: "failure", message: "Could not create Assignment" }, { status: 500 });
+            return NextResponse.json(
+                { status: "failure", message: extraMsg || "Could not create Assignment" },
+                { status: 500 },
+            );
 
         return NextResponse.json(
             { status: "success", message: "User created successfully", inject: injectRes.data },
