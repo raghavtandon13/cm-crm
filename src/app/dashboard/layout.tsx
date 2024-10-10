@@ -26,7 +26,7 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
     const user = useUser();
-    const caller = user?.role.title === "CALLER";
+    const admin = user?.role.title === "BOSS";
 
     return (
         <div className="flex h-full">
@@ -36,9 +36,8 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                         <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" />
                         <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />
                         <NavItem href="/dashboard/search" icon={Search} label="Search" />
-                        <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />
-                        <NavItem href="#" icon={Users} label="Agents" />
-                        {caller && <NavItem href="#" icon={Users} label="Top Secret Page" />}
+                        {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />}
+                        {admin && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
                     </nav>
                 </div>
             </aside>
