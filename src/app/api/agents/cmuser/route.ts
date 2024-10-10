@@ -24,20 +24,46 @@ export async function POST(req: NextRequest) {
 
     try {
         const data: Lead = await req.json();
-        const newUser = new User<Partial<CMUser>>({
-            name: data.firstName + " " + data.lastName,
-            phone: data.phone,
-            email: data.email,
-            dob: data.dob,
-            gender: data.gender,
-            addr: data.address,
-            pincode: data.pincode,
-            city: data.city,
-            state: data.state,
-            employment: data.empType,
-            company_name: data.company,
-        });
-        const user = await newUser.save();
+
+        let user = await User.findOne({ phone: data.phone });
+
+        if (user) {
+            // Update existing user
+            user = await User.findOneAndUpdate(
+                { phone: data.phone },
+                {
+                    $set: {
+                        name: data.firstName + " " + data.lastName,
+                        email: data.email,
+                        dob: data.dob,
+                        gender: data.gender,
+                        addr: data.address,
+                        pincode: data.pincode,
+                        city: data.city,
+                        state: data.state,
+                        employment: data.empType,
+                        company_name: data.company,
+                    },
+                },
+                { new: true }, // Return the updated document
+            );
+        } else {
+            // Create new user if not found
+            const newUser = new User<Partial<CMUser>>({
+                name: data.firstName + " " + data.lastName,
+                phone: data.phone,
+                email: data.email,
+                dob: data.dob,
+                gender: data.gender,
+                addr: data.address,
+                pincode: data.pincode,
+                city: data.city,
+                state: data.state,
+                employment: data.empType,
+                company_name: data.company,
+            });
+            user = await newUser.save();
+        }
 
         if (!user)
             return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
