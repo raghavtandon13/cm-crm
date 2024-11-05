@@ -60,7 +60,7 @@ export default function UserProfile() {
                     </p>
                 </div>
                 {!user.passwordUpdated && (
-                    <AlertDialog open={open}>
+                    <AlertDialog open={true}>
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Change Password</AlertDialogTitle>
