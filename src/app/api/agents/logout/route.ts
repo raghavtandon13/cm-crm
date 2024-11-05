@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "../../../../../lib/db";
-import { startOfDay } from "date-fns";
 import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET as string;
 export const dynamic = "force-dynamic";
