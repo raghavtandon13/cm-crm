@@ -53,6 +53,7 @@ export interface Agent {
     tempAccess: any[];
     createdAt: string;
     updatedAt: string;
+    passwordUpdated?: boolean;
 }
 
 //  FIX: add more stuff to Lead Type example Income

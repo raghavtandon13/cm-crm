@@ -73,7 +73,7 @@ export default function Create() {
         },
         onError: (error:any) => {
             console.error("Error creating lead:", error);
-            toast(error.response.data.message || "Error creating lead");
+            toast.error(error.response.data.message || "Error creating lead");
         },
     });
 
@@ -162,7 +162,6 @@ export default function Create() {
                             name="address"
                             control={control}
                             errors={errors}
-                            rules={{ required: "Address is required" }}
                             placeholder="Enter your address"
                         />
                         <FormField
@@ -184,7 +183,6 @@ export default function Create() {
                             name="city"
                             control={control}
                             errors={errors}
-                            rules={{ required: "City is required" }}
                             placeholder="Enter your city"
                         />
                         <FormField
@@ -192,7 +190,6 @@ export default function Create() {
                             name="state"
                             errors={errors}
                             control={control}
-                            rules={{ required: "State is required" }}
                             options={indiaStates.map((state) => ({ value: state, label: state }))}
                         />
                     </div>
@@ -215,7 +212,6 @@ export default function Create() {
                             name="company"
                             control={control}
                             errors={errors}
-                            rules={{ required: "Company Name is required" }}
                             placeholder="Enter company name"
                         />
                     </div>

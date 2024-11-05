@@ -15,11 +15,25 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { Checkbox } from "./ui/checkbox";
+import { Input } from "@/components/ui/input";
 
 export default function UserProfile() {
     const user = useUser();
-    const [confirm, setConfirm] = useState(false);
+    console.log(user);
+    const [confirm, setConfirm] = useState(true);
+    const [pass, setPass] = useState("");
+
+    const handlePasswordChange = async () => {
+        try {
+	    console.log(pass);
+            const response = await fromAPI.post(`/agents/pass-reset`, { password: pass });
+            if (response.data.status === "success") {
+                window.location.href = "/";
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -45,6 +59,24 @@ export default function UserProfile() {
                         {user.role.title}
                     </p>
                 </div>
+                {!user.passwordUpdated && (
+                    <AlertDialog open={open}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Change Password</AlertDialogTitle>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
+                                <AlertDialogAction
+                                    onClick={handlePasswordChange}
+                                    className={buttonVariants({ variant: "default" })}
+                                >
+                                    Submit
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button className="mx-2" size="icon" variant="outline">
@@ -55,17 +87,6 @@ export default function UserProfile() {
                         <AlertDialogHeader>
                             <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
                             <AlertDialogDescription>Are you sure you want to log out?</AlertDialogDescription>
-                            <AlertDialogDescription>
-                                <div className="flex items-center">
-                                    Mark logout time?
-                                    <Checkbox
-                                        className="ml-2"
-                                        onCheckedChange={() => {
-                                            setConfirm(!confirm);
-                                        }}
-                                    />
-                                </div>
-                            </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>

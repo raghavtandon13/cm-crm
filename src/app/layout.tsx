@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                     <UserProvider>
                         <Navbar />
                         <div className="flex-1 overflow-hidden">{children}</div>
-                        <Toaster />
+                        <Toaster richColors />
                     </UserProvider>
                 </Providers>
             </body>

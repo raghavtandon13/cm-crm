@@ -36,6 +36,7 @@ model Agent {
     updatedAt       DateTime          @updatedAt
     Assignment      Assignment[]
     agentAttendance AgentAttendance[]
+    passwordUpdated Boolean           @default(false)
 }
 
 // Temporary Access Model (NOT USED)
@@ -64,8 +65,8 @@ model AgentAttendance {
     agentId    String   @db.ObjectId
     agent      Agent    @relation(fields: [agentId], references: [id])
     date       DateTime
-    loginTime  DateTime
-    logoutTime DateTime?
+    loginTime  String?
+    logoutTime String?
 }
 
 // Status Options for ASSIGNMENT
