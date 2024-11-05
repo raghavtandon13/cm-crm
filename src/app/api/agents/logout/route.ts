@@ -20,10 +20,17 @@ export async function GET(req: NextRequest) {
             const existingAttendance = await db.agentAttendance.findFirst({
                 where: { agentId: agent.id, date: today },
             });
+
+            const now = new Date();
+            const todayIST = toZonedTime(now, IST_TIMEZONE); // Convert to IST
+            const todayDateString = format(todayIST, "yyyy-MM-dd"); // Date as "2024-10-21"
+            const loginTimeString = format(todayIST, "h:mma"); // Time as "4:40PM"
+	    const todayStartIST = startOfDay(todayIST);  // This is a Date object
+
             if (confirmLogout && existingAttendance) {
                 await db.agentAttendance.update({
                     where: { id: existingAttendance.id },
-                    data: { logoutTime: new Date() },
+                    data: { logoutTime: todayStartIST },
                 });
             }
         }
