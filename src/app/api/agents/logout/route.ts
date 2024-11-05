@@ -4,6 +4,10 @@ import { startOfDay } from "date-fns";
 import jwt from "jsonwebtoken";
 const secret = process.env.JWT_SECRET as string;
 export const dynamic = "force-dynamic";
+const IST_TIMEZONE = 'Asia/Kolkata';  // Timezone for IST
+import { format, startOfDay } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+
 
 export async function GET(req: NextRequest) {
     try {
