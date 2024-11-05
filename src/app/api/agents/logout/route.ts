@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
             if (confirmLogout && existingAttendance) {
                 await db.agentAttendance.update({
                     where: { id: existingAttendance.id },
-                    data: { logoutTime: todayStartIST },
+                    data: { logoutTime: loginTimeString },
                 });
             }
         }
