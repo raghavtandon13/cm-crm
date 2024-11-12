@@ -1,9 +1,17 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
 
-// Fetch function separated for cleaner code
-const fetchMonthlyLenders = async () => {
+// Define types for the data structure
+interface LenderMetrics {
+    [key: string]: number | string;
+}
+
+interface LenderData {
+    [key: string]: LenderMetrics;
+}
+
+const fetchMonthlyLenders = async (): Promise<LenderData> => {
     try {
         const response = await fetch("/api/users/monthlylenders");
         if (!response.ok) {
@@ -16,8 +24,7 @@ const fetchMonthlyLenders = async () => {
 };
 
 export default function MonthlyLenders() {
-    // Using React Query for data fetching
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error } = useQuery<LenderData, Error>({
         queryKey: ["monthlyLenders"],
         queryFn: fetchMonthlyLenders,
     });
@@ -31,11 +38,7 @@ export default function MonthlyLenders() {
     }
 
     if (isError) {
-        return (
-            <div className="flex items-center justify-center p-8 text-red-500">
-                Error: {error instanceof Error ? error.message : "Something went wrong"}
-            </div>
-        );
+        return <div className="flex items-center justify-center p-8 text-red-500">Error: {error.message}</div>;
     }
 
     return (
@@ -43,7 +46,7 @@ export default function MonthlyLenders() {
             {Object.entries(data || {})
                 .filter(([key]) => ["Zype_LS", "MoneyTap"].includes(key))
                 .map(
-                    ([lenderName, lenderData]) =>
+                    ([lenderName, lenderData]: [string, LenderMetrics]) =>
                         lenderData && (
                             <div key={lenderName} className="mb-8">
                                 <h2 className="text-2xl font-bold mb-4">{lenderName}</h2>
@@ -53,9 +56,7 @@ export default function MonthlyLenders() {
                                             <TableRow key={`${lenderName}-${key}`}>
                                                 <TableCell className="font-medium">{key}</TableCell>
                                                 <TableCell className="text-right">
-                                                    {typeof value === "number"
-                                                        ? value.toLocaleString()
-                                                        : value.toString()}
+                                                    {typeof value === "number" ? value.toLocaleString() : String(value)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
