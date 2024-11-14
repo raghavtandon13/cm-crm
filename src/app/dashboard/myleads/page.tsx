@@ -26,16 +26,14 @@ function Lead({ lead }: { lead: Assignment }) {
             const response = await fromAPI.get(`/users/id/${lead.cmUserId}`);
             return response.data as CMUser;
         },
-        //        cacheTime: Infinity,
-        // staleTime: Infinity,
     });
 
     return (
         cmuser && (
-            <TableRow className="pointer" onClick={() => window.open(`/dashboard/search?phone=${cmuser.phone}`)}>
+            <TableRow className="pointer" onClick={() => window.open(`https://cred-db.vercel.app/mv/${cmuser.phone}`)}>
                 <TableCell className="text-center">{cmuser.phone}</TableCell>
                 <TableCell className="text-center">{formatDate(lead.assignedAt)}</TableCell>
-                <TableCell className="text-left">{lead.status}</TableCell>
+                <TableCell className="text-left pointer">Status &rarr;</TableCell>
             </TableRow>
         )
     );
@@ -48,8 +46,6 @@ export default function MyLeads() {
             const response = await fromAPI.get("/agents/assignments");
             return response.data.data as Assignment[];
         },
-        // cacheTime: Infinity,
-        // staleTime: Infinity,
     });
 
     const totalLeads = useMemo(() => asgs?.length || 0, [asgs]);

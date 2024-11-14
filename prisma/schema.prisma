@@ -25,18 +25,27 @@ model Role {
 
 // AGENTS Model
 model Agent {
-    id              String            @id @default(auto()) @map("_id") @db.ObjectId
-    email           String            @unique
-    name            String?
-    password        String
-    roleId          String            @db.ObjectId
-    role            Role              @relation(fields: [roleId], references: [id])
-    tempAccess      TempAccess[]
+    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    email    String  @unique
+    name     String?
+    password String
+    roleId   String  @db.ObjectId
+    role     Role    @relation(fields: [roleId], references: [id])
+
+    // Self-referential relations with correct referential actions
+    subordinates Agent[] @relation("AgentHierarchy")
+    supervisor   Agent?  @relation("AgentHierarchy", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    supervisorId String? @db.ObjectId
+
+    // Other relations
     createdAt       DateTime          @default(now())
     updatedAt       DateTime          @updatedAt
     Assignment      Assignment[]
     agentAttendance AgentAttendance[]
     passwordUpdated Boolean           @default(false)
+    TempAccess      TempAccess[]
+
+    @@index([supervisorId])
 }
 
 // Temporary Access Model (NOT USED)

@@ -6,6 +6,8 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Table1 } from "@/components/displays/table1";
 import { chartData } from "@/lib/good";
 import { UsersTable } from "@/components/displays/usersTable";
+import MonthlyLenders from "@/components/monthlyLenders";
+import { LeadsTable } from "@/components/displays/leadsTable";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -18,6 +20,8 @@ export default function Reports() {
 
     return (
         <>
+	    <LeadsTable />
+            <MonthlyLenders />
             <UsersTable />
             <Table1 />
             <Card>

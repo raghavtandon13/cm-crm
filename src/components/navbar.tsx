@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import UserProfile from "./role";
 import { Button } from "@/components/ui/button";
-import { Menu, LineChart, Package, ShoppingCart, UserPlus } from "lucide-react";
+import { Menu, UserPlus, Library, Search } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function Navbar() {
@@ -29,32 +29,25 @@ export function Navbar() {
                         <UserProfile />
                         <hr />
                         <Link
-                            href="#"
+                            href="/dashboard/create"
                             className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
                         >
                             <UserPlus className="h-4 w-4" />
                             Create New Lead
                         </Link>
                         <Link
-                            href="#"
+                            href="/dashboard/myleads"
                             className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
                         >
-                            <ShoppingCart className="h-4 w-4" />
+                            <Library className="h-4 w-4" />
                             My Leads
                         </Link>
                         <Link
-                            href="#"
+                            href="/dashboard/search"
                             className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
                         >
-                            <Package className="h-4 w-4" />
+                            <Search className="h-4 w-4" />
                             Search
-                        </Link>
-                        <Link
-                            href="#"
-                            className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                        >
-                            <LineChart className="h-4 w-4" />
-                            Reports
                         </Link>
                     </nav>
                 </SheetContent>
