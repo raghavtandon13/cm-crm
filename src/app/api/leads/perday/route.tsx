@@ -2,18 +2,27 @@ import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
 
-async function perDay(startDay: string, endDay: string, period: string = "monthly", filters:any={}) {
+async function perDay(startDay: string, endDay: string, period: string = "monthly", filters: any = {}) {
     await connectToMongoDB();
     const dateFormat = period === "monthly" ? "%Y-%m" : "%Y-%m-%d";
-    const matchConditions:any = { createdAt: { $gte: new Date(startDay), $lt: new Date(endDay) } };
+    const matchConditions: any = { createdAt: { $gte: new Date(startDay), $lt: new Date(endDay) } };
     if (filters.partner) matchConditions.partner = filters.partner;
     if (filters["accounts.name"]) matchConditions["accounts.name"] = filters["accounts.name"];
+    console.log(matchConditions);
     const result = await User.aggregate([
+	{ $unwind: "$accounts" },
         { $match: matchConditions },
-        { $unwind: "$accounts" },
-        { $group: { _id: { date: { $dateToString: { format: dateFormat, date: "$createdAt" } }, accountName: "$accounts.name" }, count: { $sum: 2 } } },
+        {
+            $group: {
+                _id: {
+                    date: { $dateToString: { format: dateFormat, date: "$createdAt" } },
+                    accountName: "$accounts.name",
+                },
+                count: { $sum: 2 },
+            },
+        },
         { $group: { _id: "$_id.date", totalAccounts: { $sum: "$count" } } },
-        { $project: { date: "$_id", totalAccounts: 2, _id: 0 } },
+        { $project: { date: "$_id", totalAccounts: 1, _id: 0 } },
     ]);
     return result;
 }
