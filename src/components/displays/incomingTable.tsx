@@ -16,6 +16,7 @@ import { CsvExportModal } from "../exportModal";
 
 export function IncomingLeadsTable() {
     const [page, _] = useState(1);
+    const [showModal, setShowModal] = useState(false);
 
     const [date, setDate] = useState<DateRange | undefined>({
         from: startOfMonth(new Date()),
@@ -51,7 +52,6 @@ export function IncomingLeadsTable() {
             id: "totalLeads",
             header: "Total Leads",
             cell: ({ row }) => {
-                const [showModal, setShowModal] = useState(false);
                 const cellValue = row.original.count || row.original.total || row.original.overallTotal;
                 const location = {
                     dates: date,
