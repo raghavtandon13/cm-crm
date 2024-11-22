@@ -17,7 +17,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const partnerColors = {
+const partnerColors: Record<string, string> = {
     Zype_LS: "bg-blue-100 text-blue-900",
     MoneyTap: "bg-green-100 text-green-900",
 };
@@ -46,7 +46,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         getSubRows: (row: any) => {
             if (row.partnerData) return row.partnerData;
             if (row.monthlyCounts)
-                return Object.entries(row.monthlyCounts).map(([month, data]) => ({
+                return Object.entries(row.monthlyCounts).map(([month, data]: [any, any]) => ({
                     ...data,
                     month,
                     partner: row.partner,
