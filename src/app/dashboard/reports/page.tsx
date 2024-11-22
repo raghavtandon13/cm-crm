@@ -8,6 +8,7 @@ import { chartData } from "@/lib/good";
 import { UsersTable } from "@/components/displays/usersTable";
 import MonthlyLenders from "@/components/monthlyLenders";
 import { LeadsTable } from "@/components/displays/leadsTable";
+import Link from "next/link";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -20,8 +21,9 @@ export default function Reports() {
 
     return (
         <>
-	    <LeadsTable />
+            <LeadsTable />
             <MonthlyLenders />
+            <Link href="/dashboard/reports/incoming" >Incoming Leads </Link>
             <UsersTable />
             <Table1 />
             <Card>

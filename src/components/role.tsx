@@ -25,7 +25,7 @@ export default function UserProfile() {
 
     const handlePasswordChange = async () => {
         try {
-	    console.log(pass);
+            console.log(pass);
             const response = await fromAPI.post(`/agents/pass-reset`, { password: pass });
             if (response.data.status === "success") {
                 window.location.href = "/";
