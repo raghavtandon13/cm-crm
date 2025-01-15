@@ -78,6 +78,13 @@ model AgentAttendance {
     logoutTime String?
 }
 
+model Query {
+    id    String   @id @default(auto()) @map("_id") @db.ObjectId
+    name  String
+    query String
+    date  DateTime
+}
+
 // Status Options for ASSIGNMENT
 enum Status {
     PENDING

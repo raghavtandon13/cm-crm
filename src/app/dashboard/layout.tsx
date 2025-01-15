@@ -1,6 +1,6 @@
 "use client";
 import { useUser } from "@/context/UserContext";
-import { Library, LineChart, Search, UserPlus, Users } from "lucide-react";
+import { Library, LineChart, Search, UserPlus, Users, Database } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
@@ -25,8 +25,11 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 }
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {
+
+    const path = usePathname();
     const user = useUser();
     const admin = user?.role.title === "BOSS";
+    const shouldAddPadding = !path.includes("dashboard/database");
 
     return (
         <div className="flex h-full">
@@ -38,10 +41,11 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                         <NavItem href="/dashboard/search" icon={Search} label="Search" />
                         {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />}
                         {admin && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
+                        {admin && <NavItem href="/dashboard/database" icon={Database} label="Database" />}
                     </nav>
                 </div>
             </aside>
-            <main className="flex-1 overflow-y-auto p-4">
+            <main className={`flex-1 overflow-y-auto ${shouldAddPadding ? "p-4" : ""}`}>
                 <Suspense>{children}</Suspense>
             </main>
         </div>
