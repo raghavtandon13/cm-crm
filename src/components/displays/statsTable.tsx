@@ -7,7 +7,7 @@ import fromAPI from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { format, startOfMonth } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
@@ -76,6 +76,7 @@ export function StatsTable() {
     return (
         <>
             <div className="my-2">
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Lender Stats &#8628;</h1>
                 <div className="font-semibold flex gap-4 ">
                     <Popover>
                         <PopoverTrigger asChild>

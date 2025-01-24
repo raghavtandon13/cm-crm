@@ -126,7 +126,7 @@ export function IncomingLeadsTable() {
 
     return (
         <div className="space-y-4 flex flex-col">
-            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Incoming Lead Count</h1>
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Incoming Lead Count &#8628;</h1>
 
             <div className={cn(buttonVariants({ variant: "card" }), "font-semibold flex gap-4 items-center")}>
                 {/* Date selector */}
