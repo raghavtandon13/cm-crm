@@ -3,12 +3,14 @@ import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Table1 } from "@/components/displays/table1";
+// import { Table1 } from "@/components/displays/table1";
 import { chartData } from "@/lib/good";
 import { UsersTable } from "@/components/displays/usersTable";
-import MonthlyLenders from "@/components/monthlyLenders";
+// import MonthlyLenders from "@/components/monthlyLenders";
 import { LeadsTable } from "@/components/displays/leadsTable";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -21,11 +23,19 @@ export default function Reports() {
 
     return (
         <>
+            <Link
+                className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                href="/dashboard/reports/incoming"
+            >
+                Incoming Leads -{">"}{" "}
+            </Link>
+            {/* Total Leads Sent */}
             <LeadsTable />
-            <MonthlyLenders />
-            <Link href="/dashboard/reports/incoming" >Incoming Leads </Link>
+            {/* <MonthlyLenders /> */}
+            {/* New Users */}
             <UsersTable />
-            <Table1 />
+            {/* <Table1 /> */}
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Graph Demo</h1>
             <Card>
                 <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
                     <div className="flex flex-1 flex-col justify-center gap-1 border-b px-6 py-5 sm:border-b-0 sm:py-6">

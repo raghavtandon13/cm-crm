@@ -26,7 +26,7 @@ export function LeadsTable() {
     // Format dates in YYYY-MM-DD format for API
     const startDay = date?.from ? format(date.from, "yyyy-MM-dd") : "";
     const endDay = date?.to ? format(date.to, "yyyy-MM-dd") : "";
-    const [period,setPeriod] = useState("monthly");
+    const [period, setPeriod] = useState("daily");
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["leads", { startDay, endDay, period, partner, name }],
@@ -42,14 +42,12 @@ export function LeadsTable() {
             });
             return response.data;
         },
-        enabled: Boolean(startDay && endDay), 
+        enabled: Boolean(startDay && endDay),
     });
 
     return (
         <div className="space-y-4 flex flex-col">
-            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>
-                Periodic Lead Count
-            </h1>
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Sent Lead Count</h1>
 
             <div className={cn(buttonVariants({ variant: "card" }), "font-semibold flex gap-4 items-center")}>
                 {/* Date selector */}
@@ -60,7 +58,7 @@ export function LeadsTable() {
                             variant="outline"
                             className={cn(
                                 "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
+                                !date && "text-muted-foreground",
                             )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -112,8 +110,6 @@ export function LeadsTable() {
                     </SelectContent>
                 </Select>
 
-
-
                 {/* Period selector */}
                 <Select value={period} onValueChange={setPeriod}>
                     <SelectTrigger className="w-[180px]">
@@ -133,12 +129,10 @@ export function LeadsTable() {
             ) : data ? (
                 <Table>
                     <TableBody>
-                        {data.map((item:any, index:any) => (
+                        {data.map((item: any, index: any) => (
                             <TableRow key={index}>
                                 <TableCell className="font-medium">{item.date}</TableCell>
-                                <TableCell className="text-right">
-                                    {item.totalAccounts.toLocaleString()}
-                                </TableCell>
+                                <TableCell className="text-right">{item.totalAccounts.toLocaleString()}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

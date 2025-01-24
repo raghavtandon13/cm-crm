@@ -1,0 +1,250 @@
+// you should show comment in popup if it is present
+//     also agentid is not being sent in the request
+
+"use client";
+
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { DataTable } from "@/components/dataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format, startOfMonth, eachDayOfInterval } from "date-fns";
+import { CalendarIcon, Search } from "lucide-react";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
+export default function Attendance() {
+    const [date, setDate] = useState<DateRange | undefined>({
+        from: startOfMonth(new Date()),
+        to: new Date(),
+    });
+    const [dialogData, setDialogData] = useState<any>({ open: false, agentid: "", date: "", atype: "", comment: "" });
+
+    const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
+    const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
+
+    const { data, isError, isPending, refetch, isFetching } = useQuery({
+        queryKey: ["attendance", startDate, endDate],
+        queryFn: async () => {
+            const response = await fromAPI.get(
+                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`,
+            );
+            return response.data.data; // Access the `data` array directly
+        },
+    });
+
+    const mutation = useMutation({
+        mutationFn: async (payload: any) => {
+            await fromAPI.post("/agents/attendance/", payload);
+        },
+        onSuccess: () => {
+            setDialogData({ open: false });
+            refetch();
+        },
+    });
+
+    const openDialog = (agentid: string, date: string, currentType: string = "") => {
+        setDialogData({
+            open: true,
+            agentid,
+            date,
+            atype: currentType,
+            comment: "",
+        });
+    };
+
+    const closeDialog = () => setDialogData({ open: false });
+
+    const saveAttendance = () => {
+        mutation.mutate({
+            agentid: dialogData.agentid, // Corrected
+            date: dialogData.date,
+            atype: dialogData.atype,
+            comment: dialogData.comment,
+        });
+    };
+
+    if (isPending) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+                <small>Fetching agent attendance data...</small>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                Error loading data.{" "}
+                <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
+    const dates = eachDayOfInterval({
+        start: new Date(startDate),
+        end: new Date(endDate),
+    }).map((date) => format(date, "yyyy-MM-dd"));
+
+    const filteredData = data.filter((agent: any) => Object.keys(agent.attendance || {}).length >= 0);
+
+    const formattedData = filteredData.map((agent: any) => {
+        const attendance = dates.reduce((acc: any, date) => {
+            acc[date] = agent.attendance[date] || ""; // Leave empty if no data
+            return acc;
+        }, {});
+
+        return {
+            agentid: agent.agentid,
+            agentName: agent.agentName,
+            ...attendance,
+        };
+    });
+
+    const columns: ColumnDef<(typeof formattedData)[0]>[] = [
+        {
+            accessorKey: "agentName",
+            header: "Agent Name",
+
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("agentName")}</div>,
+        },
+        ...dates.map((date) => ({
+            accessorKey: date,
+            header: () => <div className="min-w-[100px] text-center">{date}</div>,
+            cell: ({ row }) => {
+                const agentid = row.original.agentid;
+		console.log(row.original);
+                const currentType = row.getValue(date) || "";
+                const comment = row.original.comments?.[date] || ""; // Fetch comment for the date
+
+                return (
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => openDialog(agentid, date, currentType)}>
+                            {currentType || "+"}
+                        </Button>
+                        {comment && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                    setDialogData({
+                                        open: true,
+                                        agentid,
+                                        date,
+                                        atype: currentType,
+                                        comment,
+                                    })
+                                }
+                                title="View Comment"
+                            >
+                                💬
+                            </Button>
+                        )}
+                    </div>
+                );
+            },
+        })),
+    ];
+
+    return (
+        <div className="my-2 ">
+            <div className="font-semibold flex gap-4 mb-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant="outline"
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date?.from ? (
+                                date.to ? (
+                                    <>
+                                        {format(date.from, "yyyy-MM-dd")} - {format(date.to, "yyyy-MM-dd")}
+                                    </>
+                                ) : (
+                                    format(date.from, "yyyy-MM-dd")
+                                )
+                            ) : (
+                                <span>Pick a date</span>
+                            )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={date?.from}
+                            selected={date}
+                            onSelect={setDate}
+                            numberOfMonths={2}
+                        />
+                    </PopoverContent>
+                </Popover>
+                <Button onClick={() => refetch()} variant="outline">
+                    {isFetching ? (
+                        <div className="animate-spin h-4 w-4 border-2 border-black-500 rounded-full border-t-transparent"></div>
+                    ) : (
+                        <Search className="w-4" />
+                    )}
+                </Button>
+            </div>
+            {formattedData.length > 0 ? (
+                <DataTable columns={columns} data={formattedData} name="attendanceData" />
+            ) : (
+                <div className="text-center mt-8">No attendance data available for the selected date range.</div>
+            )}
+            <Dialog open={dialogData.open} onOpenChange={closeDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Update Attendance: {dialogData.date}</DialogTitle>
+                    </DialogHeader>
+                    <Select
+                        onValueChange={(value) => setDialogData((prev: any) => ({ ...prev, atype: value }))}
+                        defaultValue={dialogData.atype || ""}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select Attendance Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ABSENT">Absent</SelectItem>
+                            <SelectItem value="PRESENT">Present</SelectItem>
+                            <SelectItem value="WEEK_OFF">Week Off</SelectItem>
+                            <SelectItem value="WORK_FROM_HOME">Work From Home</SelectItem>
+                            <SelectItem value="UPL">UPL</SelectItem>
+                            <SelectItem value="HOLIDAY">Holiday</SelectItem>
+                            <SelectItem value="LEAVE">Leave</SelectItem>
+                            <SelectItem value="HALF_DAY">Half Day</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Textarea
+                        placeholder="Optional Comment"
+                        value={dialogData.comment}
+                        onChange={(e) => setDialogData((prev: any) => ({ ...prev, comment: e.target.value }))}
+                        className="mt-4"
+                    />
+                    <DialogFooter>
+                        <Button onClick={closeDialog} variant="outline">
+                            Cancel
+                        </Button>
+                        <Button onClick={saveAttendance} disabled={!dialogData.atype}>
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}

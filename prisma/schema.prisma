@@ -70,12 +70,12 @@ model Assignment {
 
 // AGENT ATTENDANCE Model
 model AgentAttendance {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    agentId    String   @db.ObjectId
-    agent      Agent    @relation(fields: [agentId], references: [id])
-    date       DateTime
-    loginTime  String?
-    logoutTime String?
+    id      String         @id @default(auto()) @map("_id") @db.ObjectId
+    agentId String         @db.ObjectId
+    agent   Agent          @relation(fields: [agentId], references: [id])
+    date    DateTime
+    type    AttendanceType
+    comment String?
 }
 
 model Query {
@@ -91,4 +91,15 @@ enum Status {
     IN_PROGRESS
     COMPLETED
     REJECTED
+}
+
+enum AttendanceType {
+    ABSENT
+    PRESENT
+    WEEK_OFF
+    WORK_FROM_HOME
+    UPL
+    HOLIDAY
+    LEAVE
+    HALF_DAY
 }
