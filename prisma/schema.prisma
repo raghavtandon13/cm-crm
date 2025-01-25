@@ -74,8 +74,9 @@ model AgentAttendance {
     agentId String         @db.ObjectId
     agent   Agent          @relation(fields: [agentId], references: [id])
     date    DateTime
-    type    AttendanceType
+    type    String?
     comment String?
+    mutable Boolean       @default(true)
 }
 
 model Query {
@@ -102,4 +103,18 @@ enum AttendanceType {
     HOLIDAY
     LEAVE
     HALF_DAY
+}
+enum LeaveStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+model LeaveRequest {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    agentId   String   @db.ObjectId
+    startDate DateTime
+    endDate   DateTime
+    reason    String
+    status    LeaveStatus @default(PENDING)
+    createdAt DateTime @default(now())
 }

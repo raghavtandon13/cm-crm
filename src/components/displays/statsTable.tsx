@@ -66,17 +66,39 @@ export function StatsTable() {
         .filter(({ Accepted, Rejected, Deduped }) => Accepted !== 0 || Rejected !== 0 || Deduped !== 0);
 
     const columns: ColumnDef<(typeof formattedData)[0]>[] = [
-        { accessorKey: "lender", header: () => <div className="w-36 text-left">Lenders</div>, cell: ({ row }) => <div className="text-left">{row.getValue("lender")}</div> },
-        { accessorKey: "Accepted", header: () => <div className="text-left">Accepted</div>, cell: ({ row }) => <div className="text-left">{row.getValue("Accepted")}</div> },
-        { accessorKey: "Rejected", header: () => <div className="text-left">Rejected</div>, cell: ({ row }) => <div className="text-left">{row.getValue("Rejected")}</div> },
-        { accessorKey: "Deduped", header: () => <div className="text-left">Deduped</div>, cell: ({ row }) => <div className="text-left">{row.getValue("Deduped")}</div> },
-        { accessorKey: "Rest", header: () => <div className="text-left">Rest</div>, cell: ({ row }) => <div className="text-left">{row.getValue("Rest")}</div> },
+        {
+            accessorKey: "lender",
+            header: () => <div className="w-36 text-left">Lenders</div>,
+            cell: ({ row }) => <div className="text-left">{row.getValue("lender")}</div>,
+        },
+        {
+            accessorKey: "Accepted",
+            header: () => <div className="text-left">Accepted</div>,
+            cell: ({ row }) => <div className="text-left">{row.getValue("Accepted")}</div>,
+        },
+        {
+            accessorKey: "Rejected",
+            header: () => <div className="text-left">Rejected</div>,
+            cell: ({ row }) => <div className="text-left">{row.getValue("Rejected")}</div>,
+        },
+        {
+            accessorKey: "Deduped",
+            header: () => <div className="text-left">Deduped</div>,
+            cell: ({ row }) => <div className="text-left">{row.getValue("Deduped")}</div>,
+        },
+        {
+            accessorKey: "Rest",
+            header: () => <div className="text-left">Rest</div>,
+            cell: ({ row }) => <div className="text-left">{row.getValue("Rest")}</div>,
+        },
     ];
 
     return (
         <>
             <div className="my-2">
-            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Lender Stats &#8628;</h1>
+                <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>
+                    Accepted Rejected Dedupe Lender Stats &#8628;
+                </h1>
                 <div className="font-semibold flex gap-4 ">
                     <Popover>
                         <PopoverTrigger asChild>

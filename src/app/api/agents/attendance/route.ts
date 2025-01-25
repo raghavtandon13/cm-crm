@@ -11,14 +11,42 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ status: "failure", message: "agent not found" }, { status: 404 });
         }
 
-        await db.agentAttendance.create({
-            data: {
+        // Check if attendance already exists for the agent and date
+        const existingAttendance = await db.agentAttendance.findFirst({
+            where: {
                 agentId: agent.id,
                 date: new Date(date),
-                type: atype,
-                comment: comment,
             },
         });
+        if (existingAttendance.mutable === false) {
+            const response = NextResponse.json({
+                status: "success",
+                message: `${agent.name} ${atype} on ${date}`,
+            });
+
+            return response;
+        }
+
+        if (existingAttendance) {
+            // Update the existing attendance record
+            await db.agentAttendance.update({
+                where: { id: existingAttendance.id },
+                data: {
+                    type: atype,
+                    comment: comment,
+                },
+            });
+        } else {
+            // Create a new attendance record
+            await db.agentAttendance.create({
+                data: {
+                    agentId: agent.id,
+                    date: new Date(date),
+                    type: atype,
+                    comment: comment,
+                },
+            });
+        }
 
         // Response
         const response = NextResponse.json({
@@ -41,10 +69,7 @@ export async function GET(req: NextRequest) {
         const endDate = req.nextUrl.searchParams.get("endDate");
 
         if (!startDate || !endDate) {
-            return NextResponse.json(
-                { status: "failure", message: "startDate or endDate not provided" },
-                { status: 400 },
-            );
+            return NextResponse.json({ status: "failure", message: "startDate or endDate not provided" }, { status: 400 });
         }
 
         const start = new Date(startDate);
@@ -65,10 +90,7 @@ export async function GET(req: NextRequest) {
         } else if (full) {
             agents = await db.agent.findMany();
         } else {
-            return NextResponse.json(
-                { status: "failure", message: "Provide either 'agentid' or 'full=true'" },
-                { status: 400 },
-            );
+            return NextResponse.json({ status: "failure", message: "Provide either 'agentid' or 'full=true'" }, { status: 400 });
         }
 
         const attendanceData = await db.agentAttendance.findMany({

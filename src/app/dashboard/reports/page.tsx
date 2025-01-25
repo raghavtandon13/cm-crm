@@ -34,7 +34,7 @@ export default function Reports() {
                     className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
                     href="/dashboard/reports/stats"
                 >
-                    Per Lender Stats -{">"}{" "}
+                    ARD Lender Stats -{">"}{" "}
                 </Link>
             </div>
             {/* Total Leads Sent */}

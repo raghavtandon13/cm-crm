@@ -1,6 +1,3 @@
-// you should show comment in popup if it is present
-//     also agentid is not being sent in the request
-
 "use client";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -21,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function Attendance() {
     const [date, setDate] = useState<DateRange | undefined>({
-        from: startOfMonth(new Date()),
+        from: new Date(new Date().setDate(new Date().getDate() - 1)),
         to: new Date(),
     });
     const [dialogData, setDialogData] = useState<any>({ open: false, agentid: "", date: "", atype: "", comment: "" });
@@ -32,9 +29,15 @@ export default function Attendance() {
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(
-                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`,
-            );
+            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`);
+            return response.data.data; // Access the `data` array directly
+        },
+    });
+
+    const leaveRequestsQuery = useQuery({
+        queryKey: ["leaveRequests"],
+        queryFn: async () => {
+            const response = await fromAPI.get(`/agents/attendance/leave-requests/view/`);
             return response.data.data; // Access the `data` array directly
         },
     });
@@ -46,6 +49,15 @@ export default function Attendance() {
         onSuccess: () => {
             setDialogData({ open: false });
             refetch();
+        },
+    });
+
+    const leaveRequestMutation = useMutation({
+        mutationFn: async (payload: any) => {
+            await fromAPI.post("/agents/attendance/leave-requests/view/", payload);
+        },
+        onSuccess: () => {
+            leaveRequestsQuery.refetch();
         },
     });
 
@@ -67,6 +79,13 @@ export default function Attendance() {
             date: dialogData.date,
             atype: dialogData.atype,
             comment: dialogData.comment,
+        });
+    };
+
+    const handleLeaveRequestDecision = (leaveReqId: string, decision: string) => {
+        leaveRequestMutation.mutate({
+            leaveReqId,
+            decision,
         });
     };
 
@@ -122,7 +141,7 @@ export default function Attendance() {
             header: () => <div className="min-w-[100px] text-center">{date}</div>,
             cell: ({ row }) => {
                 const agentid = row.original.agentid;
-		console.log(row.original);
+                console.log(row.original);
                 const currentType = row.getValue(date) || "";
                 const comment = row.original.comments?.[date] || ""; // Fetch comment for the date
 
@@ -155,6 +174,68 @@ export default function Attendance() {
         })),
     ];
 
+    const leaveRequestColumns: ColumnDef<any>[] = [
+        {
+            accessorKey: "agentName",
+            header: "Agent Name",
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("agentName")}</div>,
+        },
+        {
+            accessorKey: "reason",
+            header: "Reason",
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("reason")}</div>,
+        },
+        {
+            accessorKey: "startDate",
+            header: "Start Date",
+            cell: ({ row }) => {
+                const startDate = String(row.getValue("startDate")).split("T")[0];
+                return <div className="min-w-[100px] text-left">{startDate}</div>;
+            },
+        },
+        {
+            accessorKey: "endDate",
+            header: "End Date",
+            cell: ({ row }) => {
+                const startDate = String(row.getValue("startDate")).split("T")[0];
+                const endDate = String(row.getValue("endDate")).split("T")[0];
+                return <div className="min-w-[100px] text-left">{startDate === endDate ? "" : endDate}</div>;
+            },
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("status")}</div>,
+        },
+        {
+            accessorKey: "actions",
+            header: "Actions",
+            cell: ({ row }) => {
+                const leaveReqId = row.original.id;
+                return (
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLeaveRequestDecision(leaveReqId, "APPROVED")}
+                            disabled={row.original.status !== "PENDING"}
+                        >
+                            Approve
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLeaveRequestDecision(leaveReqId, "REJECTED")}
+                            disabled={row.original.status !== "PENDING"}
+                        >
+                            Reject
+                        </Button>
+                    </div>
+                );
+            },
+        },
+    ];
+
     return (
         <div className="my-2 ">
             <div className="font-semibold flex gap-4 mb-2">
@@ -163,10 +244,7 @@ export default function Attendance() {
                         <Button
                             id="date"
                             variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
+                            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
@@ -206,6 +284,26 @@ export default function Attendance() {
             ) : (
                 <div className="text-center mt-8">No attendance data available for the selected date range.</div>
             )}
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Leave Requests</h2>
+                {leaveRequestsQuery.isLoading ? (
+                    <div className="flex items-center justify-center p-8">
+                        <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+                        <small>Fetching leave requests...</small>
+                    </div>
+                ) : leaveRequestsQuery.isError ? (
+                    <div className="flex items-center justify-center h-96">
+                        Error loading leave requests.{" "}
+                        <button onClick={() => leaveRequestsQuery.refetch()} className="ml-2 text-blue-500 hover:underline">
+                            Retry
+                        </button>
+                    </div>
+                ) : leaveRequestsQuery.data.length > 0 ? (
+                    <DataTable columns={leaveRequestColumns} data={leaveRequestsQuery.data} name="leaveRequestsData" />
+                ) : (
+                    <div className="text-center mt-8">No leave requests available.</div>
+                )}
+            </div>
             <Dialog open={dialogData.open} onOpenChange={closeDialog}>
                 <DialogContent>
                     <DialogHeader>
