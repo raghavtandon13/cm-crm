@@ -55,7 +55,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
                             date: date,
                             type: "LEAVE",
                             comment: updatedLeaveRequest.reason,
-                            mutable: false,
                         },
                     });
                 }),

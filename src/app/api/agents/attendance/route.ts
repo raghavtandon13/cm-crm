@@ -18,14 +18,6 @@ export async function POST(req: NextRequest) {
                 date: new Date(date),
             },
         });
-        if (existingAttendance.mutable === false) {
-            const response = NextResponse.json({
-                status: "success",
-                message: `${agent.name} ${atype} on ${date}`,
-            });
-
-            return response;
-        }
 
         if (existingAttendance) {
             // Update the existing attendance record

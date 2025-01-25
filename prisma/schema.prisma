@@ -76,7 +76,6 @@ model AgentAttendance {
     date    DateTime
     type    String?
     comment String?
-    mutable Boolean       @default(true)
 }
 
 model Query {
