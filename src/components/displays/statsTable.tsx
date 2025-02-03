@@ -37,33 +37,15 @@ export function StatsTable() {
         },
     });
 
-    if (isPending) {
-        return (
-            <div className="flex items-center justify-center p-8">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-                <small>This process may take upto 5 minutes.</small>
-            </div>
-        );
-    }
-
-    if (isError) {
-        return (
-            <div className="flex items-center justify-center h-96">
-                Error loading data.{" "}
-                <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
-                    Retry
-                </button>
-            </div>
-        );
-    }
-
     const formattedData = data
-        .map(({ lender, counts }) => {
-            const statusMap = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
-            counts.forEach(({ status, count }) => (statusMap[status] = count));
-            return { lender: lender || "N/A", ...statusMap };
-        })
-        .filter(({ Accepted, Rejected, Deduped }) => Accepted !== 0 || Rejected !== 0 || Deduped !== 0);
+        ? data
+              .map(({ lender, counts }) => {
+                  const statusMap = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
+                  counts.forEach(({ status, count }) => (statusMap[status] = count));
+                  return { lender: lender || "N/A", ...statusMap };
+              })
+              .filter(({ Accepted, Rejected, Deduped }) => Accepted !== 0 || Rejected !== 0 || Deduped !== 0)
+        : [];
 
     const columns: ColumnDef<(typeof formattedData)[0]>[] = [
         {
@@ -86,11 +68,6 @@ export function StatsTable() {
             header: () => <div className="text-left">Deduped</div>,
             cell: ({ row }) => <div className="text-left">{row.getValue("Deduped")}</div>,
         },
-        {
-            accessorKey: "Rest",
-            header: () => <div className="text-left">Rest</div>,
-            cell: ({ row }) => <div className="text-left">{row.getValue("Rest")}</div>,
-        },
     ];
 
     return (
@@ -105,10 +82,7 @@ export function StatsTable() {
                             <Button
                                 id="date"
                                 variant="outline"
-                                className={cn(
-                                    "w-[300px] justify-start text-left font-normal",
-                                    !date && "text-muted-foreground",
-                                )}
+                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -143,7 +117,21 @@ export function StatsTable() {
                         )}
                     </Button>
                 </div>
-                <DataTable columns={columns} data={formattedData} name="lenderARER" />
+                {isPending ? (
+                    <div className="flex items-center justify-center p-8">
+                        <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+                        <small>This process may take up to 5 minutes.</small>
+                    </div>
+                ) : isError ? (
+                    <div className="flex items-center justify-center h-96">
+                        Error loading data.{" "}
+                        <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                            Retry
+                        </button>
+                    </div>
+                ) : (
+                    <DataTable columns={columns} data={formattedData} name="lenderARER" />
+                )}
             </div>
         </>
     );

@@ -46,7 +46,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                         {(admin || agent) && <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />}
                         {(admin || agent) && <NavItem href="/dashboard/search" icon={Search} label="Search" />}
                         {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />}
-                        {admin && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
+                        {(admin || hr) && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
                         {admin && <NavItem href="/dashboard/database" icon={Database} label="Database" />}
                         {(admin || hr) && <NavItem href="/dashboard/attendance" icon={UserRound} label="Attendance" />}
                         {agent && <NavItem href="/dashboard/agent_attendance" icon={UserRound} label="My Attendance" />}

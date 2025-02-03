@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
             return {
                 agentid: agent.id,
                 agentName: agent.name,
+                active: agent.active,
                 attendance,
             };
         });

@@ -43,6 +43,7 @@ model Agent {
     Assignment      Assignment[]
     agentAttendance AgentAttendance[]
     passwordUpdated Boolean           @default(false)
+    active          Boolean           @default(true)
     TempAccess      TempAccess[]
 
     @@index([supervisorId])

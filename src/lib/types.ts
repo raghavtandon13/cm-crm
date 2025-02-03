@@ -54,6 +54,7 @@ export interface Agent {
     createdAt: string;
     updatedAt: string;
     passwordUpdated?: boolean;
+    active: boolean;
 }
 
 //  FIX: add more stuff to Lead Type example Income

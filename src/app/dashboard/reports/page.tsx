@@ -11,6 +11,7 @@ import { LeadsTable } from "@/components/displays/leadsTable";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LenderCharts } from "@/components/displays/lenderChart";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -24,23 +25,18 @@ export default function Reports() {
     return (
         <>
             <div>
-                <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
-                    href="/dashboard/reports/incoming"
-                >
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/incoming">
                     Incoming Leads -{">"}{" "}
                 </Link>
-                <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
-                    href="/dashboard/reports/stats"
-                >
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/stats">
                     ARD Lender Stats -{">"}{" "}
                 </Link>
             </div>
             {/* Total Leads Sent */}
-            <LeadsTable />
+            {/* <LeadsTable /> */}
             {/* <MonthlyLenders /> */}
             {/* New Users */}
+            <LenderCharts />
             <UsersTable />
             {/* <Table1 /> */}
             <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold")}>Graph Demo</h1>
