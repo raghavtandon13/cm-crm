@@ -12,6 +12,7 @@ import { format, startOfMonth } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { CsvExportModal } from "../exportModal";
 
 export type LenderData = {
     lender: string | null;
@@ -25,6 +26,7 @@ export function StatsTable() {
     const [date, setDate] = useState<DateRange | undefined>({ from: startOfMonth(new Date()), to: new Date() });
     const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
     const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
+    const [modalData, setModalData] = useState<{ cellValue: number; location: any } | null>(null);
 
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["stats"],
@@ -56,7 +58,23 @@ export function StatsTable() {
         {
             accessorKey: "Accepted",
             header: () => <div className="text-left">Accepted</div>,
-            cell: ({ row }) => <div className="text-left">{row.getValue("Accepted")}</div>,
+            cell: ({ row }) => {
+                const cellValue = row.original["Accepted"];
+                const location = {
+                    dates: date,
+                    lender: row.original.lender,
+                    type: "Accepted",
+                };
+                if (!cellValue) return null;
+                const handleClick = () => {
+                    setModalData({ cellValue, location });
+                };
+                return (
+                    <div className="cursor-pointer text-blue-500 hover:underline" onClick={handleClick}>
+                        {cellValue.toLocaleString()}
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "Rejected",
@@ -133,6 +151,16 @@ export function StatsTable() {
                     <DataTable columns={columns} data={formattedData} name="lenderARER" />
                 )}
             </div>
+            {modalData && (
+                <CsvExportModal
+                    usage="statsTable"
+                    cellValue={modalData.cellValue}
+                    location={modalData.location}
+                    onClose={() => {
+                        setModalData(null);
+                    }}
+                />
+            )}
         </>
     );
 }

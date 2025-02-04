@@ -8,9 +8,8 @@ async function perDay(startDay: string, endDay: string, period: string = "monthl
     const matchConditions: any = { createdAt: { $gte: new Date(startDay), $lt: new Date(endDay) } };
     if (filters.partner) matchConditions.partner = filters.partner;
     if (filters["accounts.name"]) matchConditions["accounts.name"] = filters["accounts.name"];
-    console.log(matchConditions);
     const result = await User.aggregate([
-	{ $unwind: "$accounts" },
+        { $unwind: "$accounts" },
         { $match: matchConditions },
         {
             $group: {
@@ -30,10 +29,8 @@ export async function POST(_req: NextRequest) {
     try {
         const { startDay, endDay, period, filters } = await _req.json();
         // Set default values
-        const startDate =
-            startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
+        const startDate = startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
         const endDate = endDay || new Date().toISOString().split("T")[0];
-        console.log(startDate, endDate, period);
 
         await connectToMongoDB();
         const res = await perDay(startDate, endDate, period, filters);

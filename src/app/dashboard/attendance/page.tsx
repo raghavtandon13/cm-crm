@@ -30,7 +30,6 @@ export default function Attendance() {
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
             const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`);
-            console.log(response.data.data);
             return response.data.data; // Access the `data` array directly
         },
     });
@@ -120,8 +119,6 @@ export default function Attendance() {
     const formattedData = filteredData.map((agent: any) => {
         const attendance = dates.reduce((acc: any, date) => {
             acc[date] = agent.attendance[date] || ""; // Leave empty if no data
-            console.log("ello");
-            console.log(acc);
             return acc;
         }, {});
 
@@ -144,7 +141,6 @@ export default function Attendance() {
             header: () => <div className="min-w-[100px] text-center">{date}</div>,
             cell: ({ row }) => {
                 const agentid = row.original.agentid;
-                console.log(row.original);
                 const currentType = row.getValue(date) || "";
                 const comment = row.original.comments?.[date] || ""; // Fetch comment for the date
 

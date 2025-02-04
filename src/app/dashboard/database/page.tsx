@@ -40,6 +40,7 @@ export default function Create() {
     const queryId = searchParams.get("id");
     const [queryText, setQueryText] = useState("");
     const [queryName, setQueryName] = useState("");
+    const [viewMode, setViewMode] = useState<"table" | "json">("table");
 
     const { data } = useQuery({
         queryKey: ["query"],
@@ -77,14 +78,75 @@ export default function Create() {
         }
     }, [selectedQuery]);
 
+    const renderTable = (data: any) => {
+        if (!Array.isArray(data) || data.length === 0) {
+            return <p className="text-slate-500">No data available</p>;
+        }
+
+        const headers = Object.keys(data[0]);
+
+        return (
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        {headers.map((header) => (
+                            <th
+                                key={header}
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                {header}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {data.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            {headers.map((header) => (
+                                <td key={header} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {typeof row[header] === "object" && row[header] !== null
+                                        ? Array.isArray(row[header])
+                                            ? renderTable(row[header])
+                                            : renderNestedObject(row[header])
+                                        : row[header]}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    };
+
+    const renderNestedObject = (obj: any) => {
+        const entries = Object.entries(obj);
+        return (
+            <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {entries.map(([key, value]) => (
+                        <tr key={key}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{key}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {typeof value === "object" && value !== null
+                                    ? Array.isArray(value)
+                                        ? renderTable(value)
+                                        : renderNestedObject(value)
+                                    : String(value)}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    };
+
     return (
         <div className="flex h-full">
             <aside className="hidden w-[220px] overflow-y-auto border-r bg-white md:block lg:w-[280px]">
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
-                        {data?.map((query) => (
-                            <NavItem key={query.id} href={`/dashboard/database?id=${query.id}`} label={query.name} />
-                        ))}
+                        {data?.map((query) => <NavItem key={query.id} href={`/dashboard/database?id=${query.id}`} label={query.name} />)}
                     </nav>
                 </div>
             </aside>
@@ -151,6 +213,12 @@ export default function Create() {
                     </Card>
                     <Card>
                         <CardContent className="p-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-md font-semibold">Results</h3>
+                                <Button variant="outline" onClick={() => setViewMode(viewMode === "table" ? "json" : "table")}>
+                                    {viewMode === "table" ? "JSON" : "Table"}
+                                </Button>
+                            </div>
                             <div className="min-h-[300px] p-3 rounded-md border bg-slate-50">
                                 {runMutation.isPending ? (
                                     <div className="flex items-center justify-center h-full">
@@ -159,9 +227,11 @@ export default function Create() {
                                 ) : runMutation.isError ? (
                                     <p className="text-red-500">Error running query: {runMutation.error?.message}</p>
                                 ) : runMutation.data ? (
-                                    <pre className="whitespace-pre-wrap">
-                                        {JSON.stringify(runMutation.data, null, 2)}
-                                    </pre>
+                                    viewMode === "table" ? (
+                                        renderTable(runMutation.data)
+                                    ) : (
+                                        <pre className="whitespace-pre-wrap">{JSON.stringify(runMutation.data, null, 2)}</pre>
+                                    )
                                 ) : (
                                     <p className="text-slate-500">Query results will appear here</p>
                                 )}

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export default function RegisterationForm() {
     const user = useUser();
     const router = useRouter();
-    if (user?.role.title === "CALLER") {
+    if (user?.role.title === "OE") {
         router.push(`/dashboard/create`);
     }
 
@@ -69,23 +69,11 @@ export default function RegisterationForm() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="firstName">First name</Label>
-                                    <Input
-                                        id="firstName"
-                                        placeholder="Priya"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        required
-                                    />
+                                    <Input id="firstName" placeholder="Priya" value={formData.firstName} onChange={handleChange} required />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="lastName">Last name</Label>
-                                    <Input
-                                        id="lastName"
-                                        placeholder="Sharma"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        required
-                                    />
+                                    <Input id="lastName" placeholder="Sharma" value={formData.lastName} onChange={handleChange} required />
                                 </div>
                             </div>
                             <div className="grid gap-2">
@@ -101,13 +89,7 @@ export default function RegisterationForm() {
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
+                                <Input id="password" type="password" value={formData.password} onChange={handleChange} required />
                             </div>
                             <Button type="submit" className="w-full" disabled={loading}>
                                 {loading ? "Creating account..." : "Create an account"}

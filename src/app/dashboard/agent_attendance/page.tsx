@@ -147,12 +147,12 @@ export default function UserAttendance() {
         {
             accessorKey: "startDate",
             header: "Start Date",
-            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("startDate")}</div>,
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("startDate")), "yyyy-MM-dd")}</div>,
         },
         {
             accessorKey: "endDate",
             header: "End Date",
-            cell: ({ row }) => <div className="min-w-[100px] text-left">{row.getValue("endDate")}</div>,
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("endDate")), "yyyy-MM-dd")}</div>,
         },
         {
             accessorKey: "reason",

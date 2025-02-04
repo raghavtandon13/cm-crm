@@ -19,13 +19,11 @@ import { Input } from "@/components/ui/input";
 
 export default function UserProfile() {
     const user = useUser();
-    console.log(user);
     const [confirm, setConfirm] = useState(true);
     const [pass, setPass] = useState("");
 
     const handlePasswordChange = async () => {
         try {
-            console.log(pass);
             const response = await fromAPI.post(`/agents/pass-reset`, { password: pass });
             if (response.data.status === "success") {
                 window.location.href = "/";
@@ -67,10 +65,7 @@ export default function UserProfile() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
-                                <AlertDialogAction
-                                    onClick={handlePasswordChange}
-                                    className={buttonVariants({ variant: "default" })}
-                                >
+                                <AlertDialogAction onClick={handlePasswordChange} className={buttonVariants({ variant: "default" })}>
                                     Submit
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -90,10 +85,7 @@ export default function UserProfile() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={handleLogout}
-                                className={buttonVariants({ variant: "destructive" })}
-                            >
+                            <AlertDialogAction onClick={handleLogout} className={buttonVariants({ variant: "destructive" })}>
                                 Log Out
                             </AlertDialogAction>
                         </AlertDialogFooter>

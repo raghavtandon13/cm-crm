@@ -12,17 +12,29 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
-export async function CsvExportModal({ cellValue, location }: { cellValue: number; location: any }) {
-    console.log(cellValue, location);
-    const [open, setOpen] = useState(true);
+export function CsvExportModal({
+    cellValue,
+    location,
+    usage,
+    onClose,
+}: {
+    cellValue: number;
+    location: any;
+    usage: string;
+    onClose: () => void;
+}) {
     const [loading, setLoading] = useState(false);
 
     const handleExport = async () => {
         setLoading(true);
         try {
-	    console.log(location)
-	    console.log("hello")
-            const response = await fetch("/api/leads/export", {
+            let route: string;
+            if (usage === "statsTable") {
+                route = "stats";
+            } else if (usage === "incoming") {
+                route = "incoming";
+            }
+            const response = await fetch(`/api/leads/export/${route}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(location),
@@ -44,10 +56,23 @@ export async function CsvExportModal({ cellValue, location }: { cellValue: numbe
         }
 
         setLoading(false);
+        onClose(); // Close the modal after the export is complete
+    };
+
+    const renderDescription = () => {
+        if (usage === "statsTable") {
+            const fromDate = new Date(location.dates.from).toLocaleDateString("en-IN");
+            const toDate = new Date(location.dates.to).toLocaleDateString("en-IN");
+            return <span>{`${location.type} leads in ${location.lender} from ${fromDate} to ${toDate}`}</span>;
+        } else if (usage === "incoming") {
+            return <span>Export incoming leads.</span>;
+        } else {
+            return <span>Export current selection.</span>;
+        }
     };
 
     return (
-        <AlertDialog open={open}>
+        <AlertDialog open={true}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Export Leads Data</AlertDialogTitle>
@@ -58,12 +83,14 @@ export async function CsvExportModal({ cellValue, location }: { cellValue: numbe
                                 <span>Generating your CSV file, please wait...</span>
                             </div>
                         ) : (
-                            <span>Click Start Export to generate your CSV file.</span>
+                            renderDescription()
                         )}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setOpen(false)}>Close</AlertDialogCancel>
+                    <AlertDialogCancel onClick={onClose} disabled={loading}>
+                        Close
+                    </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleExport}
                         disabled={loading}

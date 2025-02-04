@@ -66,12 +66,11 @@ export default function Create() {
         },
         onSuccess: (_, data: Lead) => {
             toast(phone ? "User updated successfully" : "User created successfully");
-            console.log("done");
             !!inject
                 ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
                 : router.push(`/dashboard/search?phone=${data.phone}`);
         },
-        onError: (error:any) => {
+        onError: (error: any) => {
             console.error("Error creating lead:", error);
             toast.error(error.response.data.message || "Error creating lead");
         },
@@ -83,9 +82,7 @@ export default function Create() {
 
     return (
         <>
-            <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-8">
-                {phone ? "Edit Existing Lead" : "Create New Lead"}
-            </h1>
+            <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-8">{phone ? "Edit Existing Lead" : "Create New Lead"}</h1>
             <form onSubmit={handleSubmit(onSubmit)} className="mx-2 my-4 sm:mx-8">
                 <div className="grid gap-4">
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
@@ -157,13 +154,7 @@ export default function Create() {
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                        <FormField
-                            label="Address"
-                            name="address"
-                            control={control}
-                            errors={errors}
-                            placeholder="Enter your address"
-                        />
+                        <FormField label="Address" name="address" control={control} errors={errors} placeholder="Enter your address" />
                         <FormField
                             label="Pincode"
                             name="pincode"
@@ -178,13 +169,7 @@ export default function Create() {
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                        <FormField
-                            label="City"
-                            name="city"
-                            control={control}
-                            errors={errors}
-                            placeholder="Enter your city"
-                        />
+                        <FormField label="City" name="city" control={control} errors={errors} placeholder="Enter your city" />
                         <FormField
                             label="State"
                             name="state"
@@ -207,13 +192,7 @@ export default function Create() {
                                 { value: "No-employment", label: "Non Employed" },
                             ]}
                         />
-                        <FormField
-                            label="Company Name"
-                            name="company"
-                            control={control}
-                            errors={errors}
-                            placeholder="Enter company name"
-                        />
+                        <FormField label="Company Name" name="company" control={control} errors={errors} placeholder="Enter company name" />
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
@@ -271,19 +250,8 @@ export default function Create() {
                             >
                                 Save
                             </Button>
-                            <Button
-                                type="submit"
-                                className="w-full flex-1"
-                                disabled={isPending}
-                                onClick={() => setInject(true)}
-                            >
-                                {isPending
-                                    ? phone
-                                        ? "Updating..."
-                                        : "Creating..."
-                                    : phone
-                                      ? "Update Lead"
-                                      : "Create Lead"}
+                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(true)}>
+                                {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
                             </Button>
                         </div>
                     </div>

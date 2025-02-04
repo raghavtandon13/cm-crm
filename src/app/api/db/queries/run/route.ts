@@ -57,14 +57,10 @@ export async function POST(_req: NextRequest) {
 
         // Validate that the pipeline is an array
         if (!Array.isArray(aggregationPipeline)) {
-            return NextResponse.json(
-                { error: "Invalid aggregation pipeline format. Must be an array." },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: "Invalid aggregation pipeline format. Must be an array." }, { status: 400 });
         }
 
         // Execute the aggregation pipeline
-        console.log("Executing aggregation pipeline:", aggregationPipeline);
         const result = await User.aggregate(aggregationPipeline);
 
         return NextResponse.json(result, { status: 200 });

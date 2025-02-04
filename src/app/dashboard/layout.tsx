@@ -29,11 +29,12 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     const user = useUser();
     // const user = {
     //     role: {
-    //         title: "CALLER",
+    //         title: "OE",
     //     },
     // };
     const admin = user?.role.title === "BOSS";
-    const agent = user?.role.title === "CALLER";
+    const agent = user?.role.title === "OE";
+    const tech = user?.role.title === "TE";
     const hr = user?.role.title === "HR";
     const shouldAddPadding = !path.includes("dashboard/database");
 
@@ -49,7 +50,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                         {(admin || hr) && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
                         {admin && <NavItem href="/dashboard/database" icon={Database} label="Database" />}
                         {(admin || hr) && <NavItem href="/dashboard/attendance" icon={UserRound} label="Attendance" />}
-                        {agent && <NavItem href="/dashboard/agent_attendance" icon={UserRound} label="My Attendance" />}
+                        {(agent || tech) && <NavItem href="/dashboard/agent_attendance" icon={UserRound} label="My Attendance" />}
                     </nav>
                 </div>
             </aside>

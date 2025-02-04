@@ -1,11 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
-import { connectToMongoDB } from "../../../../../lib/db";
+import { connectToMongoDB } from "../../../../../../lib/db";
 
 export async function POST(_req: NextRequest) {
     try {
         const { dates, day, month, partner, overall } = await _req.json();
-        console.log(dates, day, month, partner, overall);
         await connectToMongoDB();
 
         const matchConditions: any = {};
@@ -47,8 +46,6 @@ export async function POST(_req: NextRequest) {
             };
             matchConditions.partner = partner;
         }
-
-        console.log("starting export for: ", matchConditions);
 
         const users = await User.find(matchConditions).select("phone partner").lean();
 

@@ -8,17 +8,43 @@ export async function middleware(request: NextRequest) {
         return Response.redirect(new URL("/login", request.url));
     }
 
-    if (currentUser && !request.nextUrl.pathname.startsWith("/dashboard")) {
-        const response = await axios.get("http://13.201.83.62//api/agents/get", {
+    if (currentUser) {
+        const response = await axios.get("http://13.201.83.62/api/agents/get", {
             headers: { Authorization: `Bearer ${currentUser}` },
         });
-        if (response.data.role.title === "BOSS") {
+
+        const role = response.data.role.title;
+        const pathname = request.nextUrl.pathname;
+
+        const roleRoutes = {
+            BOSS: [
+                "/dashboard/create",
+                "/dashboard/myleads",
+                "/dashboard/search",
+                "/dashboard/reports",
+                "/dashboard/register",
+                "/dashboard/database",
+                "/dashboard/attendance",
+                // "/dashboard/agent_attendance",
+            ],
+            OE: ["/dashboard/create", "/dashboard/myleads", "/dashboard/search", "/dashboard/agent_attendance"],
+            TE: ["/dashboard/agent_attendance"],
+            HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
+        };
+
+        const allowedRoutes = roleRoutes[role] || [];
+
+        if (!allowedRoutes.some((route) => pathname.startsWith(route))) {
+            return Response.redirect(new URL("/dashboard/agent_attendance", request.url));
+        }
+
+        if (role === "BOSS" && pathname === "/dashboard") {
             return Response.redirect(new URL("/dashboard/reports", request.url));
         }
-        if (response.data.role.title === "HR") {
+
+        if (role === "HR" && pathname === "/dashboard") {
             return Response.redirect(new URL("/dashboard/attendance", request.url));
         }
-        return Response.redirect(new URL("/dashboard/create", request.url));
     }
 }
 
