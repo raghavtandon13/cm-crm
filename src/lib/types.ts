@@ -23,6 +23,7 @@ export interface CMUser extends Document {
     residence_type?: string;
     phoneOtp?: string;
     pincode?: string;
+    consent?: string;
     phoneOtpExpire?: Date;
     detailsFilled: boolean;
     eformFilled: boolean;

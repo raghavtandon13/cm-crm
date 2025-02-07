@@ -9,11 +9,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/otp"; // Import OTP components
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogFooter,
+    DialogTitle,
+    DialogDescription,
+    DialogClose,
+} from "@/components/ui/dialog";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
     const router = useRouter();
     const [inject, setInject] = useState<boolean | undefined>(true);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [leadData, setLeadData] = useState<Lead | null>(null);
 
     const {
         handleSubmit,
@@ -60,7 +74,36 @@ export default function Create() {
         }
     }, [userData, setValue]);
 
-    const { mutate, isPending } = useMutation({
+    const { mutate: sendOtp } = useMutation({
+        mutationFn: (phone: string) => {
+            return fromAPI.get(`/users/otp?phone=${phone}`);
+        },
+        onSuccess: () => {
+            setIsDialogOpen(true);
+            toast("OTP sent successfully");
+        },
+        onError: (error: any) => {
+            console.error("Error sending OTP:", error);
+            toast.error(error.response.data.message || "Error sending OTP");
+        },
+    });
+
+    const { mutate: verifyOtp } = useMutation({
+        mutationFn: ({ phone, otp }: { phone: string; otp: string }) => {
+            return fromAPI.post("/users/otp", { phone, otp });
+        },
+        onSuccess: () => {
+            if (leadData) {
+                mutateLead(leadData);
+            }
+        },
+        onError: (error: any) => {
+            console.error("Error verifying OTP:", error);
+            toast.error(error.response.data.message || "Error verifying OTP");
+        },
+    });
+
+    const { mutate: mutateLead, isPending } = useMutation({
         mutationFn: (data: Lead & { inject?: boolean }) => {
             return fromAPI.post("/agents/cmuser", data);
         },
@@ -77,7 +120,14 @@ export default function Create() {
     });
 
     const onSubmit: SubmitHandler<any> = (data) => {
-        mutate({ ...data, inject });
+        setLeadData({ ...data, inject });
+        sendOtp(data.phone);
+    };
+
+    const handleOtpSubmit = () => {
+        if (leadData) {
+            verifyOtp({ phone: leadData.phone, otp });
+        }
     };
 
     return (
@@ -213,9 +263,7 @@ export default function Create() {
                             name="pan"
                             control={control}
                             errors={errors}
-                            rules={{
-                                required: "PAN is required",
-                            }}
+                            rules={{ required: "PAN is required" }}
                             placeholder="Enter PAN"
                         />
                     </div>
@@ -243,23 +291,40 @@ export default function Create() {
                             >
                                 Reset
                             </Button>
-                            <Button
-                                type="submit"
-                                className="w-full flex-1"
-                                onClick={() => setInject(false)} // Set inject to false for "Save"
-                            >
+                            <Button type="submit" className="w-full flex-1" onClick={() => setInject(false)}>
                                 Save
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled onClick={() => setInject(true)}>
+                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(false)}>
                                 {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
                             </Button>
                         </div>
                     </div>
                 </div>
             </form>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Enter OTP</DialogTitle>
+                        <DialogDescription>Please enter the OTP sent to your phone number.</DialogDescription>
+                    </DialogHeader>
+                    <InputOTP maxLength={6} onChange={setOtp}>
+                        <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                    </InputOTP>
+                    <DialogFooter>
+                        <Button onClick={handleOtpSubmit}>Verify OTP</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
-    // }
 }
 
 const indiaStates = [
