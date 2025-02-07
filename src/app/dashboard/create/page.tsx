@@ -250,7 +250,7 @@ export default function Create() {
                             >
                                 Save
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(true)}>
+                            <Button type="submit" className="w-full flex-1" disabled onClick={() => setInject(true)}>
                                 {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
                             </Button>
                         </div>

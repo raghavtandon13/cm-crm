@@ -244,6 +244,7 @@ export async function POST(_req: NextRequest) {
                                     then: "Rejected",
                                 },
                                 // MONEYVIEW CONDITIONS
+
                                 {
                                     case: {
                                         $and: [
@@ -285,6 +286,17 @@ export async function POST(_req: NextRequest) {
                                 {
                                     case: {
                                         $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "success"] }],
+                                    },
+                                    then: "Accepted",
+                                },
+
+                                // LOANTAP CONDITIONS
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "LoanTap"] },
+                                            { $eq: ["$accounts.message", "Application created successfully"] },
+                                        ],
                                     },
                                     then: "Accepted",
                                 },

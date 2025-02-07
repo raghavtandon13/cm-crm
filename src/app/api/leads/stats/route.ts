@@ -271,6 +271,16 @@ async function count(start: string, end: string) {
                                 },
                                 then: "Accepted",
                             },
+                            // LOANTAP CONDITIONS
+                            {
+                                case: {
+                                    $and: [
+                                        { $eq: ["$accounts.name", "LoanTap"] },
+                                        { $eq: ["$accounts.message", "Application created successfully"] },
+                                    ],
+                                },
+                                then: "Accepted",
+                            },
                         ],
                         default: "Rest",
                     },
@@ -299,6 +309,7 @@ async function count(start: string, end: string) {
     ]);
     return result;
 }
+
 export async function POST(req: NextRequest) {
     try {
         const { startDate, endDate, forceRefresh } = await req.json();
