@@ -20,15 +20,16 @@ export async function middleware(request: NextRequest) {
             BOSS: [
                 "/dashboard/create",
                 "/dashboard/myleads",
+                "/dashboard/team_leads",
                 "/dashboard/search",
                 "/dashboard/reports",
                 "/dashboard/register",
                 "/dashboard/database",
                 "/dashboard/attendance",
-                // "/dashboard/agent_attendance",
             ],
             OE: ["/dashboard/create", "/dashboard/myleads", "/dashboard/search", "/dashboard/agent_attendance"],
             TE: ["/dashboard/agent_attendance"],
+            TL: ["/dashboard/agent_attendance", "/dashboard/attendance", "/dashboard/team_leads"],
             HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
         };
 

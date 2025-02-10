@@ -31,6 +31,9 @@ export default function Reports() {
                 <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/stats">
                     ARD Lender Stats -{">"}{" "}
                 </Link>
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/graphs">
+                    Grapshs -{">"}{" "}
+                </Link>
             </div>
             {/* Total Leads Sent */}
             {/* <LeadsTable /> */}
