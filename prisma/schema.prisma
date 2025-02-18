@@ -1,120 +1,172 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mongodb"
-    url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 // FEATURES that can be accessed by different roles
 enum Feature {
-    FEATURE1
-    FEATURE2
-    FEATURE3
-    FEATURE4
+  FEATURE1
+  FEATURE2
+  FEATURE3
+  FEATURE4
 }
 
 // ROLES that can be assigned to agents
 model Role {
-    id       String    @id @default(auto()) @map("_id") @db.ObjectId
-    title    String    @unique
-    features Feature[]
-    agents   Agent[]
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  title    String    @unique
+  features Feature[]
+  agents   Agent[]
+  Partner  Partner[]
 }
 
 // AGENTS Model
 model Agent {
-    id       String  @id @default(auto()) @map("_id") @db.ObjectId
-    email    String  @unique
-    name     String?
-    password String
-    roleId   String  @db.ObjectId
-    role     Role    @relation(fields: [roleId], references: [id])
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  name     String?
+  password String
+  roleId   String  @db.ObjectId
+  role     Role    @relation(fields: [roleId], references: [id])
 
-    // Self-referential relations with correct referential actions
-    subordinates Agent[] @relation("AgentHierarchy")
-    supervisor   Agent?  @relation("AgentHierarchy", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    supervisorId String? @db.ObjectId
+  // Self-referential relations with correct referential actions
+  subordinates Agent[] @relation("AgentHierarchy")
+  supervisor   Agent?  @relation("AgentHierarchy", fields: [supervisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  supervisorId String? @db.ObjectId
 
-    // Other relations
-    createdAt       DateTime          @default(now())
-    updatedAt       DateTime          @updatedAt
-    Assignment      Assignment[]
-    agentAttendance AgentAttendance[]
-    passwordUpdated Boolean           @default(false)
-    active          Boolean           @default(true)
-    TempAccess      TempAccess[]
+  // Other relations
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Assignment      Assignment[]
+  agentAttendance AgentAttendance[]
+  passwordUpdated Boolean           @default(false)
+  active          Boolean           @default(true)
+  TempAccess      TempAccess[]
 
-    @@index([supervisorId])
+  @@index([supervisorId])
 }
 
 // Temporary Access Model (NOT USED)
 model TempAccess {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    userId    String   @db.ObjectId
-    agent     Agent    @relation(fields: [userId], references: [id])
-    feature   Feature
-    expiresAt DateTime
-    createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  agent     Agent    @relation(fields: [userId], references: [id])
+  feature   Feature
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 // USER to AGENT Relation
 model Assignment {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    cmUserId   String   @db.ObjectId
-    agentId    String   @db.ObjectId
-    agent      Agent    @relation(fields: [agentId], references: [id])
-    assignedAt DateTime @default(now())
-    status     Status   @default(PENDING)
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  cmUserId   String   @db.ObjectId
+  agentId    String   @db.ObjectId
+  agent      Agent    @relation(fields: [agentId], references: [id])
+  assignedAt DateTime @default(now())
+  status     Status   @default(PENDING)
 }
 
 // AGENT ATTENDANCE Model
 model AgentAttendance {
-    id      String         @id @default(auto()) @map("_id") @db.ObjectId
-    agentId String         @db.ObjectId
-    agent   Agent          @relation(fields: [agentId], references: [id])
-    date    DateTime
-    type    String?
-    comment String?
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  agentId String   @db.ObjectId
+  agent   Agent    @relation(fields: [agentId], references: [id])
+  date    DateTime
+  type    String?
+  comment String?
 }
 
 model Query {
-    id    String   @id @default(auto()) @map("_id") @db.ObjectId
-    name  String
-    query String
-    date  DateTime
+  id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  query String
+  date  DateTime
 }
 
 // Status Options for ASSIGNMENT
 enum Status {
-    PENDING
-    IN_PROGRESS
-    COMPLETED
-    REJECTED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
 }
 
 enum AttendanceType {
-    ABSENT
-    PRESENT
-    WEEK_OFF
-    WORK_FROM_HOME
-    UPL
-    HOLIDAY
-    LEAVE
-    HALF_DAY
+  ABSENT
+  PRESENT
+  WEEK_OFF
+  WORK_FROM_HOME
+  UPL
+  HOLIDAY
+  LEAVE
+  HALF_DAY
 }
+
 enum LeaveStatus {
-    PENDING
-    APPROVED
-    REJECTED
+  PENDING
+  APPROVED
+  REJECTED
 }
+
 model LeaveRequest {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    agentId   String   @db.ObjectId
-    startDate DateTime
-    endDate   DateTime
-    reason    String
-    status    LeaveStatus @default(PENDING)
-    createdAt DateTime @default(now())
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  agentId   String      @db.ObjectId
+  startDate DateTime
+  endDate   DateTime
+  reason    String
+  status    LeaveStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+}
+
+model Partner {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  email         String         @unique
+  cmId          String?        @unique
+  name          String?
+  password      String
+  roleId        String         @db.ObjectId // ["DSA","subDSA","indiv"]
+  role          Role           @relation(fields: [roleId], references: [id])
+  partnerLeads  PartnerLeads[]
+  pancard       String
+  aadhar        String
+  address       String
+  pincode       String
+  alt_mob       String
+  bank_ac       String
+  bank_ifsc     String
+  bank_acc_name String
+  bank_name     String
+
+  // Self-referential relations for DSA and subDSA/indiv
+  subPartners Partner[] @relation("PartnerHierarchy")
+  parent      Partner?  @relation("PartnerHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId    String?   @db.ObjectId
+
+  // Other relations
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  passwordUpdated Boolean  @default(false)
+  active          Boolean  @default(true)
+
+  @@index([parentId])
+}
+
+model PartnerLeads {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  cmUserId   String     @db.ObjectId
+  partnerId  String     @db.ObjectId
+  partner    Partner    @relation(fields: [partnerId], references: [id])
+  assignedAt DateTime   @default(now())
+  status     LeadStatus @default(PENDING)
+}
+
+enum LeadStatus {
+  PENDING
+  DUPLICATE
+  ACCEPTED
+  REJECTED
 }

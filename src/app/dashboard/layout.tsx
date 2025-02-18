@@ -27,15 +27,15 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 export default function Dashboard({ children }: { children: React.ReactNode }) {
     const path = usePathname();
     const user = useUser();
-    // const user = {
-    //     role: {
-    //         title: "OE",
-    //     },
-    // };
+
+    // testing
+    // const user = { role: { title: "OE" } };
+
     const admin = user?.role.title === "BOSS";
     const agent = user?.role.title === "OE";
     const tech = user?.role.title === "TE";
     const hr = user?.role.title === "HR";
+    const indiv = user?.role.title === "INDIV";
     const shouldAddPadding = !path.includes("dashboard/database");
 
     return (
@@ -44,7 +44,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
                         {(admin || agent) && <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" />}
+                        {indiv && <NavItem href="/dashboard/patner_create" icon={UserPlus} label="Create New Lead" />}
                         {(admin || agent) && <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />}
+                        {indiv && <NavItem href="/dashboard/partner_leads" icon={Library} label="Partner Leads" />}
                         {(admin || agent) && <NavItem href="/dashboard/search" icon={Search} label="Search" />}
                         {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />}
                         {(admin || hr) && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}

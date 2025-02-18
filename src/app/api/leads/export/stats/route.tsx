@@ -327,7 +327,7 @@ export async function POST(_req: NextRequest) {
 
         // Create CSV with header
         const csv = [
-            "phone,partner,name,pincode,dob", // CSV header
+            "phone,partner,name,pincode,dob", 
             ...users.map((user) => `${user.phone},${user.partner},${user.name},${user.pincode},${user.dob}`),
         ].join("\n");
 

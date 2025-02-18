@@ -57,7 +57,7 @@ export default function UserProfile() {
                         {user.role.title}
                     </p>
                 </div>
-                {!user.passwordUpdated && (
+                {!user.passwordUpdated && ["OE", "TE", "HR", "TL"].includes(user.role.title) && (
                     <AlertDialog open={true}>
                         <AlertDialogContent>
                             <AlertDialogHeader>

@@ -9,19 +9,24 @@ export async function POST(req: NextRequest) {
     try {
         const { email, pass } = await req.json();
 
-        // Getting Agent
-        const user = await db.agent.findUnique({ where: { email } });
-        if (!user) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        const partner = await db.partner.findUnique({ where: { email }, include: { role: true } });
+        const agent = await db.agent.findUnique({ where: { email }, include: { role: true } });
+        if (!partner && !agent) return NextResponse.json({ status: "failure", message: "Invalid credentials provided" }, { status: 401 });
 
+        const user = partner || agent;
+        const role = user.role.title;
+
+        // Check password
         const isMatch = await bcrypt.compare(pass, user.password);
         if (!isMatch) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
-        const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: "10h" });
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id, email: user.email, role }, secret, { expiresIn: "10h" });
 
         // Response
         const response = NextResponse.json({
             status: "success",
-            message: "User logged in successfully",
+            message: `${role.charAt(0).toUpperCase() + role.slice(1)} logged in successfully`,
         });
 
         response.cookies.set("cm-token", token);

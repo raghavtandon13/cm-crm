@@ -31,7 +31,14 @@ export interface CMUser extends Document {
     google?: GoogleInfo;
     createdAt: Date;
     updatedAt: Date;
+    partnerHistory: PartnerHistory;
 }
+
+export type PartnerHistory = {
+    name: string;
+    date: Date;
+    type: "new" | "dedupe";
+};
 
 interface GoogleInfo {
     id?: string;

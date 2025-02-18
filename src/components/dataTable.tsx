@@ -124,9 +124,13 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
+                                {headerGroup.headers.map((header, index) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead
+                                            className={index === 0 ? "sticky left-0 z-10 bg-background" : ""}
+                                            // style={index === 0 ? { minWidth: "80px" } : { minWidth: "150px" }}
+                                            key={header.id}
+                                        >
                                             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     );
@@ -138,8 +142,14 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                                    {row.getVisibleCells().map((cell, index) => (
+                                        <TableCell
+                                            className={index === 0 ? "sticky left-0 z-10 bg-background" : ""}
+                                            // style={index === 0 ? { minWidth: "80px" } : { minWidth: "150px" }}
+                                            key={cell.id}
+                                        >
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
                                     ))}
                                 </TableRow>
                             ))

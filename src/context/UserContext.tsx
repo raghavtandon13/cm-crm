@@ -11,8 +11,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const { data: user } = useQuery({
         queryKey: ["users"],
         queryFn: async () => {
-            const response = await fromAPI.get("/agents/get");
-            return response.data as Agent | undefined;
+            const response = await fromAPI.get("/auth/get");
+            return response.data as Agent | any | undefined;
         },
     });
     return <UserContext.Provider value={user}>{children}</UserContext.Provider>;

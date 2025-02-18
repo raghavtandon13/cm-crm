@@ -146,7 +146,17 @@ export default function Attendance() {
 
                 return (
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => openDialog(agentid, date, currentType)}>
+                        <Button
+                            variant="outline"
+                            className={cn({
+                                "bg-red-100 text-red-500 border-red-500": currentType === "ABSENT",
+                                "bg-orange-100 text-orange-500 border-orange-500": currentType === "UPL",
+                                "bg-yellow-100 text-yellow-500 border-yellow-500": currentType === "WEEK_OFF",
+                                "bg-gray-100 text-gray-500 border-gray-500": currentType === "HALF_DAY",
+                            })}
+                            size="sm"
+                            onClick={() => openDialog(agentid, date, currentType)}
+                        >
                             {currentType || "+"}
                         </Button>
                         {comment && (

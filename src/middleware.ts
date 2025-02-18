@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (currentUser) {
-        const response = await axios.get("http://13.201.83.62/api/agents/get", {
+        const response = await axios.get("http:/localhost:3000/api/auth/get", {
             headers: { Authorization: `Bearer ${currentUser}` },
         });
 
@@ -31,20 +31,26 @@ export async function middleware(request: NextRequest) {
             TE: ["/dashboard/agent_attendance"],
             TL: ["/dashboard/agent_attendance", "/dashboard/attendance", "/dashboard/team_leads"],
             HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
+            INDIV: ["/dashboard/partner_create", "/dashboard/partner_leads"],
         };
 
         const allowedRoutes = roleRoutes[role] || [];
 
-        if (!allowedRoutes.some((route) => pathname.startsWith(route))) {
-            return Response.redirect(new URL("/dashboard/agent_attendance", request.url));
+        const defaultRedirects = {
+            BOSS: "/dashboard/reports",
+            HR: "/dashboard/attendance",
+            INDIV: "/dashboard/partner_create",
+            OE: "/dashboard/create",
+            TE: "/dashboard/agent_attendance",
+            TL: "/dashboard/team_leads",
+        };
+
+        if (pathname === "/dashboard" && defaultRedirects[role]) {
+            return Response.redirect(new URL(defaultRedirects[role], request.url));
         }
 
-        if (role === "BOSS" && pathname === "/dashboard") {
-            return Response.redirect(new URL("/dashboard/reports", request.url));
-        }
-
-        if (role === "HR" && pathname === "/dashboard") {
-            return Response.redirect(new URL("/dashboard/attendance", request.url));
+        if (!allowedRoutes.includes(pathname)) {
+            return Response.redirect(new URL(defaultRedirects[role], request.url));
         }
     }
 }

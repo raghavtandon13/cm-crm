@@ -13,6 +13,7 @@ export function FormField({
     placeholder,
     options,
     className,
+    disabled = false,
 }: {
     label: string;
     name: string;
@@ -23,15 +24,14 @@ export function FormField({
     placeholder?: string;
     options?: { value: string; label: string }[];
     className?: string;
+    disabled?: boolean;
 }) {
     return (
         <div className={`grid gap-2 ${className}`}>
             <Label htmlFor={name}>
                 {label}
                 {errors[name] && (
-                    <span className="m-2 sm:ml-4 bg-red-200 px-1 rounded text-sm text-red-500">
-                        {errors[name]?.message as string}
-                    </span>
+                    <span className="m-2 sm:ml-4 bg-red-200 px-1 rounded text-sm text-red-500">{errors[name]?.message as string}</span>
                 )}
             </Label>
             <Controller
@@ -40,7 +40,7 @@ export function FormField({
                 rules={rules}
                 render={({ field }) =>
                     options ? (
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={disabled}>
                             <SelectTrigger className="bg-white">
                                 <SelectValue placeholder={placeholder} />
                             </SelectTrigger>
@@ -55,7 +55,7 @@ export function FormField({
                             </SelectContent>
                         </Select>
                     ) : (
-                        <Input id={name} type={type} placeholder={placeholder} className="bg-white" {...field} />
+                        <Input id={name} type={type} placeholder={placeholder} className="bg-white" {...field} disabled={disabled} />
                     )
                 }
             />

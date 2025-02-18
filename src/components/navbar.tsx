@@ -14,6 +14,7 @@ export function Navbar() {
     const agent = user?.role.title === "OE";
     const tech = user?.role.title === "TE";
     const hr = user?.role.title === "HR";
+    const indiv = user?.role.title === "INDIV";
 
     return (
         <header className="bg-background sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6">
@@ -107,6 +108,15 @@ export function Navbar() {
                             >
                                 <UserRound className="h-4 w-4" />
                                 My Attendance
+                            </Link>
+                        )}
+                        {indiv && (
+                            <Link
+                                href="/dashboard/partner_create"
+                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
+                            >
+                                <UserRound className="h-4 w-4" />
+                                Create New Lead
                             </Link>
                         )}
                     </nav>
