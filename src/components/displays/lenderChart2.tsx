@@ -23,7 +23,7 @@ export function LenderCharts({ data, title }) {
     data.forEach((lenderData) => {
         const lender = lenderData.lender;
         let hasAccepted = false;
-        Object.entries(lenderData?.weeks).forEach(([week, data]) => {
+        Object.entries(lenderData?.weeks).forEach(([week, data]: [week: any, data: any]) => {
             if (data.Accepted) {
                 hasAccepted = true;
                 const existingWeekData = chartData.find((d) => d.week === week);

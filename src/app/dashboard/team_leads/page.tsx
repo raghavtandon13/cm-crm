@@ -55,11 +55,11 @@ export default function MyLeads() {
     };
 
     const allAssignments = () => {
-        const assignments: Assignment[] = [];
+        const assignments: any[] = [];
         if (agentsData) {
             Object.entries(agentsData).forEach(([agentId, agentData]) => {
                 agentData.assignments.forEach((assignment) => {
-                    assignments.push({ ...assignment, agentId });
+                    assignments.push({ ...assignment, agentId, agentName: agentData.agentName });
                 });
             });
         }
@@ -76,7 +76,7 @@ export default function MyLeads() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["assignments"], exact: true });
             toast.success("Assignment transferred successfully");
-            refetch(); // Ensure the data is refetched after mutation
+            refetch();
         },
     });
 
@@ -108,6 +108,7 @@ export default function MyLeads() {
                             <TableCell className="text-slate-600 text-center">Name</TableCell>
                             <TableCell className="text-slate-600 text-center">Date</TableCell>
                             <TableCell className="text-slate-600 text-left">Status</TableCell>
+                            <TableCell className="text-slate-600 text-left">Agent</TableCell>
                             <TableCell className="text-slate-600 text-left">Transfer</TableCell>
                         </TableRow>
                     </TableBody>
@@ -124,16 +125,18 @@ export default function MyLeads() {
                                 >
                                     {asg.status} &rarr;
                                 </TableCell>
+
+                                <TableCell className="text-center">{asg.agentName}</TableCell>
                                 <TableCell className="text-left">
-                                    <select onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)} defaultValue={asg.agentId}>
-                                        {Array.from(agentsMapValue.entries()).map(([id, name2]) => {
-                                            console.log("hello", id, name2);
-                                            return (
-                                                <option key={id} value={name2}>
-                                                    {name2} {id === asg.agentId && "(Current)"}
-                                                </option>
-                                            );
-                                        })}
+                                    <select onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)} defaultValue="">
+                                        <option value="" disabled>
+                                            Select Agent
+                                        </option>
+                                        {Array.from(agentsMapValue.entries()).map(([id, name]) => (
+                                            <option key={id} value={id}>
+                                                {name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </TableCell>
                             </TableRow>
