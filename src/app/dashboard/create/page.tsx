@@ -112,7 +112,11 @@ export default function Create() {
 
     const onSubmit: SubmitHandler<any> = (data) => {
         setLeadData({ ...data, inject });
-        sendOtp(data.phone);
+        if (inject) {
+            sendOtp(data.phone);
+        } else {
+            mutateLead(data);
+        }
     };
 
     const handleOtpSubmit = () => {
@@ -285,7 +289,7 @@ export default function Create() {
                             <Button type="submit" className="w-full flex-1" onClick={() => setInject(false)}>
                                 Save
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(false)}>
+                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(true)}>
                                 {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
                             </Button>
                         </div>

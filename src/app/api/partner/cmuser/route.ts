@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
 
     try {
         const data = (await req.json()) as Lead & { inject?: boolean };
-        const inject = data.inject === true ? true : false;
+        // const inject = data.inject === true ? true : false;
+        const inject = false;
 
         let user = await User.findOne({ phone: data.phone });
 

@@ -11,19 +11,20 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
-    const otp = "123456";
-    // const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+    // const otp = "123456";
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
     const otpExpire = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+    console.log(otp);
 
     try {
-        await axios.get("https://www.fast2sms.com/dev/bulkV2", {
-            params: {
-                authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
-                variables_values: otp,
-                route: "otp",
-                numbers: phone,
-            },
-        });
+        // await axios.get("https://www.fast2sms.com/dev/bulkV2", {
+        //     params: {
+        //         authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
+        //         variables_values: otp,
+        //         route: "otp",
+        //         numbers: phone,
+        //     },
+        // });
 
         // Save OTP and expiration time to the user's record in the database
         await connectToMongoDB();

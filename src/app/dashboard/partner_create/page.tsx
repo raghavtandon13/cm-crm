@@ -142,9 +142,12 @@ export default function Create() {
         },
         onSuccess: (_, data: Lead) => {
             toast(phone ? "User updated successfully" : "User created successfully");
-            !!inject
-                ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
-                : router.push(`/dashboard/search?phone=${data.phone}`);
+            setIsDialogOpen(false);
+            reset();
+            router.push(`/dashboard/partner_leads`);
+            // !!inject
+            //     ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
+            //     : router.push(`/dashboard/search?phone=${data.phone}`);
         },
         onError: (error: any) => {
             console.error("Error creating lead:", error);

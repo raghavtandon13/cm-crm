@@ -44,12 +44,12 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <aside className="hidden w-[220px] overflow-y-auto border-r bg-white md:block lg:w-[280px]">
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
-                        {(admin || agent) && <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" />}
+                        {(tl || admin || agent) && <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" />}
                         {indiv && <NavItem href="/dashboard/patner_create" icon={UserPlus} label="Create New Lead" />}
-                        {(admin || agent) && <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />}
+                        {(tl || admin || agent) && <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" />}
                         {indiv && <NavItem href="/dashboard/partner_leads" icon={Library} label="Partner Leads" />}
                         {(tl || admin) && <NavItem href="/dashboard/team_leads" icon={BookUser} label="Team Leads" />}
-                        {(admin || agent) && <NavItem href="/dashboard/search" icon={Search} label="Search" />}
+                        {(tl || admin || agent) && <NavItem href="/dashboard/search" icon={Search} label="Search" />}
                         {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" />}
                         {(admin || hr) && <NavItem href="/dashboard/register" icon={Users} label="Agents" />}
                         {admin && <NavItem href="/dashboard/database" icon={Database} label="Database" />}

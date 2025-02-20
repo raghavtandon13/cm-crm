@@ -29,7 +29,14 @@ export async function middleware(request: NextRequest) {
             ],
             OE: ["/dashboard/create", "/dashboard/myleads", "/dashboard/search", "/dashboard/agent_attendance"],
             TE: ["/dashboard/agent_attendance"],
-            TL: ["/dashboard/agent_attendance", "/dashboard/attendance", "/dashboard/team_leads"],
+            TL: [
+                "/dashboard/create",
+                "/dashboard/myleads",
+                "/dashboard/search",
+                "/dashboard/agent_attendance",
+                "/dashboard/attendance",
+                "/dashboard/team_leads",
+            ],
             HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
             INDIV: ["/dashboard/partner_create", "/dashboard/partner_leads"],
         };
@@ -49,7 +56,9 @@ export async function middleware(request: NextRequest) {
             return Response.redirect(new URL(defaultRedirects[role], request.url));
         }
 
-        if (!allowedRoutes.includes(pathname)) {
+        const isAllowed = allowedRoutes.some((route) => pathname.startsWith(route));
+
+        if (!isAllowed) {
             return Response.redirect(new URL(defaultRedirects[role], request.url));
         }
     }

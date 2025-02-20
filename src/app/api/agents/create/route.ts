@@ -6,18 +6,17 @@ import { NextResponse, NextRequest } from "next/server";
 const secret = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
-    // const token = req.headers.get("Authorization")?.split(" ")[1];
-    // if (!token) return NextResponse.json({ status: "failure", message: "No token provided" }, { status: 401 });
-    //
-    // const { id } = jwt.verify(token, secret) as { id: string };
-    // const user = await db.agent.findUnique({
-    //     where: { id },
-    //     include: { role: true },
-    // });
-    //
-    // if (!user) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
-    // if (user.role.title !== "BOSS")
-    //     return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    const token = req.headers.get("Authorization")?.split(" ")[1];
+    if (!token) return NextResponse.json({ status: "failure", message: "No token provided" }, { status: 401 });
+
+    const { id } = jwt.verify(token, secret) as { id: string };
+    const user = await db.agent.findUnique({
+        where: { id },
+        include: { role: true },
+    });
+
+    if (!user) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
+    if (user.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
 
     try {
         const { email, firstName, lastName, password } = await req.json();

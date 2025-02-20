@@ -12,6 +12,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LenderCharts } from "@/components/displays/lenderChart";
+import { RealtimeStats } from "@/components/realtime";
 
 const chartConfig = {
     views: { label: "Leads Pushed" },
@@ -24,6 +25,7 @@ export default function Reports() {
 
     return (
         <>
+            <RealtimeStats />
             <div>
                 <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/incoming">
                     Incoming Leads -{">"}{" "}
