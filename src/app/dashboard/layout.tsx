@@ -29,7 +29,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     const user = useUser();
 
     // testing
-    // const user = { role: { title: "TL" } };
+    // const user = { role: { title: "QA" } };
 
     const admin = user?.role.title === "BOSS";
     const agent = user?.role.title === "OE";
@@ -37,6 +37,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     const tl = user?.role.title === "TL";
     const hr = user?.role.title === "HR";
     const indiv = user?.role.title === "INDIV";
+    const qa = user?.role.title === "QA";
     const shouldAddPadding = !path.includes("dashboard/database");
 
     return (

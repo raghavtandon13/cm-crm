@@ -14,9 +14,10 @@ interface BarChartProps {
     config: ChartConfig;
     size?: "sm" | "lg";
     loading: boolean;
+    multi?: boolean;
 }
 
-export function BarChartComponent({ data, title, description, config, size = "sm", loading }: BarChartProps) {
+export function BarChartComponent({ data, title, description, config, size = "sm", loading, multi = true }: BarChartProps) {
     const [chartSize, setChartSize] = useState(size);
     const toggleSize = () => setChartSize((prevSize) => (prevSize === "sm" ? "lg" : "sm"));
 
@@ -44,17 +45,38 @@ export function BarChartComponent({ data, title, description, config, size = "sm
                         {renderSkeletonBars()}
                     </div>
                 ) : (
-                    <ChartContainer className={chartSize === "sm" ? "w-full sm:h-[250px] sm:w-[350px] " : "h-full w-full"} config={config}>
-                        <BarChart data={data}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="group" tickLine={false} tickMargin={10} axisLine={false} />
-                            <YAxis />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-                            {Object.keys(config).map((key) => (
-                                <Bar key={key} dataKey={key} fill={config[key].color} radius={4} />
-                            ))}
-                        </BarChart>
-                    </ChartContainer>
+                    <>
+                        {multi ? (
+                            <ChartContainer
+                                className={chartSize === "sm" ? "w-full sm:h-[250px] sm:w-[350px] " : "h-full w-full"}
+                                config={config}
+                            >
+                                <BarChart data={data}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="group" tickLine={false} tickMargin={10} axisLine={false} />
+                                    <YAxis />
+                                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+                                    {Object.keys(config).map((key) => (
+                                        <Bar key={key} dataKey={key} fill={config[key].color} radius={4} />
+                                    ))}
+                                </BarChart>
+                            </ChartContainer>
+                        ) : (
+                            <ChartContainer
+                                className={chartSize === "sm" ? "w-full sm:h-[250px] sm:w-[350px] " : "h-full w-full"}
+                                config={config}
+                            >
+                                <BarChart data={data}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="group" tickLine={false} tickMargin={10} axisLine={false} />
+                                    <YAxis />
+                                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+                                    {/* <Bar dataKey="count" radius={4} /> */}
+                                    <Bar dataKey="count" fill={"#274754"} radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                        )}
+                    </>
                 )}
             </CardContent>
         </Card>

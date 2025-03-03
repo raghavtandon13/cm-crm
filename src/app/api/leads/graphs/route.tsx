@@ -5,10 +5,13 @@ import NodeCache from "node-cache";
 
 const cache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
 
-async function count(start: string, end: string, group: string, lender: string, partner: string) {
-    const matchConditions = { "accounts.resp_date": { $gte: new Date(start), $lte: new Date(end) } };
+async function count(start: string, end: string, group: string, lender: string, partner: string, datetype: string) {
+    const matchConditions: any = {};
+    const dt = datetype === "resp" ? "accounts.resp_date" : "createdAt";
+    matchConditions[dt] = { $gte: new Date(start), $lte: new Date(end) };
     if (lender) matchConditions["accounts.name"] = lender;
     if (partner) matchConditions["partner"] = partner;
+    console.log(matchConditions);
     await connectToMongoDB();
 
     const pipeline: any[] = [
@@ -37,12 +40,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                                 case: {
                                     $and: [
                                         { $eq: ["$accounts.name", "Fibe"] },
-                                        {
-                                            $regexMatch: {
-                                                input: "$accounts.res.reason",
-                                                regex: /(salary|pincode|Pan|Age|Invalid)/i,
-                                            },
-                                        },
+                                        { $regexMatch: { input: "$accounts.res.reason", regex: /(salary|pincode|Pan|Age|Invalid)/i } },
                                     ],
                                 },
                                 then: "Rejected",
@@ -336,7 +334,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                         $cond: {
                             if: { $eq: [group, "age"] },
                             then: {
-                                $subtract: [{ $year: new Date() }, { $year: { $dateFromString: { dateString: "$dob" } } }],
+                                $subtract: [{ $year: new Date() }, { $year: { $dateFromString: { dateString: "$dob", onError: null } } }],
                             },
                             else: null,
                         },
@@ -352,7 +350,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                 {
                                                     $subtract: [
                                                         { $year: new Date() },
-                                                        { $year: { $dateFromString: { dateString: "$dob" } } },
+                                                        { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
                                                     ],
                                                 },
                                                 {
@@ -360,7 +358,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                         {
                                                             $subtract: [
                                                                 { $year: new Date() },
-                                                                { $year: { $dateFromString: { dateString: "$dob" } } },
+                                                                { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
                                                             ],
                                                         },
                                                         5,
@@ -378,7 +376,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                         {
                                                             $subtract: [
                                                                 { $year: new Date() },
-                                                                { $year: { $dateFromString: { dateString: "$dob" } } },
+                                                                { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
                                                             ],
                                                         },
                                                         {
@@ -388,7 +386,7 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                                         { $year: new Date() },
                                                                         {
                                                                             $year: {
-                                                                                $dateFromString: { dateString: "$dob" },
+                                                                                $dateFromString: { dateString: "$dob", onError: null },
                                                                             },
                                                                         },
                                                                     ],
@@ -412,7 +410,7 @@ async function count(start: string, end: string, group: string, lender: string, 
             {
                 $group: {
                     _id: {
-                        lender: "$accounts.name",
+                        lender: lender ? "$accounts.name" : null,
                         status: "$lenderStatus",
                         group: {
                             $cond: {
@@ -452,7 +450,7 @@ async function count(start: string, end: string, group: string, lender: string, 
             {
                 $group: {
                     _id: {
-                        lender: "$accounts.name",
+                        lender: lender ? "$accounts.name" : null,
                         status: "$lenderStatus",
                     },
                     count: { $sum: 1 },
@@ -480,12 +478,12 @@ async function count(start: string, end: string, group: string, lender: string, 
 
 export async function POST(req: NextRequest) {
     try {
-        const { startDate, endDate, forceRefresh, group, lender, partner } = await req.json();
+        const { startDate, endDate, forceRefresh, group, lender, partner, datetype } = await req.json();
         const cacheKey = `${startDate}-${endDate}-${group || ""}-${lender || ""}-${partner || ""}`;
         const cachedResult = cache.get(cacheKey);
         if (cachedResult && !forceRefresh) return NextResponse.json(cachedResult, { status: 200 });
         await connectToMongoDB();
-        const res = await count(startDate, endDate, group, lender, partner);
+        const res = await count(startDate, endDate, group, lender, partner, datetype);
         cache.set(cacheKey, res);
 
         return NextResponse.json(res, { status: 200 });

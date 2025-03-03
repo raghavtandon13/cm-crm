@@ -13,54 +13,72 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export default function Graphs() {
+    // State and dates
     const [lender, setLender] = useState("SmartCoin");
     const [partner, setPartner] = useState("Zype_LS");
+    const [datetype, setDatetype] = useState("resp");
     const [date, setDate] = useState<DateRange | undefined>({ from: startOfMonth(new Date("2025-01-01")), to: new Date() });
-
     const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
     const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
+    // Fetch graph data
     const fetchGraphData = async (group: string) => {
         const response = await fromAPI.post("/leads/graphs", {
             startDate,
             endDate,
             lender: lender === "None" ? undefined : lender,
             partner: partner === "None" ? undefined : partner,
-            group,
+            group: group === "None" ? undefined : group,
+            datetype: datetype,
         });
         return response.data;
     };
 
+    // Total ARD Query
+    const {
+        data: ardData,
+        isFetching: isFetchingARD,
+        refetch: refetchARD,
+    } = useQuery({
+        queryKey: ["ardData", { startDate, endDate, lender, partner, datetype }],
+        queryFn: () => fetchGraphData("None"),
+        enabled: !!startDate && !!endDate,
+    });
+
+    // Age Distribution Query
     const {
         data: ageData,
         isFetching: isFetchingAge,
         refetch: refetchAge,
     } = useQuery({
-        queryKey: ["ageData", { startDate, endDate, lender, partner }],
+        queryKey: ["ageData", { startDate, endDate, lender, partner, datetype }],
         queryFn: () => fetchGraphData("age"),
         enabled: !!startDate && !!endDate,
     });
 
+    // Employement Distribution Query
     const {
         data: employmentData,
         isFetching: isFetchingEmployment,
         refetch: refetchEmployment,
     } = useQuery({
-        queryKey: ["employmentData", { startDate, endDate, lender, partner }],
+        queryKey: ["employmentData", { startDate, endDate, lender, partner, datetype }],
         queryFn: () => fetchGraphData("employment"),
         enabled: !!startDate && !!endDate,
     });
 
+    // Gender Distrubution Query
     const {
         data: genderData,
         isFetching: isFetchingGender,
         refetch: refetchGender,
     } = useQuery({
-        queryKey: ["genderData", { startDate, endDate, lender, partner }],
+        queryKey: ["genderData", { startDate, endDate, lender, partner, datetype }],
         queryFn: () => fetchGraphData("gender"),
         enabled: !!startDate && !!endDate,
     });
 
+    // Function to transform raw data into a graph data
     const transformData = (data: any) => {
         return data
             .map((item: any) => {
@@ -76,14 +94,47 @@ export default function Graphs() {
             .flat();
     };
 
-    const transformedAgeData = transformData(ageData || []);
-    const transformedEmploymentData = transformData(employmentData || []);
-    const transformedGenderData = transformData(genderData || []);
+    // Transform and filtered ARD data
+    const transformedArdData =
+        ardData?.[0]?.counts
+            .filter((item: any) => item.status !== "Rest" && item.status !== "Errors")
+            .map((item: any) => ({ group: item.status, count: item.count })) || [];
 
+    // Transform and sort age data
+    const transformedAgeData = transformData(ageData || [])
+        .filter((item: any) => item.group !== null)
+        .sort((a: any, b: any) => {
+            const [aStart] = a.group.split("-").map(Number);
+            const [bStart] = b.group.split("-").map(Number);
+            return aStart - bStart;
+        });
+
+    // Transform employment data
+    const transformedEmploymentData = transformData(employmentData || []).filter((item: any) =>
+        ["Salaried", "Self-employed"].includes(item.group),
+    );
+
+    // Transform and aggregate gender data
+    const transformedGenderData = transformData(genderData || [])
+        .filter((item: any) => ["male", "female"].includes(item.group?.toLowerCase()))
+        .map((item: any) => ({ ...item, group: item.group.toLowerCase() === "male" ? "Male" : "Female" }))
+        .reduce((acc: any, item: any) => {
+            const existing = acc.find((i: any) => i.group === item.group);
+            if (existing) {
+                Object.keys(item).forEach((key) => {
+                    if (key !== "group") existing[key] = (existing[key] || 0) + item[key];
+                });
+            } else acc.push(item);
+            return acc;
+        }, []);
+
+    // Configuration for the bar charts
     const ageConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
     const employmentConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
     const genderConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
+    const ardConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
 
+    // refetch all function
     const refetchAll = () => {
         refetchAge();
         refetchEmployment();
@@ -92,6 +143,7 @@ export default function Graphs() {
 
     return (
         <div>
+            {/* Controls for selecting lender, partner, and date range */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <Select value={lender} onValueChange={(v) => setLender(v)}>
                     <SelectTrigger className="bg-white w-[350px]">
@@ -126,6 +178,15 @@ export default function Graphs() {
                         <SelectItem value="None">None</SelectItem>
                         <SelectItem value="Zype_LS">Zype_LS</SelectItem>
                         <SelectItem value="MoneyTap">MoneyTap</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select value={datetype} onValueChange={(v) => setDatetype(v)}>
+                    <SelectTrigger className="bg-white w-[150px]">
+                        <SelectValue placeholder="Date Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="resp">Resp</SelectItem>
+                        <SelectItem value="created">Created</SelectItem>
                     </SelectContent>
                 </Select>
                 <Popover>
@@ -168,6 +229,7 @@ export default function Graphs() {
                     )}
                 </Button>
             </div>
+            {/* Display bar charts for age, employment, and gender distributions */}
             <div className="flex flex-wrap gap-4">
                 <BarChart data={transformedAgeData} title="Age Distribution" config={ageConfig} loading={isFetchingAge} />
                 <BarChart
@@ -177,6 +239,7 @@ export default function Graphs() {
                     loading={isFetchingEmployment}
                 />
                 <BarChart data={transformedGenderData} title="Gender Distribution" config={genderConfig} loading={isFetchingGender} />
+                <BarChart data={transformedArdData} multi={false} title="Total ARD" config={ardConfig} loading={isFetchingARD} />
             </div>
         </div>
     );
