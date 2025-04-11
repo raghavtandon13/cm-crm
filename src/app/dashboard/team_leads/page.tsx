@@ -1,24 +1,38 @@
 "use client";
-import fromAPI from "@/lib/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { CalendarIcon, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { DateRange } from "react-day-picker";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 function formatDate(utcDateStr: any) {
     const utcDate = new Date(utcDateStr);
-    return utcDate.toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-    });
+    return utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric", month: "short", day: "numeric" });
 }
+
+const statusMap = {
+    CALLBACK: "CALLBACK",
+    PTP: "PTP",
+    DISBURSED: "DISBURSED",
+    PENDING: "PENDING",
+};
+
+const subStatusMap = {
+    NOT_REQUIRED: "NOT_REQUIRED",
+    NOT_CONTACTED: "NOT_CONTACTED",
+    REJECTED: "REJECTED",
+    IN_PROGRESS: "IN_PROGRESS",
+    DISBURSED: "DISBURSED",
+};
 
 interface Assignment {
     assignmentId: string;
@@ -27,6 +41,7 @@ interface Assignment {
     userName: string;
     assignedAt: string;
     status: string;
+    subStatus: string;
     agentId: string;
 }
 
@@ -39,16 +54,25 @@ interface AgentData {
 export default function MyLeads() {
     const user = useUser();
     let qa = user?.role.title === "QA";
-    // qa = true;
 
     const [searchPhone, setSearchPhone] = useState("");
     const [searchResult, setSearchResult] = useState("");
+    const [date, setDate] = useState<DateRange | undefined>({
+        from: new Date(new Date().setDate(new Date().getDate() - 1)),
+        to: new Date(new Date().setDate(new Date().getDate() + 1)),
+    });
+    const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
+    const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
     const queryClient = useQueryClient();
-    const { data: agentsData, refetch } = useQuery({
+    const {
+        data: agentsData,
+        refetch,
+        isFetching,
+    } = useQuery({
         queryKey: ["assignments"],
         queryFn: async () => {
-            const response = await fromAPI.get("/agents/tl_assignments");
+            const response = await fromAPI.get(`/agents/tl_assignments?start=${startDate}&end=${endDate}`);
             return response.data.data as Record<string, AgentData>;
         },
     });
@@ -99,7 +123,46 @@ export default function MyLeads() {
         },
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async ({ assignmentId }: { assignmentId: string }) => {
+            await fromAPI.post("/agents/assignments/delete", { assignmentId });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["assignments"], exact: true });
+            toast.success("Assignment deleted successfully");
+            refetch();
+        },
+    });
+
+    const statusMutation = useMutation({
+        mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
+            await fromAPI.post("/assignments/change", {
+                assignmentId,
+                status,
+                subStatus,
+            });
+        },
+        onSuccess: () => {
+            toast.success("Status updated successfully");
+            queryClient.invalidateQueries({ queryKey: ["assignments"], exact: true });
+        },
+        onError: () => {
+            toast.error("Status update failed.");
+            queryClient.invalidateQueries({ queryKey: ["assignments"], exact: true });
+        },
+    });
+
+    const handleStatusChangeLocal = (e: React.ChangeEvent<HTMLSelectElement>, type: "status" | "subStatus", lead: Assignment) => {
+        const value = e.target.value;
+        if (type === "status") {
+            statusMutation.mutate({ assignmentId: lead.assignmentId, status: value, subStatus: lead.subStatus });
+        } else {
+            statusMutation.mutate({ assignmentId: lead.assignmentId, status: lead.status, subStatus: value });
+        }
+    };
+
     const handleTransfer = (assignmentId: string, newAgentId: string) => transferMutation.mutate({ assignmentId, newAgentId });
+    const handleDelete = (assignmentId: string) => deleteMutation.mutate({ assignmentId });
 
     const agentsMapValue = agentsMap();
     const allAssignmentsValue = allAssignments();
@@ -108,13 +171,53 @@ export default function MyLeads() {
     return (
         <>
             <div className="mb-4 w-full flex items-center justify-between">
-                <div className="w-[150px]">
-                    Total Leads:
-                    {filteredAssignments.length}
+                <div className="font-semibold flex gap-4 mb-2 items-center">
+                    <div className="w-[150px]">
+                        Total Leads:
+                        {filteredAssignments.length}
+                    </div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                id="date"
+                                variant="outline"
+                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date?.from ? (
+                                    date.to ? (
+                                        <>
+                                            {format(date.from, "yyyy-MM-dd")} - {format(date.to, "yyyy-MM-dd")}
+                                        </>
+                                    ) : (
+                                        format(date.from, "yyyy-MM-dd")
+                                    )
+                                ) : (
+                                    <span>Pick a date</span>
+                                )}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                initialFocus
+                                mode="range"
+                                defaultMonth={date?.from}
+                                selected={date}
+                                onSelect={setDate}
+                                numberOfMonths={2}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    <Button onClick={() => refetch()} variant="outline">
+                        {isFetching ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-black-500 rounded-full border-t-transparent"></div>
+                        ) : (
+                            <Search className="w-4" />
+                        )}
+                    </Button>
                 </div>
-
                 {!qa && (
-                    <input
+                    <Input
                         type="text"
                         placeholder="Search by phone TL"
                         value={searchPhone}
@@ -124,7 +227,8 @@ export default function MyLeads() {
                 )}
                 {qa && (
                     <div className="flex">
-                        <input
+                        <Input
+                            className="w-4 bg-white"
                             type="text"
                             placeholder="Search by phone QA"
                             value={searchPhone}
@@ -136,7 +240,7 @@ export default function MyLeads() {
                                     else setSearchResult("No results found");
                                 }
                             }}
-                            className="mb-2 p-2 border rounded"
+                            // className="mb-2 p-2 border rounded"
                         />
                         <div className="mt-2 ml-2">{searchResult && <div>{searchResult}</div>}</div>
                     </div>
@@ -168,30 +272,48 @@ export default function MyLeads() {
                         <TableBody>
                             <TableRow>
                                 <TableCell className="text-slate-600 text-center">Phone</TableCell>
-                                <TableCell className="text-slate-600 text-center">Email</TableCell>
-                                <TableCell className="text-slate-600 text-center">Name</TableCell>
+                                {/* <TableCell className="text-slate-600 text-center">Email</TableCell> */}
+                                <TableCell className="text-slate-600 text-left">Name</TableCell>
                                 <TableCell className="text-slate-600 text-center">Date</TableCell>
                                 <TableCell className="text-slate-600 text-left">Status</TableCell>
-                                <TableCell className="text-slate-600 text-left">Agent</TableCell>
+                                <TableCell className="text-slate-600 text-left">SubStatus</TableCell>
+                                <TableCell className="text-slate-600 text-right">Agent</TableCell>
                                 <TableCell className="text-slate-600 text-left">Transfer</TableCell>
                             </TableRow>
                         </TableBody>
                         <TableBody>
                             {filteredAssignments.map((asg) => (
                                 <TableRow key={asg.assignmentId}>
-                                    <TableCell className="text-center">{asg.userPhone}</TableCell>
-                                    <TableCell className="text-center">{asg.userEmail}</TableCell>
-                                    <TableCell className="text-center">{asg.userName}</TableCell>
-                                    <TableCell className="text-center">{formatDate(asg.assignedAt)}</TableCell>
-                                    <TableCell
-                                        onClick={() => window.open(`https://cred-db.vercel.app/mv/${asg.userPhone}`)}
-                                        className="text-left pointer"
-                                    >
-                                        {asg.status} &rarr;
+                                    <TableCell className="text-center border-r border-gray-200">{asg.userPhone}</TableCell>
+                                    {/* <TableCell className="text-center">{asg.userEmail}</TableCell> */}
+                                    <TableCell className="text-left border-r border-gray-200">{asg.userName}</TableCell>
+                                    <TableCell className="text-left border-r border-gray-200">{formatDate(asg.assignedAt)}</TableCell>
+                                    <TableCell className="text-left border-r border-gray-200 pointer">
+                                        <select onChange={(e) => handleStatusChangeLocal(e, "status", asg)} defaultValue={asg.status}>
+                                            <option value="" disabled>
+                                                Select Status
+                                            </option>
+                                            {Object.entries(statusMap).map(([status, value]) => (
+                                                <option key={status} value={value}>
+                                                    {status}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </TableCell>
-
-                                    <TableCell className="text-center">{asg.agentName}</TableCell>
-                                    <TableCell className="text-left">
+                                    <TableCell className="text-left border-r border-gray-200 pointer">
+                                        <select onChange={(e) => handleStatusChangeLocal(e, "subStatus", asg)} defaultValue={asg.subStatus}>
+                                            <option value="" disabled>
+                                                Select Sub Status
+                                            </option>
+                                            {Object.entries(subStatusMap).map(([subStatus, value]) => (
+                                                <option key={subStatus} value={value}>
+                                                    {subStatus}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </TableCell>
+                                    <TableCell className="text-right border-r border-gray-200">{asg.agentName}</TableCell>
+                                    <TableCell className="text-left border-r border-gray-200">
                                         <select onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)} defaultValue="">
                                             <option value="" disabled>
                                                 Select Agent
@@ -202,6 +324,11 @@ export default function MyLeads() {
                                                 </option>
                                             ))}
                                         </select>
+                                    </TableCell>
+                                    <TableCell className="text-left" onClick={() => handleDelete(asg.assignmentId)}>
+                                        <Button variant="ghost">
+                                            <Trash2 strokeWidth={1} className="w-4" />
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

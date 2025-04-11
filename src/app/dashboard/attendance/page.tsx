@@ -7,14 +7,15 @@ import fromAPI from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { format, startOfMonth, eachDayOfInterval } from "date-fns";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { format, eachDayOfInterval } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Link from "next/link";
 
 export default function Attendance() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -30,7 +31,7 @@ export default function Attendance() {
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
             const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`);
-            return response.data.data; // Access the `data` array directly
+            return response.data.data;
         },
     });
 
@@ -93,7 +94,7 @@ export default function Attendance() {
         return (
             <div className="flex items-center justify-center p-8">
                 <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-                <small>Fetching agent attendance data...</small>
+                <p className="ml-4">Fetching leave requests...</p>
             </div>
         );
     }
@@ -118,7 +119,7 @@ export default function Attendance() {
 
     const formattedData = filteredData.map((agent: any) => {
         const attendance = dates.reduce((acc: any, date) => {
-            acc[date] = agent.attendance[date] || ""; // Leave empty if no data
+            acc[date] = agent.attendance[date] || ""; 
             return acc;
         }, {});
 
@@ -287,6 +288,9 @@ export default function Attendance() {
                         <Search className="w-4" />
                     )}
                 </Button>
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/attendance/overview">
+                    Overview -{">"}{" "}
+                </Link>
             </div>
             {formattedData.length > 0 ? (
                 <DataTable columns={columns} data={formattedData} name="attendanceData" />
@@ -298,7 +302,7 @@ export default function Attendance() {
                 {leaveRequestsQuery.isLoading ? (
                     <div className="flex items-center justify-center p-8">
                         <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-                        <small>Fetching leave requests...</small>
+                        <p className="ml-4">Fetching leave requests...</p>
                     </div>
                 ) : leaveRequestsQuery.isError ? (
                     <div className="flex items-center justify-center h-96">

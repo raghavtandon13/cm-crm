@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Papa from "papaparse";
+import { read, utils } from "xlsx";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
@@ -159,20 +160,48 @@ export default function Create() {
         const fileInput = document.getElementById("csvfile") as HTMLInputElement;
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const file = fileInput.files[0];
-            Papa.parse(file, {
-                complete: (result: any) => {
-                    const headers = result.data[0]; // Extract headers
+            const fileType = file.name.split(".").pop()?.toLowerCase();
+
+            if (fileType === "csv") {
+                Papa.parse(file, {
+                    complete: (result: any) => {
+                        const headers = result.data[0]; // Extract headers
+                        const chunkSize = 1000; // Each chunk will have one lead
+                        const chunks = [];
+                        for (let i = 1; i < result.data.length; i += chunkSize) {
+                            chunks.push([headers, ...result.data.slice(i, i + chunkSize)]);
+                        }
+
+                        setProgress(0);
+
+                        uploadNextChunk(chunks, 0);
+                    },
+                });
+            } else if (fileType === "xlsx") {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                    const workbook = read(data, { type: "array" });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
+                    console.log(jsonData);
+
+                    const headers = jsonData[0]; // Extract headers
                     const chunkSize = 1; // Each chunk will have one lead
                     const chunks = [];
-                    for (let i = 1; i < result.data.length; i += chunkSize) {
-                        chunks.push([headers, ...result.data.slice(i, i + chunkSize)]);
+                    for (let i = 1; i < jsonData.length; i += chunkSize) {
+                        chunks.push([headers, ...jsonData.slice(i, i + chunkSize)]);
                     }
 
                     setProgress(0);
 
                     uploadNextChunk(chunks, 0);
-                },
-            });
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                toast.error("Unsupported file type");
+            }
         }
     };
 
@@ -214,7 +243,7 @@ export default function Create() {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Upload CSV</DialogTitle>
-                        <DialogDescription>Please select a CSV file to upload.</DialogDescription>
+                        <DialogDescription>Please select a CSV or XLSX file to upload.</DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-row space-x-1">
                         <Input className="bg-white" id="csvfile" type="file" />
@@ -241,22 +270,20 @@ export default function Create() {
                                     </AccordionTrigger>
                                     <AccordionContent>
                                         <ul>
-                                            <li className="text-gray-600 text-sm">• First Name</li>
-                                            <li className="text-gray-600 text-sm">• Last Name</li>
-                                            <li className="text-gray-600 text-sm">• Phone</li>
-                                            <li className="text-gray-600 text-sm">• Email</li>
-                                            <li className="text-gray-600 text-sm">• Date of Birth</li>
-                                            <li className="text-gray-600 text-sm">• Gender (MALE/FEMALE)</li>
-                                            <li className="text-gray-600 text-sm">• Address</li>
-                                            <li className="text-gray-600 text-sm">• Pincode</li>
-                                            <li className="text-gray-600 text-sm">• City</li>
-                                            <li className="text-gray-600 text-sm">• State</li>
-                                            <li className="text-gray-600 text-sm">
-                                                • Employment Type (Salaried/Self-employed/No-employment)
-                                            </li>
-                                            <li className="text-gray-600 text-sm">• Company Name</li>
-                                            <li className="text-gray-600 text-sm">• Salary</li>
-                                            <li className="text-gray-600 text-sm">• PAN</li>
+                                            <li className="text-gray-600 text-sm">• firstName</li>
+                                            <li className="text-gray-600 text-sm">• lastName</li>
+                                            <li className="text-gray-600 text-sm">• phone</li>
+                                            <li className="text-gray-600 text-sm">• email</li>
+                                            <li className="text-gray-600 text-sm">• dob</li>
+                                            <li className="text-gray-600 text-sm">• gender (MALE/FEMALE)</li>
+                                            <li className="text-gray-600 text-sm">• address</li>
+                                            <li className="text-gray-600 text-sm">• pincode</li>
+                                            <li className="text-gray-600 text-sm">• city</li>
+                                            <li className="text-gray-600 text-sm">• state</li>
+                                            <li className="text-gray-600 text-sm">• empType (Salaried/Self-employed/No-employment)</li>
+                                            <li className="text-gray-600 text-sm">• company</li>
+                                            <li className="text-gray-600 text-sm">• salary</li>
+                                            <li className="text-gray-600 text-sm">• pan</li>
                                         </ul>
                                     </AccordionContent>
                                 </AccordionItem>

@@ -1,21 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "../../../../../../../lib/db";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
-        const leaveRequests = await db.leaveRequest.findMany({
-            orderBy: { createdAt: "desc" },
-        });
+        const leaveRequests = await db.leaveRequest.findMany({ orderBy: { createdAt: "desc" } });
 
         const leaveRequestsWithAgentNames = await Promise.all(
             leaveRequests.map(async (leaveRequest) => {
-                const agent = await db.agent.findUnique({
-                    where: { id: leaveRequest.agentId },
-                });
-                return {
-                    ...leaveRequest,
-                    agentName: agent?.name || "Unknown",
-                };
+                const agent = await db.agent.findUnique({ where: { id: leaveRequest.agentId } });
+                return { ...leaveRequest, agentName: agent?.name || "Unknown" };
             }),
         );
 
@@ -25,12 +18,10 @@ export async function GET(req: NextRequest) {
     }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
     const { leaveReqId, decision } = await req.json();
 
-    if (!leaveReqId || !decision) {
-        return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
-    }
+    if (!leaveReqId || !decision) return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
 
     try {
         // if startDate and endDate is same then leave is only for one day but if they are different then leave is for multiple days

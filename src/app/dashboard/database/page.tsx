@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import fromAPI from "@/lib/api";
+// import superjson from "superjson";
 
 type NavItemProps = {
     href: string;
@@ -55,6 +56,7 @@ export default function Create() {
             const response = await fromAPI.post("/db/queries/run", {
                 id,
                 query: queryText,
+                // query: superjson.stringify(queryText),
             });
             return response.data;
         },

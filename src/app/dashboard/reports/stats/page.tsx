@@ -1,5 +1,5 @@
-import { StatsTable } from "@/components/displays/statsTable";
+import { StatsDaywiseTable } from "@/components/displays/statsDaywiseTable";
 
 export default function Reports() {
-    return <StatsTable />;
+    return <StatsDaywiseTable />;
 }

@@ -90,5 +90,6 @@ export type Assignment = {
     agentId: string;
     assignedAt: Date;
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+    subStatus: "NOT_REQIORED" | "NOT_CONTACTED" | "REJECTED" | "IN_PROGRESS" | "DISBURSED";
     agent: Agent;
 };

@@ -1,15 +1,17 @@
 import { NextResponse, NextRequest } from "next/server";
-import { db, connectToMongoDB } from "../../../../../lib/db";
+import { db } from "../../../../../lib/db";
 import User from "@/lib/users";
-import jwt from "jsonwebtoken";
-const secret = process.env.JWT_SECRET as string;
 
 export async function GET(req: NextRequest) {
     try {
+        const startDate = req.nextUrl.searchParams.get("start");
+        const endDate = req.nextUrl.searchParams.get("end");
         // Fetch all agents and their assignments
         const agents = await db.agent.findMany({
             include: {
-                Assignment: true,
+                Assignment: {
+                    where: { ...(startDate && endDate ? { assignedAt: { gte: new Date(startDate), lte: new Date(endDate) } } : {}) },
+                },
             },
         });
 

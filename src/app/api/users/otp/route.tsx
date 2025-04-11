@@ -18,11 +18,24 @@ export async function GET(req: NextRequest) {
         await axios.get("https://www.fast2sms.com/dev/bulkV2", {
             params: {
                 authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
+                route: "dlt",
+                sender_id: "CredML",
+                message: 181108,
+                // 181108
                 variables_values: otp,
-                route: "otp",
+                flash: 0,
                 numbers: phone,
             },
         });
+
+        // await axios.get("https://www.fast2sms.com/dev/bulkV2", {
+        //     params: {
+        //         authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
+        //         variables_values: otp,
+        //         route: "otp",
+        //         numbers: phone,
+        //     },
+        // });
 
         // Save OTP and expiration time to the user's
         // ecord in the database

@@ -3,6 +3,7 @@ import { db } from "../../../../../../lib/db";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
 import { ObjectId } from "mongodb";
+// import superjson from "superjson";
 
 function convertSpecialOperators(query: any) {
     if (Array.isArray(query)) {
@@ -33,7 +34,7 @@ export async function POST(_req: NextRequest) {
     try {
         const { id, query } = await _req.json();
 
-        let aggregationPipeline;
+        let aggregationPipeline: any;
 
         if (id) {
             // If ID provided, fetch and use saved query
@@ -47,9 +48,12 @@ export async function POST(_req: NextRequest) {
             try {
                 aggregationPipeline = JSON.parse(query);
                 aggregationPipeline = convertSpecialOperators(aggregationPipeline);
+                // aggregationPipeline = superjson.parse(query);
+                // aggregationPipeline = typeof aggregationPipeline === "string" ? JSON.parse(aggregationPipeline) : aggregationPipeline;
+                console.log(aggregationPipeline);
             } catch (error) {
                 console.error("Invalid query format:", error);
-                return NextResponse.json({ error: "Invalid query format" }, { status: 400 });
+                return NextResponse.json({ error: "Invalid query format 2" }, { status: 400 });
             }
         } else {
             return NextResponse.json({ error: "No query provided" }, { status: 400 });
