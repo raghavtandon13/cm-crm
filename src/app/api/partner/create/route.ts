@@ -16,19 +16,19 @@ import { NextResponse, NextRequest } from "next/server";
 const secret = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
-    const token = req.headers.get("Authorization")?.split(" ")[1];
-    if (!token) return NextResponse.json({ status: "failure", message: "No token provided" }, { status: 401 });
+    // const token = req.headers.get("Authorization")?.split(" ")[1];
+    // if (!token) return NextResponse.json({ status: "failure", message: "No token provided" }, { status: 401 });
 
-    const { id } = jwt.verify(token, secret) as { id: string };
-    const dsa = await db.partner.findUnique({ where: { id }, include: { role: true } });
-    const boss = await db.agent.findUnique({ where: { id }, include: { role: true } });
-    if (!dsa && !boss) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
-    if (!!boss && boss.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
-    if (!!dsa && dsa.role.title !== "DSA") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    // const { id } = jwt.verify(token, secret) as { id: string };
+    // const dsa = await db.partner.findUnique({ where: { id }, include: { role: true } });
+    // const boss = await db.agent.findUnique({ where: { id }, include: { role: true } });
+    // if (!dsa && !boss) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
+    // if (!!boss && boss.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    // if (!!dsa && dsa.role.title !== "DSA") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
 
     // testing
-    // const boss = true;
-    // const dsa = false;
+    const boss = true;
+    const dsa = false;
 
     try {
         const body = await req.json();
@@ -45,20 +45,20 @@ export async function POST(req: NextRequest) {
         }
 
         const newPartner = await db.partner.create({
-            data: {
-                email: body.email,
-                name: body.firstName + " " + body.lastName,
-                password: hashedPassword,
-                pancard: body.pancard,
-                aadhar: body.aadhar,
-                address: body.address,
-                pincode: body.pincode,
-                alt_mob: body.alt_mob,
-                bank_ac: body.bank_ac,
-                bank_ifsc: body.bank_ifsc,
-                bank_acc_name: body.bank_acc_name,
-                bank_name: body.bank_name,
-                roleId: roleId,
+            "data": {
+                "email": body.email,
+                "name": body.firstName + " " + body.lastName,
+                "password": hashedPassword,
+                // "pancard": body.pancard,
+                // "aadhar": body.aadhar,
+                // "address": body.address,
+                // "pincode": body.pincode,
+                // "alt_mob": body.alt_mob,
+                // "bank_ac": body.bank_ac,
+                // "bank_ifsc": body.bank_ifsc,
+                // "bank_acc_name": body.bank_acc_name,
+                // "bank_name": body.bank_name,
+                "roleId": roleId,
             },
             include: { role: true },
         });
