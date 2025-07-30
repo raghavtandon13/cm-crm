@@ -134,7 +134,6 @@ model LeaveRequest {
 model Partner {
     id            String         @id @default(auto()) @map("_id") @db.ObjectId
     email         String         @unique
-    cmId          String?        @unique
     name          String?
     password      String
     roleId        String         @db.ObjectId // ["DSA","subDSA","indiv"]
