@@ -139,22 +139,13 @@ model Partner {
     roleId        String         @db.ObjectId // ["DSA","subDSA","indiv"]
     role          Role           @relation(fields: [roleId], references: [id])
     partnerLeads  PartnerLeads[]
-    pancard       String?
-    aadhar        String?
-    address       String?
-    pincode       String?
-    alt_mob       String?
-    bank_ac       String?
-    bank_ifsc     String?
-    bank_acc_name String?
-    bank_name     String?
 
     // Self-referential relations for DSA and subDSA/indiv
     subPartners Partner[] @relation("PartnerHierarchy")
     parent      Partner?  @relation("PartnerHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     parentId    String?   @db.ObjectId
 
-    // Other relations
+    // Others
     createdAt       DateTime @default(now())
     updatedAt       DateTime @default(now())
     passwordUpdated Boolean  @default(false)

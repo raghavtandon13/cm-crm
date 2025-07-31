@@ -11,10 +11,54 @@ export async function GET(req: NextRequest) {
         // Getting Agent
         if (!token) return NextResponse.json({ message: "No token provided" }, { status: 401 });
         const { id } = jwt.verify(token, secret) as { id: string };
-        const partner = await db.partner.findUnique({ where: { id }, include: { role: true } });
 
-        // Assignments
-        const partnerLeads = await db.partnerLeads.findMany({ where: { partnerId: partner?.id } });
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+        console.log(page, limit);
+
+        const partner = await db.partner.findUnique({ where: { id }, include: { role: true } });
+        const partnerRole = partner.role.title;
+        let leadsRes: any, groupRes: any, countRes: any;
+
+        if (partnerRole !== "DSA") {
+            [leadsRes, groupRes, countRes] = await Promise.allSettled([
+                db.partnerLeads.findMany({
+                    where: { partnerId: partner.id },
+                    skip: (page - 1) * limit,
+                    take: limit,
+                    orderBy: { assignedAt: "desc" },
+                }),
+                db.partnerLeads.groupBy({ by: ["status"], where: { partnerId: partner.id }, _count: { status: true } }),
+                db.partnerLeads.count({ where: { partnerId: partner.id } }),
+            ]);
+        } else {
+            const subDsas = await db.partner
+                .findMany({ where: { parentId: partner.id }, select: { id: true } })
+                .then((dsas) => dsas.map((dsa) => dsa.id));
+
+            [leadsRes, groupRes, countRes] = await Promise.allSettled([
+                db.partnerLeads.findMany({
+                    where: { partnerId: { in: subDsas } },
+                    skip: (page - 1) * limit,
+                    take: limit,
+                    orderBy: { assignedAt: "desc" },
+                }),
+                db.partnerLeads.groupBy({
+                    by: ["status"],
+                    where: { partnerId: { in: subDsas } },
+                    _count: { status: true },
+                }),
+                db.partnerLeads.count({ where: { partnerId: { in: subDsas } } }),
+            ]);
+        }
+
+        const partnerLeads = leadsRes.status === "fulfilled" ? leadsRes.value : [];
+        const partnerARD = groupRes.status === "fulfilled" ? groupRes.value : [];
+        const totalPartnerLeads = countRes.status === "fulfilled" ? countRes.value : 0;
+
+        const totalPages = Math.ceil(totalPartnerLeads / limit);
+
         await connectToMongoDB();
 
         // Find users for each cmUserId in partnerLeads
@@ -28,6 +72,8 @@ export async function GET(req: NextRequest) {
         // Response
         const response = NextResponse.json({
             status: "success",
+            totalPages,
+            partnerARD,
             data: users,
         });
 

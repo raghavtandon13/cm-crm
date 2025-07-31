@@ -6,7 +6,6 @@ import { CMUser } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { RefreshCcw } from "lucide-react";
-import { useState } from "react";
 
 export const columns: ColumnDef<CMUser>[] = [
     { accessorKey: "name", header: () => <div className=" text-left">Name</div> },
@@ -23,37 +22,21 @@ export const columns: ColumnDef<CMUser>[] = [
         header: () => <div className="">Phone</div>,
         cell: ({ row }) => <div className="min-w-max ">{row.getValue("phone")}</div>,
     },
-    // {
-    //     accessorKey: "pan",
-    //     header: () => <div className=" text-center">PAN</div>,
-    //     cell: ({ row }) => <div className="min-w-max text-right">{row.getValue("pan")}</div>,
-    // },
-    // {
-    //     accessorKey: "dob",
-    //     header: () => <div className=" text-center">DOB</div>,
-    //     cell: ({ row }) => <div className="min-w-max text-right">{row.getValue("dob")}</div>,
-    // },
-    // {
-    //     accessorKey: "email",
-    //     header: () => <div className=" text-right">Email</div>,
-    //     cell: ({ row }) => <div className="min-w-max text-right">{row.getValue("email")}</div>,
-    // },
 ];
 
-function convertToIST(gmtDate: string): string {
-    const date = new Date(gmtDate);
-    return date.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "Asia/Kolkata",
-    });
-}
+// function convertToIST(gmtDate: string): string {
+//     const date = new Date(gmtDate);
+//     return date.toLocaleTimeString("en-US", {
+//         hour12: false,
+//         hour: "2-digit",
+//         minute: "2-digit",
+//         timeZone: "Asia/Kolkata",
+//     });
+// }
 
 export function NewWebUsersTable() {
-    const [page, setPage] = useState(1);
     const { data, isError, isPending, refetch, isFetching } = useQuery({
-        queryKey: ["users", { page }],
+        queryKey: ["newweb"],
         queryFn: async () => {
             const response = await fromAPI.get(`/users/newweb`);
             return response.data as any;

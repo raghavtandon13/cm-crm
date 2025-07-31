@@ -19,6 +19,7 @@ import DateSearch from "./dateSearch";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
+
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];

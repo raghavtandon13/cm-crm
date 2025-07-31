@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (currentUser) {
-        const response = await axios.get("http:/localhost:3000/api/auth/get", {
+        const response = await axios.get("http://localhost:3000/api/auth/get", {
             headers: { Authorization: `Bearer ${currentUser}` },
         });
 
@@ -23,11 +23,22 @@ export async function middleware(request: NextRequest) {
                 "/dashboard/team_leads",
                 "/dashboard/search",
                 "/dashboard/reports",
+                "/dashboard/reports2",
                 "/dashboard/register",
                 "/dashboard/database",
                 "/dashboard/attendance",
+                "/dashboard/export",
             ],
+            DSA: [
+                "/dashboard/partner_create",
+                "/dashboard/partner_leads",
+                "/dashboard/partner_search",
+                "/dashboard/partner_dsa",
+            ],
+            HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
+            INDIV: ["/dashboard/partner_create", "/dashboard/partner_leads", "/dashboard/partner_search"],
             OE: ["/dashboard/create", "/dashboard/myleads", "/dashboard/search", "/dashboard/agent_attendance"],
+            SUBDSA: ["/dashboard/partner_create", "/dashboard/partner_leads", "/dashboard/partner_search"],
             TE: ["/dashboard/agent_attendance"],
             TL: [
                 "/dashboard/create",
@@ -36,18 +47,19 @@ export async function middleware(request: NextRequest) {
                 "/dashboard/agent_attendance",
                 "/dashboard/attendance",
                 "/dashboard/team_leads",
+                "/dashboard/export",
             ],
-            HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
-            INDIV: ["/dashboard/partner_create", "/dashboard/partner_leads"],
         };
 
         const allowedRoutes = roleRoutes[role] || [];
 
         const defaultRedirects = {
             BOSS: "/dashboard/reports",
+            DSA: "/dashboard/partner_create",
             HR: "/dashboard/attendance",
             INDIV: "/dashboard/partner_create",
             OE: "/dashboard/create",
+            SUBDSA: "/dashboard/partner_create",
             TE: "/dashboard/agent_attendance",
             TL: "/dashboard/team_leads",
         };

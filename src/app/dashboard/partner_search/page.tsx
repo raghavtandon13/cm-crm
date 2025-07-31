@@ -1,30 +1,51 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import UserSearch from "@/components/userSearch";
 import User from "@/lib/users";
-// import Image from "next/image";
 import Link from "next/link";
 import { CMUser } from "@/lib/types";
 import { buttonVariants } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
-import { NewWebUsersTable } from "@/components/displays/newWebUsers";
 import LenderStatus from "@/components/displays/lenderStatus";
+import { redirect } from "next/navigation";
+import { db } from "../../../../lib/db";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+const secret = process.env.JWT_SECRET as string;
 
 interface UserData {
     accounts: Record<string, any>[];
     details: Omit<CMUser, "accounts">;
 }
 
-async function getData(phone: string): Promise<UserData | string> {
+async function getData(phone: string, partnerId: string): Promise<UserData | string> {
     try {
-        const user1 = await User.find({ phone: phone }).lean();
+        // getting cmUser from phone and subDSAs (if any) from partnerId
+        const [user, subDsasRaw] = await Promise.all([
+            User.findOne({ phone: phone }).lean(),
+            db.partner.findMany({ where: { parentId: partnerId }, select: { id: true } }),
+        ]);
+
+        if (!user) return "Error Occurred";
+
+        const userId = user._id?.toString();
+        const subDsas = subDsasRaw.map((dsa) => dsa.id);
+
+        // getting associations between cmUser and DSA or their subDSAs
+        const [u, u2] = await Promise.all([
+            db.partnerLeads.findFirst({ where: { partnerId: partnerId, cmUserId: userId } }),
+            db.partnerLeads.findFirst({ where: { partnerId: { in: subDsas }, cmUserId: userId } }),
+        ]);
+
+        // if no association found, return "Error Occurred"
+        if (!u && !u2) return "Error Occurred";
+
         let res: any = {};
-        if (user1[0] && user1[0].accounts) {
-            const { accounts, ...details } = user1[0];
-            if (accounts !== undefined && details !== undefined) {
-                res.accounts = accounts;
-                res.details = details;
-            }
+        if (user.accounts) {
+            const { accounts, ...details } = user;
+            res.accounts = accounts;
+            res.details = details;
         }
+
         return res;
     } catch (error) {
         console.log("Error:", error);
@@ -33,37 +54,27 @@ async function getData(phone: string): Promise<UserData | string> {
 }
 
 export default async function Phone({ searchParams }: { searchParams: { phone: string; accountsOnly: string } }) {
+    const { id } = jwt.verify(await cookies().get("cm-token").value, secret) as { id: string };
+
     let phone = "";
-    let accountsOnly = false;
-
-    if (searchParams.phone === undefined) {
-        return (
-            <main className="flex flex-col items-stretch md:p-8 ">
-                <UserSearch phone={phone} />
-
-                <NewWebUsersTable />
-                {/* <div className="flex justify-center py-10">
-                    <Image src="/search.svg" alt="" width={400} height={400} className="mix-blend-multiply"></Image>
-                </div> */}
-            </main>
-        );
-    }
-
-    if (searchParams.phone) {
-        phone = searchParams.phone.toString();
-    }
-
+    let accountsOnly = true;
+    if (searchParams.phone === undefined || searchParams.phone === "" || /^\d{10}$/.test(searchParams.phone) === false)
+        redirect("/dashboard/partner_create");
+    if (searchParams.phone) phone = searchParams.phone.toString();
     if (searchParams.accountsOnly) {
         accountsOnly = searchParams.accountsOnly === "true";
+        accountsOnly = true; // force true
     }
-    const res = await getData(phone);
+
+    const res = await getData(phone, id);
 
     if (typeof res === "string") {
         return (
             <div className="justify-center py-10 text-center">
                 <h1 className="text-2xl font-bold">NOT FOUND</h1>
                 <Link href={"/"} className="text-sm">
-                    Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                    Create New Lead for{" "}
+                    <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                 </Link>
             </div>
         );
@@ -73,7 +84,9 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
         return res.accounts.map((account: any, index: any) => (
             <div key={index} className="mx-auto mb-4 items-center justify-center rounded-xl bg-white px-4 py-8 shadow">
                 <div className="px-4">
-                    <p className="mb-4 ml-[-8px] w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">{account.name}</p>
+                    <p className="mb-4 ml-[-8px] w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">
+                        {account.name}
+                    </p>
                     {Object.entries(account)
                         .filter(([key]) => !["res", "req", "sent", "name", "status_code"].includes(key))
                         .map(([key, value]: any, entryIndex, arr) =>
@@ -101,7 +114,10 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                     <div className="items-center justify-center">
                         <div className="flex justify-between py-10">
                             <h1 className="font-bold">Personal Details</h1>
-                            <Link className={`${buttonVariants({ variant: "outline" })}`} href={`/dashboard/create?phone=${phone}`}>
+                            <Link
+                                className={`${buttonVariants({ variant: "outline" })}`}
+                                href={`/dashboard/create?phone=${phone}`}
+                            >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
@@ -134,7 +150,9 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                                                 <TableRow key={key}>
                                                     <TableCell className="font-medium">{key}</TableCell>
                                                     <TableCell className="max-w-xs truncate text-right">
-                                                        {typeof value === "object" ? JSON.stringify(value, null, 1) : value.toString()}
+                                                        {typeof value === "object"
+                                                            ? JSON.stringify(value, null, 1)
+                                                            : value.toString()}
                                                     </TableCell>
                                                 </TableRow>
                                             ),
@@ -178,7 +196,8 @@ export default async function Phone({ searchParams }: { searchParams: { phone: s
                 <div className="justify-center py-10 text-center">
                     <h1 className="text-2xl font-bold">NOT FOUND</h1>
                     <Link href={"/"} className="text-sm">
-                        Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                        Create New Lead for{" "}
+                        <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                     </Link>
                 </div>
             )}

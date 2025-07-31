@@ -1,8 +1,0 @@
-firstName,lastName,phone,email,dob,gender,address,pincode,city,state,empType,company,salary,pan,
-Rohan,Sharma,9876543210,rohan.sharma@example.com,1990-05-15,MALE,123 MG Road,110001,Delhi,Delhi,Salaried,ABC Pvt Ltd,75000,ABCDE1234F, 
-Priya,Mehta,9876543211,priya.mehta@example.com,1988-09-20,FEMALE,45 Park Street,400001,Mumbai,Maharashtra,Self-employed,XYZ Enterprises,95000,XYZAB5678L
-Amit,Verma,9876543212,amit.verma@example.com,1995-03-10,MALE,78 Patel Nagar,560001,Bangalore,Karnataka,No-employment,,0,LMNOP2345K
-Neha,Gupta,9876543213,neha.gupta@example.com,1992-07-25,FEMALE,33 Residency Road,600001,Chennai,Tamil Nadu,Salaried,Tech Solutions,68000,QRSTU6789M
-Rajesh,Kumar,9876543214,rajesh.kumar@example.com,1985-11-12,MALE,12 Sector 5,500001,Hyderabad,Telangana,Self-employed,Kumar Traders,120000,ABCDE9876P
-Simran,Kaur,9876543215,simran.kaur@example.com,1998-02-18,FEMALE,89 Green Avenue,700001,Kolkata,West Bengal,No-employment,,0,PQRSX5432N
-Simranok,Kaur,8093467645,simran.kaur@example.com,1998-02-18,FEMALE,89 Green Avenue,700001,Kolkata,West Bengal,No-employment,ok,34000,PQRSX5432N

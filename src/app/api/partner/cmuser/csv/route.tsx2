@@ -9,18 +9,17 @@ import { Readable } from "stream";
 const secret = process.env.JWT_SECRET as string;
 
 const requiredHeaders = [
-    "firstName",
-    "lastName",
+    "name",
     "phone",
     "email",
     "dob",
-    "gender",
-    "address",
-    "pincode",
-    "city",
-    "state",
-    "empType",
-    "company",
+    // "gender",
+    // "address",
+    // "pincode",
+    // "city",
+    // "state",
+    // "empType",
+    // "company",
 ];
 
 export async function POST(req: NextRequest) {
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
         if (!file) return NextResponse.json({ status: "failure", message: "No file provided" }, { status: 400 });
 
         const fileStream = Readable.from(Buffer.from(await file.arrayBuffer()));
-        const results: Lead[] = [];
+        const results: any[] = [];
         let headersValid = true;
 
         fileStream
@@ -64,7 +63,7 @@ export async function POST(req: NextRequest) {
                             { phone: data.phone },
                             {
                                 $set: {
-                                    name: data.firstName + " " + data.lastName,
+                                    name: data.name,
                                     email: data.email,
                                     dob: data.dob,
                                     gender: data.gender,
@@ -74,10 +73,12 @@ export async function POST(req: NextRequest) {
                                     state: data.state,
                                     employment: data.empType,
                                     company_name: data.company,
+                                    pan: data.pan,
+                                    income: data.salary,
                                 },
                                 $push: {
                                     partnerHistory: {
-                                        name: partner.cmId,
+                                        name: partner.name,
                                         date: Date.now(),
                                         type: "dedupe",
                                     },
@@ -100,9 +101,8 @@ export async function POST(req: NextRequest) {
                             state: data.state,
                             employment: data.empType,
                             company_name: data.company,
-                            partner: partner.cmId,
                             partnerHistory: {
-                                name: partner.cmId,
+                                name: partner.name,
                                 date: new Date(),
                                 type: "new",
                             },

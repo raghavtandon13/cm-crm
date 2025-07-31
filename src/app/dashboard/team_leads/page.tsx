@@ -136,7 +136,7 @@ export default function MyLeads() {
 
     const statusMutation = useMutation({
         mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
-            await fromAPI.post("/assignments/change", {
+            await fromAPI.post("/agents/assignments/change", {
                 assignmentId,
                 status,
                 subStatus,

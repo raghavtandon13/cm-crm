@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToMongoDB, db } from "../../../../../lib/db";
 
 const secret = process.env.JWT_SECRET as string;
+const injectUri = process.env.INJECT_URI as string;
 
 export async function POST(req: NextRequest) {
     await connectToMongoDB();
@@ -18,8 +19,8 @@ export async function POST(req: NextRequest) {
 
     try {
         const data = (await req.json()) as Lead & { inject?: boolean };
-        // const inject = data.inject === true ? true : false;
-        const inject = false;
+        const inject = data.inject === true ? true : false;
+        // const inject = false;
 
         let user = await User.findOne({ phone: data.phone });
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
                     },
                     $push: {
                         partnerHistory: {
-                            name: partner.cmId,
+                            name: partner.id,
                             date: Date.now(),
                             type: "new",
                         },
@@ -73,9 +74,9 @@ export async function POST(req: NextRequest) {
                 state: data.state,
                 employment: data.empType,
                 company_name: data.company,
-                partner: partner.cmId,
+                partner: partner.id,
                 partnerHistory: {
-                    name: partner.cmId,
+                    name: partner.id,
                     date: new Date(),
                     type: "new",
                 },
@@ -86,9 +87,10 @@ export async function POST(req: NextRequest) {
         if (!user) return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
         let injectRes = { data: {} };
+        console.log("inject:", inject);
         if (inject) {
             injectRes = await axios.post(
-                "https://credmantra.com/api/v1/leads/inject2",
+                `https://credmantra.com/api/v1/leads/${injectUri}`,
                 { lead: data },
                 { headers: { "x-api-key": "vs65Cu06K1GB2qSdJejP", "Content-Type": "application/json" } },
             );
@@ -101,8 +103,7 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        if (!partnerLead)
-            return NextResponse.json({ status: "failure", message: extraMsg || "Could not create Assignment" }, { status: 500 });
+        if (!partnerLead) return NextResponse.json({ status: "failure", message: extraMsg || "Could not create Assignment" }, { status: 500 });
 
         return NextResponse.json({ status: "success", message: "User created successfully", inject: injectRes.data }, { status: 201 });
     } catch (error) {

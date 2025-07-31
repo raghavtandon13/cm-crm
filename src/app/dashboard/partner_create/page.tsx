@@ -1,22 +1,23 @@
 "use client";
 
-import { FormField } from "@/components/formField";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
-import { Progress } from "@/components/ui/progress";
 import fromAPI from "@/lib/api";
+import { Button } from "@/components/ui/button";
 import { CMUser, Lead } from "@/lib/types";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChevronDown, File } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { FormField } from "@/components/formField";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Papa from "papaparse";
-import { read, utils } from "xlsx";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
@@ -26,9 +27,7 @@ export default function Create() {
     const [otp, setOtp] = useState("");
     const [leadData, setLeadData] = useState<Lead | null>(null);
     const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-
-    const [isCsvDialogOpen, setIsCsvDialogOpen] = useState(false); // State for CSV dialog
-    const [progress, setProgress] = useState(0);
+    const [isOTP, setIsOTP] = useState(false);
 
     const {
         handleSubmit,
@@ -117,6 +116,7 @@ export default function Create() {
 
     // verify otp
     const handleOtpSubmit = () => {
+        setIsOTP(true);
         if (leadData) {
             verifyOtp({ phone: leadData.phone, otp });
         }
@@ -145,10 +145,10 @@ export default function Create() {
             toast(phone ? "User updated successfully" : "User created successfully");
             setIsDialogOpen(false);
             reset();
-            router.push(`/dashboard/partner_leads`);
-            // !!inject
-            //     ? router.push(`/dashboard/search?accountsOnly=true&phone=${data.phone}`)
-            //     : router.push(`/dashboard/search?phone=${data.phone}`);
+            // router.push(`/dashboard/partner_leads`);
+            !!inject
+                ? router.push(`/dashboard/partner_search?accountsOnly=true&phone=${data.phone}`)
+                : router.push(`/dashboard/partner_search?phone=${data.phone}`);
         },
         onError: (error: any) => {
             console.error("Error creating lead:", error);
@@ -156,142 +156,14 @@ export default function Create() {
         },
     });
 
-    const handleSubmitCSV = async () => {
-        const fileInput = document.getElementById("csvfile") as HTMLInputElement;
-        if (fileInput && fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
-            const fileType = file.name.split(".").pop()?.toLowerCase();
-
-            if (fileType === "csv") {
-                Papa.parse(file, {
-                    complete: (result: any) => {
-                        const headers = result.data[0]; // Extract headers
-                        const chunkSize = 1000; // Each chunk will have one lead
-                        const chunks = [];
-                        for (let i = 1; i < result.data.length; i += chunkSize) {
-                            chunks.push([headers, ...result.data.slice(i, i + chunkSize)]);
-                        }
-
-                        setProgress(0);
-
-                        uploadNextChunk(chunks, 0);
-                    },
-                });
-            } else if (fileType === "xlsx") {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                    const workbook = read(data, { type: "array" });
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    const jsonData = utils.sheet_to_json(worksheet, { header: 1 });
-                    console.log(jsonData);
-
-                    const headers = jsonData[0]; // Extract headers
-                    const chunkSize = 1; // Each chunk will have one lead
-                    const chunks = [];
-                    for (let i = 1; i < jsonData.length; i += chunkSize) {
-                        chunks.push([headers, ...jsonData.slice(i, i + chunkSize)]);
-                    }
-
-                    setProgress(0);
-
-                    uploadNextChunk(chunks, 0);
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                toast.error("Unsupported file type");
-            }
-        }
-    };
-
-    const uploadNextChunk = async (chunks: string[][], index: number) => {
-        if (index < chunks.length) {
-            try {
-                const csvString = Papa.unparse(chunks[index]); // Convert chunk to CSV string
-                const formData = new FormData();
-                formData.append("file", new Blob([csvString], { type: "text/csv" }), "chunk.csv");
-                await fromAPI.post("/partner/cmuser/csv", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-                setProgress(((index + 1) / chunks.length) * 100);
-
-                uploadNextChunk(chunks, index + 1);
-            } catch (error) {
-                console.error("Error uploading chunk:", error);
-                toast.error("Error uploading chunk");
-            }
-        } else {
-            toast.success("CSV uploaded successfully");
-            router.push("/dashboard/partner_leads");
-        }
-    };
-
     return (
         <>
             <div className="flex justify-between align-middle mt-4">
-                <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-0">{phone ? "Edit Existing Lead" : "Create New Lead"}</h1>
-                {!isPhoneVerified && (
-                    <Button className="mr-8" onClick={() => setIsCsvDialogOpen(true)}>
-                        <File className="w-4 mr-2" />
-                        Upload CSV
-                    </Button>
-                )}
+                <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-0">
+                    {phone ? "Edit Existing Lead" : "Create New Lead"}
+                </h1>
             </div>
 
-            <Dialog open={isCsvDialogOpen} onOpenChange={setIsCsvDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Upload CSV</DialogTitle>
-                        <DialogDescription>Please select a CSV or XLSX file to upload.</DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-row space-x-1">
-                        <Input className="bg-white" id="csvfile" type="file" />
-                        <DialogFooter>
-                            <Button onClick={handleSubmitCSV}>Upload</Button>
-                        </DialogFooter>
-                    </div>
-                    {progress > 0 && (
-                        <>
-                            {Math.round(progress)}%
-                            <Progress value={progress} className="" />
-                        </>
-                    )}
-
-                    {progress === 0 && (
-                        <>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger className="text-gray-600 text-sm">
-                                        <div className="flex">
-                                            CSV Headers and Values
-                                            <ChevronDown className="text-gray-600 w-4" />
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <ul>
-                                            <li className="text-gray-600 text-sm">• firstName</li>
-                                            <li className="text-gray-600 text-sm">• lastName</li>
-                                            <li className="text-gray-600 text-sm">• phone</li>
-                                            <li className="text-gray-600 text-sm">• email</li>
-                                            <li className="text-gray-600 text-sm">• dob</li>
-                                            <li className="text-gray-600 text-sm">• gender (MALE/FEMALE)</li>
-                                            <li className="text-gray-600 text-sm">• address</li>
-                                            <li className="text-gray-600 text-sm">• pincode</li>
-                                            <li className="text-gray-600 text-sm">• city</li>
-                                            <li className="text-gray-600 text-sm">• state</li>
-                                            <li className="text-gray-600 text-sm">• empType (Salaried/Self-employed/No-employment)</li>
-                                            <li className="text-gray-600 text-sm">• company</li>
-                                            <li className="text-gray-600 text-sm">• salary</li>
-                                            <li className="text-gray-600 text-sm">• pan</li>
-                                        </ul>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
             {!isPhoneVerified ? (
                 <form onSubmit={handleSubmit(onPhoneSubmit)} className="mx-2 my-4 sm:mx-8">
                     <div className="grid gap-4">
@@ -346,10 +218,7 @@ export default function Create() {
                                 control={control}
                                 rules={{
                                     required: "Phone is required",
-                                    pattern: {
-                                        value: /^\d{10}$/,
-                                        message: "Phone number must be a 10-digit number.",
-                                    },
+                                    pattern: { value: /^\d{10}$/, message: "Phone number must be a 10-digit number." },
                                 }}
                                 placeholder="98XXXXXXXX"
                             />
@@ -388,7 +257,13 @@ export default function Create() {
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                            <FormField label="Address" name="address" control={control} errors={errors} placeholder="Enter your address" />
+                            <FormField
+                                label="Address"
+                                name="address"
+                                control={control}
+                                errors={errors}
+                                placeholder="Enter your address"
+                            />
                             <FormField
                                 label="Pincode"
                                 name="pincode"
@@ -403,7 +278,13 @@ export default function Create() {
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                            <FormField label="City" name="city" control={control} errors={errors} placeholder="Enter your city" />
+                            <FormField
+                                label="City"
+                                name="city"
+                                control={control}
+                                errors={errors}
+                                placeholder="Enter your city"
+                            />
                             <FormField
                                 label="State"
                                 name="state"
@@ -481,8 +362,19 @@ export default function Create() {
                                 >
                                     Reset
                                 </Button>
-                                <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(false)}>
-                                    {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
+                                <Button
+                                    type="submit"
+                                    className="w-full flex-1"
+                                    disabled={isPending}
+                                    onClick={() => setInject(true)}
+                                >
+                                    {isPending
+                                        ? phone
+                                            ? "Updating..."
+                                            : "Creating..."
+                                        : phone
+                                          ? "Update Lead"
+                                          : "Create Lead"}
                                 </Button>
                             </div>
                         </div>
@@ -507,7 +399,9 @@ export default function Create() {
                         </InputOTPGroup>
                     </InputOTP>
                     <DialogFooter>
-                        <Button onClick={handleOtpSubmit}>Verify OTP</Button>
+                        <Button disabled={isOTP} onClick={handleOtpSubmit}>
+                            Verify OTP
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

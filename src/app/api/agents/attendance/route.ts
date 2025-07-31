@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
     try {
         const agentid = req.nextUrl.searchParams.get("agentid");
         const full = (await req.nextUrl.searchParams.get("full")) === "true";
+        const overview = (await req.nextUrl.searchParams.get("overview")) === "true";
         const startDate = req.nextUrl.searchParams.get("startDate");
         const endDate = req.nextUrl.searchParams.get("endDate");
 
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ status: "failure", message: "Invalid date format" }, { status: 400 });
         }
 
-        let agents;
+        let agents:any;
 
         if (agentid) {
             const agent = await db.agent.findUnique({ where: { id: agentid } });
@@ -81,6 +82,51 @@ export async function GET(req: NextRequest) {
             agents = [agent];
         } else if (full) {
             agents = await db.agent.findMany();
+        } else if (overview) {
+            agents = await db.agent.findMany({ where: { active: true } });
+
+            const attendanceTypes = ["PRESENT", "ABSENT", "LEAVE", "HALF DAY", "WEEK OFF", "HOLIDAY", "UPL", "WFH"];
+
+            const agentAttendance = await db.agentAttendance.findMany({
+                where: {
+                    date: {
+                        gte: new Date(startDate),
+                        lte: new Date(endDate),
+                    },
+                },
+                select: {
+                    agentId: true,
+                    date: true,
+                    type: true,
+                },
+            });
+
+            const data = agents.map((agent: any) => {
+                const attendanceRecords = agentAttendance.filter((r) => r.agentId === agent.id);
+
+                const summary = {
+                    agentId: agent.id,
+                    agentName: agent.name,
+                    active: agent.active,
+                };
+
+                // Initialize all counts to 0
+                for (const type of attendanceTypes) {
+                    summary[type] = 0;
+                }
+
+                // Count each attendance type
+                for (const record of attendanceRecords) {
+                    const type = record.type?.toUpperCase();
+                    if (type && summary[type] !== undefined) {
+                        summary[type]++;
+                    }
+                }
+
+                return summary;
+            });
+
+            return NextResponse.json({ status: "success", data });
         } else {
             return NextResponse.json({ status: "failure", message: "Provide either 'agentid' or 'full=true'" }, { status: 400 });
         }
@@ -89,7 +135,7 @@ export async function GET(req: NextRequest) {
             where: { date: { gte: start, lte: end } },
         });
 
-        const attendanceByAgent = agents.map((agent) => {
+        const attendanceByAgent = agents.map((agent:any) => {
             const attendanceRecords = attendanceData.filter((record) => record.agentId === agent.id);
 
             // Map attendance to { date: status }

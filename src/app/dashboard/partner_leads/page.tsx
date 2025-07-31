@@ -6,6 +6,7 @@ import fromAPI from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, Clock, Copy, RefreshCcw, Users } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const columns: ColumnDef<any>[] = [
@@ -20,33 +21,35 @@ const columns: ColumnDef<any>[] = [
     },
     { accessorKey: "user.phone", header: () => <div>Phone</div> },
     { accessorKey: "user.email", header: () => <div>Email</div> },
-    { accessorKey: "status", header: () => <div>Status</div> },
+    {
+        accessorKey: "status",
+        header: () => <div>Status</div>,
+        cell: ({ row }) => {
+            const s = row.getValue("status") as string;
+            const p = row.original?.user?.phone;
+            return s === "PENDING" ? (
+                <Link href={`/dashboard/partner_search?accountsOnly=true&phone=${p}`}>VIEW&rarr;</Link>
+            ) : (
+                <div>{s}</div>
+            );
+        },
+    },
 ];
 
-function _convertToIST(gmtDate: string): string {
-    const date = new Date(gmtDate);
-    return date.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "Asia/Kolkata",
-    });
-}
-
 export default function PartnerLeadsTable() {
+    const limit = 20;
     const [page, setPage] = useState(1);
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["users", { page }],
         queryFn: async () => {
-            const response = await fromAPI.get(`/partner/getLeads`);
-            console.log(response.data.data);
-            return response.data.data;
+            const response = await fromAPI.get(`/partner/getLeads?page=${page}&limit=${limit}`);
+            return response.data;
         },
     });
 
     if (isPending) return <h1>Loading...</h1>;
     if (isError) return <h1>Error</h1>;
-    if (data === null || data.length === 0) return <h1>No data available</h1>;
+    // if (data === null || data.length === 0) return <h1>No data available</h1>;
 
     return (
         <>
@@ -58,7 +61,9 @@ export default function PartnerLeadsTable() {
                             <Users className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.length}</div>
+                            <div className="text-2xl font-bold">
+                                {data.partnerARD.reduce((sum, entry) => sum + entry._count.status, 0)}
+                            </div>
                             <p className="text-xs text-muted-foreground">All leads in the system</p>
                         </CardContent>
                     </Card>
@@ -69,7 +74,9 @@ export default function PartnerLeadsTable() {
                             <Clock className="h-4 w-4 text-yellow-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.filter((lead: any) => lead.status === "PENDING").length}</div>
+                            <div className="text-2xl font-bold">
+                                {data.partnerARD.find((entry) => entry.status === "PENDING")?._count.status || 0}
+                            </div>
                             <p className="text-xs text-muted-foreground">Awaiting review</p>
                         </CardContent>
                     </Card>
@@ -80,7 +87,9 @@ export default function PartnerLeadsTable() {
                             <CheckCircle className="h-4 w-4 text-green-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.filter((lead: any) => lead.status === "ACCEPTED").length}</div>
+                            <div className="text-2xl font-bold">
+                                {data.partnerARD.find((entry) => entry.status === "ACCEPTED")?._count.status || 0}
+                            </div>
                             <p className="text-xs text-muted-foreground">Successfully converted</p>
                         </CardContent>
                     </Card>
@@ -91,29 +100,18 @@ export default function PartnerLeadsTable() {
                             <Copy className="h-4 w-4 text-red-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data.filter((lead: any) => lead.status === "DUPLICATE").length}</div>
+                            <div className="text-2xl font-bold">
+                                {data.partnerARD.find((entry) => entry.status === "DUPLICATE")?._count.status || 0}
+                            </div>
                             <p className="text-xs text-muted-foreground">Marked as duplicates</p>
                         </CardContent>
                     </Card>
                 </div>
-                {/* <div className="flex items-center mb-4 space-x-2 w-full">
-                    <div className={`${buttonVariants({ variant: "card" })} text-2xl  h-24 flex-1 text-center`}>
-                        Total Leads: {data.length}
-                    </div>
-                    <div className={`${buttonVariants({ variant: "card" })} text-2xl  h-24 flex-1 text-center`}>
-                        Pending Leads: {data.filter((lead: any) => lead.status === "PENDING").length}
-                    </div>
-                    <div className={`${buttonVariants({ variant: "card" })} text-2xl  h-24 flex-1 text-center`}>
-                        Accepted Leads: {data.filter((lead: any) => lead.status === "ACCEPTED").length}
-                    </div>
-                    <div className={`${buttonVariants({ variant: "card" })} text-2xl  h-24 flex-1 text-center`}>
-                        Duplicate Leads: {data.filter((lead: any) => lead.status === "DUPLICATE").length}
-                    </div>
-                </div> */}
 
                 <div className="flex justify-between items-center mb-4">
                     <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>Partner Leads</h1>
 
+                    {/* this changes page */}
                     <div className={`${buttonVariants({ variant: "card" })} font-semibold`}>
                         <Button disabled={page === 1} variant={"link"} onClick={() => setPage(page - 1)}>
                             {"<"}
@@ -134,7 +132,7 @@ export default function PartnerLeadsTable() {
                         )}
                     </Button>
                 </div>
-                <DataTable columns={columns} data={data} />
+                <DataTable columns={columns} data={data.data} />
             </div>
         </>
     );

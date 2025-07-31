@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "../../../../../lib/db";
 import User from "@/lib/users";
@@ -10,7 +12,11 @@ export async function GET(req: NextRequest) {
         const agents = await db.agent.findMany({
             include: {
                 Assignment: {
-                    where: { ...(startDate && endDate ? { assignedAt: { gte: new Date(startDate), lte: new Date(endDate) } } : {}) },
+                    where: {
+                        ...(startDate && endDate
+                            ? { assignedAt: { gte: new Date(startDate), lte: new Date(endDate) } }
+                            : {}),
+                    },
                 },
             },
         });
