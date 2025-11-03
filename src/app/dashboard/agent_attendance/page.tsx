@@ -31,7 +31,9 @@ export default function UserAttendance() {
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user.id}`);
+            const response = await fromAPI.get(
+                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user.id}`,
+            );
             return response.data.data; // Access the `data` array directly
         },
     });
@@ -147,12 +149,18 @@ export default function UserAttendance() {
         {
             accessorKey: "startDate",
             header: "Start Date",
-            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("startDate")), "yyyy-MM-dd")}</div>,
+            cell: ({ row }) => (
+                <div className="min-w-[100px] text-left">
+                    {format(new Date(row.getValue("startDate")), "yyyy-MM-dd")}
+                </div>
+            ),
         },
         {
             accessorKey: "endDate",
             header: "End Date",
-            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("endDate")), "yyyy-MM-dd")}</div>,
+            cell: ({ row }) => (
+                <div className="min-w-[100px] text-left">{format(new Date(row.getValue("endDate")), "yyyy-MM-dd")}</div>
+            ),
         },
         {
             accessorKey: "reason",
@@ -174,7 +182,10 @@ export default function UserAttendance() {
                         <Button
                             id="date"
                             variant="outline"
-                            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (

@@ -26,13 +26,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                             // FIBE CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "customer lead created"] }],
-                                },
-                                then: "Accepted",
-                            },
-                            {
-                                case: {
-                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "customer lead updated"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Fibe"] },
+                                        { $eq: ["$accounts.res.reason", "customer lead created"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
@@ -40,7 +37,21 @@ async function count(start: string, end: string, group: string, lender: string, 
                                 case: {
                                     $and: [
                                         { $eq: ["$accounts.name", "Fibe"] },
-                                        { $regexMatch: { input: "$accounts.res.reason", regex: /(salary|pincode|Pan|Age|Invalid)/i } },
+                                        { $eq: ["$accounts.res.reason", "customer lead updated"] },
+                                    ],
+                                },
+                                then: "Accepted",
+                            },
+                            {
+                                case: {
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Fibe"] },
+                                        {
+                                            $regexMatch: {
+                                                input: "$accounts.res.reason",
+                                                regex: /(salary|pincode|Pan|Age|Invalid)/i,
+                                            },
+                                        },
                                     ],
                                 },
                                 then: "Rejected",
@@ -56,20 +67,29 @@ async function count(start: string, end: string, group: string, lender: string, 
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "Duplicate request"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Fibe"] },
+                                        { $eq: ["$accounts.res.reason", "Duplicate request"] },
+                                    ],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $ne: ["$accounts.res.errorMessage", null] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Fibe"] },
+                                        { $ne: ["$accounts.res.errorMessage", null] },
+                                    ],
                                 },
                                 then: "Errors",
                             },
                             // RAMFIN CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.msg", "Lead created successfully."] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "RamFin"] },
+                                        { $eq: ["$accounts.msg", "Lead created successfully."] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
@@ -84,57 +104,84 @@ async function count(start: string, end: string, group: string, lender: string, 
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Ineligible"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "RamFin"] },
+                                        { $eq: ["$accounts.status", "Ineligible"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Dedupe"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "RamFin"] },
+                                        { $eq: ["$accounts.status", "Dedupe"] },
+                                    ],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $ne: ["$accounts.lead_status", null] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "RamFin"] },
+                                        { $ne: ["$accounts.lead_status", null] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             // FATAKPAY CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Eligible"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "FatakPay"] },
+                                        { $eq: ["$accounts.status", "Eligible"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Ineligible"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "FatakPay"] },
+                                        { $eq: ["$accounts.status", "Ineligible"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Deduped"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "FatakPay"] },
+                                        { $eq: ["$accounts.status", "Deduped"] },
+                                    ],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $ne: ["$accounts.stage_name", null] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "FatakPay"] },
+                                        { $ne: ["$accounts.stage_name", null] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             // SMARTCOIN CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "true"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "SmartCoin"] },
+                                        { $eq: ["$accounts.isDuplicateLead", "true"] },
+                                    ],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "false"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "SmartCoin"] },
+                                        { $eq: ["$accounts.isDuplicateLead", "false"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
@@ -159,38 +206,56 @@ async function count(start: string, end: string, group: string, lender: string, 
                             // ZYPE CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "ACCEPT"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Zype"] },
+                                        { $eq: ["$accounts.status", "ACCEPT"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.message", "REJECT"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Zype"] },
+                                        { $eq: ["$accounts.message", "REJECT"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "REJECT"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Zype"] },
+                                        { $eq: ["$accounts.status", "REJECT"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
                             // CASHE CONDITIONS
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_approved"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Cashe"] },
+                                        { $eq: ["$accounts.status", "pre_approved"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_qualified_low"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Cashe"] },
+                                        { $eq: ["$accounts.status", "pre_qualified_low"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "rejected"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Cashe"] },
+                                        { $eq: ["$accounts.status", "rejected"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
@@ -205,7 +270,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.res.payload.status", "rejected"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Cashe"] },
+                                        { $eq: ["$accounts.res.payload.status", "rejected"] },
+                                    ],
                                 },
                                 then: "Rejected",
                             },
@@ -221,7 +289,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "New User"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "Mpocket"] },
+                                        { $eq: ["$accounts.message", "New User"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
@@ -257,7 +328,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                                     $and: [
                                         { $eq: ["$accounts.name", "Mpocket"] },
                                         {
-                                            $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
+                                            $or: [
+                                                { $eq: ["$accounts.message", null] },
+                                                { $not: ["$accounts.message"] },
+                                            ],
                                         },
                                     ],
                                 },
@@ -269,7 +343,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                                     $and: [
                                         { $eq: ["$accounts.name", "MoneyView"] },
                                         {
-                                            $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
+                                            $or: [
+                                                { $eq: ["$accounts.message", null] },
+                                                { $not: ["$accounts.message"] },
+                                            ],
                                         },
                                     ],
                                 },
@@ -304,7 +381,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                             },
                             {
                                 case: {
-                                    $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "success"] }],
+                                    $and: [
+                                        { $eq: ["$accounts.name", "MoneyView"] },
+                                        { $eq: ["$accounts.message", "success"] },
+                                    ],
                                 },
                                 then: "Accepted",
                             },
@@ -334,7 +414,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                         $cond: {
                             if: { $eq: [group, "age"] },
                             then: {
-                                $subtract: [{ $year: new Date() }, { $year: { $dateFromString: { dateString: "$dob", onError: null } } }],
+                                $subtract: [
+                                    { $year: new Date() },
+                                    { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
+                                ],
                             },
                             else: null,
                         },
@@ -350,7 +433,11 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                 {
                                                     $subtract: [
                                                         { $year: new Date() },
-                                                        { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
+                                                        {
+                                                            $year: {
+                                                                $dateFromString: { dateString: "$dob", onError: null },
+                                                            },
+                                                        },
                                                     ],
                                                 },
                                                 {
@@ -358,7 +445,14 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                         {
                                                             $subtract: [
                                                                 { $year: new Date() },
-                                                                { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
+                                                                {
+                                                                    $year: {
+                                                                        $dateFromString: {
+                                                                            dateString: "$dob",
+                                                                            onError: null,
+                                                                        },
+                                                                    },
+                                                                },
                                                             ],
                                                         },
                                                         5,
@@ -376,7 +470,14 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                         {
                                                             $subtract: [
                                                                 { $year: new Date() },
-                                                                { $year: { $dateFromString: { dateString: "$dob", onError: null } } },
+                                                                {
+                                                                    $year: {
+                                                                        $dateFromString: {
+                                                                            dateString: "$dob",
+                                                                            onError: null,
+                                                                        },
+                                                                    },
+                                                                },
                                                             ],
                                                         },
                                                         {
@@ -386,7 +487,10 @@ async function count(start: string, end: string, group: string, lender: string, 
                                                                         { $year: new Date() },
                                                                         {
                                                                             $year: {
-                                                                                $dateFromString: { dateString: "$dob", onError: null },
+                                                                                $dateFromString: {
+                                                                                    dateString: "$dob",
+                                                                                    onError: null,
+                                                                                },
                                                                             },
                                                                         },
                                                                     ],

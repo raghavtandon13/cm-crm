@@ -8,7 +8,12 @@ import { toast } from "sonner";
 
 function formatDate(utcDateStr: any) {
     const utcDate = new Date(utcDateStr);
-    return utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric", month: "short", day: "numeric" });
+    return utcDate.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
 }
 
 const statusMap = {
@@ -29,7 +34,15 @@ const subStatusMap = {
 function useHandleStatusChange() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
+        mutationFn: async ({
+            assignmentId,
+            status,
+            subStatus,
+        }: {
+            assignmentId: string;
+            status: string;
+            subStatus: string;
+        }) => {
             await fromAPI.post("/assignments/change", {
                 assignmentId,
                 status,

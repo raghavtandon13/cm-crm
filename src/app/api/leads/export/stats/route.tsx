@@ -43,7 +43,12 @@ export async function POST(_req: NextRequest) {
                                     case: {
                                         $and: [
                                             { $eq: ["$accounts.name", "Fibe"] },
-                                            { $regexMatch: { input: "$accounts.res.reason", regex: /(salary|pincode|Pan|Age|Invalid)/i } },
+                                            {
+                                                $regexMatch: {
+                                                    input: "$accounts.res.reason",
+                                                    regex: /(salary|pincode|Pan|Age|Invalid)/i,
+                                                },
+                                            },
                                         ],
                                     },
                                     then: "Rejected",
@@ -59,12 +64,20 @@ export async function POST(_req: NextRequest) {
                                 },
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "Duplicate request"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Fibe"] },
+                                            { $eq: ["$accounts.res.reason", "Duplicate request"] },
+                                        ],
                                     },
                                     then: "Deduped",
                                 },
                                 {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $ne: ["$accounts.res.errorMessage", null] }] },
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Fibe"] },
+                                            { $ne: ["$accounts.res.errorMessage", null] },
+                                        ],
+                                    },
                                     then: "Errors",
                                 },
                                 // RAMFIN CONDITIONS
@@ -87,44 +100,85 @@ export async function POST(_req: NextRequest) {
                                     then: "Accepted",
                                 },
                                 {
-                                    case: { $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Ineligible"] }] },
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "RamFin"] },
+                                            { $eq: ["$accounts.status", "Ineligible"] },
+                                        ],
+                                    },
                                     then: "Rejected",
                                 },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Dedupe"] }] },
-                                    then: "Deduped",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $ne: ["$accounts.lead_status", null] }] },
-                                    then: "Accepted",
-                                },
-                                // FATAKPAY CONDITIONS
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Eligible"] }] },
-                                    then: "Accepted",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Ineligible"] }] },
-                                    then: "Rejected",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Deduped"] }] },
-                                    then: "Deduped",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $ne: ["$accounts.stage_name", null] }] },
-                                    then: "Accepted",
-                                },
-                                // SMARTCOIN CONDITIONS
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "true"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "RamFin"] },
+                                            { $eq: ["$accounts.status", "Dedupe"] },
+                                        ],
                                     },
                                     then: "Deduped",
                                 },
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "false"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "RamFin"] },
+                                            { $ne: ["$accounts.lead_status", null] },
+                                        ],
+                                    },
+                                    then: "Accepted",
+                                },
+                                // FATAKPAY CONDITIONS
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "FatakPay"] },
+                                            { $eq: ["$accounts.status", "Eligible"] },
+                                        ],
+                                    },
+                                    then: "Accepted",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "FatakPay"] },
+                                            { $eq: ["$accounts.status", "Ineligible"] },
+                                        ],
+                                    },
+                                    then: "Rejected",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "FatakPay"] },
+                                            { $eq: ["$accounts.status", "Deduped"] },
+                                        ],
+                                    },
+                                    then: "Deduped",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "FatakPay"] },
+                                            { $ne: ["$accounts.stage_name", null] },
+                                        ],
+                                    },
+                                    then: "Accepted",
+                                },
+                                // SMARTCOIN CONDITIONS
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "SmartCoin"] },
+                                            { $eq: ["$accounts.isDuplicateLead", "true"] },
+                                        ],
+                                    },
+                                    then: "Deduped",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "SmartCoin"] },
+                                            { $eq: ["$accounts.isDuplicateLead", "false"] },
+                                        ],
                                     },
                                     then: "Accepted",
                                 },
@@ -148,30 +202,58 @@ export async function POST(_req: NextRequest) {
                                 },
                                 // ZYPE CONDITIONS
                                 {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "ACCEPT"] }] },
-                                    then: "Accepted",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.message", "REJECT"] }] },
-                                    then: "Rejected",
-                                },
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "REJECT"] }] },
-                                    then: "Rejected",
-                                },
-                                // CASHE CONDITIONS
-                                {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_approved"] }] },
-                                    then: "Accepted",
-                                },
-                                {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_qualified_low"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Zype"] },
+                                            { $eq: ["$accounts.status", "ACCEPT"] },
+                                        ],
                                     },
                                     then: "Accepted",
                                 },
                                 {
-                                    case: { $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "rejected"] }] },
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Zype"] },
+                                            { $eq: ["$accounts.message", "REJECT"] },
+                                        ],
+                                    },
+                                    then: "Rejected",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Zype"] },
+                                            { $eq: ["$accounts.status", "REJECT"] },
+                                        ],
+                                    },
+                                    then: "Rejected",
+                                },
+                                // CASHE CONDITIONS
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Cashe"] },
+                                            { $eq: ["$accounts.status", "pre_approved"] },
+                                        ],
+                                    },
+                                    then: "Accepted",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Cashe"] },
+                                            { $eq: ["$accounts.status", "pre_qualified_low"] },
+                                        ],
+                                    },
+                                    then: "Accepted",
+                                },
+                                {
+                                    case: {
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Cashe"] },
+                                            { $eq: ["$accounts.status", "rejected"] },
+                                        ],
+                                    },
                                     then: "Rejected",
                                 },
                                 {
@@ -185,7 +267,10 @@ export async function POST(_req: NextRequest) {
                                 },
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.res.payload.status", "rejected"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Cashe"] },
+                                            { $eq: ["$accounts.res.payload.status", "rejected"] },
+                                        ],
                                     },
                                     then: "Rejected",
                                 },
@@ -201,7 +286,10 @@ export async function POST(_req: NextRequest) {
                                 },
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "New User"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "Mpocket"] },
+                                            { $eq: ["$accounts.message", "New User"] },
+                                        ],
                                     },
                                     then: "Accepted",
                                 },
@@ -237,7 +325,10 @@ export async function POST(_req: NextRequest) {
                                         $and: [
                                             { $eq: ["$accounts.name", "Mpocket"] },
                                             {
-                                                $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
+                                                $or: [
+                                                    { $eq: ["$accounts.message", null] },
+                                                    { $not: ["$accounts.message"] },
+                                                ],
                                             },
                                         ],
                                     },
@@ -250,7 +341,10 @@ export async function POST(_req: NextRequest) {
                                         $and: [
                                             { $eq: ["$accounts.name", "MoneyView"] },
                                             {
-                                                $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
+                                                $or: [
+                                                    { $eq: ["$accounts.message", null] },
+                                                    { $not: ["$accounts.message"] },
+                                                ],
                                             },
                                         ],
                                     },
@@ -285,7 +379,10 @@ export async function POST(_req: NextRequest) {
                                 },
                                 {
                                     case: {
-                                        $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "success"] }],
+                                        $and: [
+                                            { $eq: ["$accounts.name", "MoneyView"] },
+                                            { $eq: ["$accounts.message", "success"] },
+                                        ],
                                     },
                                     then: "Accepted",
                                 },
@@ -327,7 +424,7 @@ export async function POST(_req: NextRequest) {
 
         // Create CSV with header
         const csv = [
-            "phone,partner,name,pincode,dob", 
+            "phone,partner,name,pincode,dob",
             ...users.map((user) => `${user.phone},${user.partner},${user.name},${user.pincode},${user.dob}`),
         ].join("\n");
 

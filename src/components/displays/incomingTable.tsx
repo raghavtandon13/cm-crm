@@ -67,7 +67,14 @@ export function IncomingLeadsTable() {
                         <div className="cursor-pointer text-blue-500 hover:underline" onClick={handleClick}>
                             {cellValue.toLocaleString()}
                         </div>
-                        {showModal && <CsvExportModal cellValue={cellValue} location={location} usage="incoming" onClose={() => {}} />}
+                        {showModal && (
+                            <CsvExportModal
+                                cellValue={cellValue}
+                                location={location}
+                                usage="incoming"
+                                onClose={() => {}}
+                            />
+                        )}
                     </>
                 );
             },
@@ -135,7 +142,10 @@ export function IncomingLeadsTable() {
                         <Button
                             id="date"
                             variant="outline"
-                            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (

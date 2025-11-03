@@ -148,7 +148,9 @@ export default function Create() {
             <aside className="hidden w-[220px] overflow-y-auto border-r bg-white md:block lg:w-[280px]">
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
-                        {data?.map((query) => <NavItem key={query.id} href={`/dashboard/database?id=${query.id}`} label={query.name} />)}
+                        {data?.map((query) => (
+                            <NavItem key={query.id} href={`/dashboard/database?id=${query.id}`} label={query.name} />
+                        ))}
                     </nav>
                 </div>
             </aside>
@@ -217,7 +219,10 @@ export default function Create() {
                         <CardContent className="p-4">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-md font-semibold">Results</h3>
-                                <Button variant="outline" onClick={() => setViewMode(viewMode === "table" ? "json" : "table")}>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setViewMode(viewMode === "table" ? "json" : "table")}
+                                >
                                     {viewMode === "table" ? "JSON" : "Table"}
                                 </Button>
                             </div>
@@ -232,7 +237,9 @@ export default function Create() {
                                     viewMode === "table" ? (
                                         renderTable(runMutation.data)
                                     ) : (
-                                        <pre className="whitespace-pre-wrap">{JSON.stringify(runMutation.data, null, 2)}</pre>
+                                        <pre className="whitespace-pre-wrap">
+                                            {JSON.stringify(runMutation.data, null, 2)}
+                                        </pre>
                                     )
                                 ) : (
                                     <p className="text-slate-500">Query results will appear here</p>

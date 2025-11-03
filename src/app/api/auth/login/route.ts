@@ -11,14 +11,18 @@ export async function POST(req: NextRequest) {
 
         const partner = await db.partner.findUnique({ where: { email }, include: { role: true } });
         const agent = await db.agent.findUnique({ where: { email }, include: { role: true } });
-        if (!partner && !agent) return NextResponse.json({ status: "failure", message: "Invalid credentials provided" }, { status: 401 });
+        if (!partner && !agent)
+            return NextResponse.json({ status: "failure", message: "Invalid credentials provided" }, { status: 401 });
 
         const user = partner || agent;
+        if (!user?.role?.title)
+            return NextResponse.json({ status: "failure", message: "Invalid credentials provided" }, { status: 401 });
         const role = user.role.title;
 
         // Check password
         const isMatch = await bcrypt.compare(pass, user.password);
-        if (!isMatch) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        if (!isMatch)
+            return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
         // Generate JWT token
         const token = jwt.sign({ id: user.id, email: user.email, role }, secret, { expiresIn: "10h" });

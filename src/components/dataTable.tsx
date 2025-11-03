@@ -1,6 +1,11 @@
 "use client";
 
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
     ColumnDef,
@@ -18,7 +23,6 @@ import { useState } from "react";
 import DateSearch from "./dateSearch";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -132,7 +136,9 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                                             // style={index === 0 ? { minWidth: "80px" } : { minWidth: "150px" }}
                                             key={header.id}
                                         >
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     );
                                 })}

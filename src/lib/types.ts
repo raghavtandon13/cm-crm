@@ -55,13 +55,14 @@ export interface Role {
 export interface Agent {
     id: string;
     email: string;
-    name?: string;
+    name?: string | null;
     roleId: string;
-    role: Role;
-    tempAccess: any[];
-    createdAt: string;
-    updatedAt: string;
-    passwordUpdated?: boolean;
+    supervisorId?: string | null;
+    role?: Role;
+    tempAccess?: any[];
+    createdAt: Date;
+    updatedAt: Date;
+    passwordUpdated: boolean;
     active: boolean;
 }
 

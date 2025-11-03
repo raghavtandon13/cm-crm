@@ -1,12 +1,8 @@
-import jwt from "jsonwebtoken";
-import { db } from "../../../../../../lib/db";
-import { NextResponse, NextRequest } from "next/server";
-import { CMUser, Lead } from "@/lib/types";
 import User from "@/lib/users";
-import axios from "axios";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToMongoDB } from "../../../../../../lib/db";
 
-const secret = process.env.JWT_SECRET as string;
+// const secret = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
     await connectToMongoDB();

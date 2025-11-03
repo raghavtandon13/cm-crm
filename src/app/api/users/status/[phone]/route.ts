@@ -3,12 +3,13 @@ import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: NextRequest, { params }: { params: { phone: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ phone: string }> }) {
+    const params = await props.params;
     await connectToMongoDB();
     try {
         const phone = params.phone;
         const user = await User.findOne({ phone: phone });
-	if (!user) {
+        if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
         const results = await Promise.all([
@@ -32,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: { params: { phone: stri
             { status: 200 },
         );
     } catch (error) {
-	console.log(error);
+        console.log(error);
         return NextResponse.json(
             {
                 moneyview: "N/A",
@@ -46,7 +47,7 @@ export async function GET(_req: NextRequest, { params }: { params: { phone: stri
         );
     }
 }
-const fetchJson = async (url:any, options:any) => {
+const fetchJson = async (url: any, options: any) => {
     try {
         const response = await fetch(url, options);
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -57,10 +58,10 @@ const fetchJson = async (url:any, options:any) => {
     }
 };
 
-async function mv_status(user:any) {
+async function mv_status(user: any) {
     try {
         if (!user || !user.accounts) return { error: "N/A" };
-        const moneyviewaccount = user.accounts.find((account:any) => account.name === "moneyview");
+        const moneyviewaccount = user.accounts.find((account: any) => account.name === "moneyview");
         if (!moneyviewaccount) return { error: "N/A" };
 
         const tokenData = await fetchJson("https://atlas.whizdm.com/atlas/v1/token", {
@@ -80,7 +81,7 @@ async function mv_status(user:any) {
     }
 }
 
-async function ramfin_status(phone:any) {
+async function ramfin_status(phone: any) {
     try {
         return await fetchJson("https://credmantra.com/api/v1/partner-api/ram/status", {
             method: "POST",
@@ -92,10 +93,10 @@ async function ramfin_status(phone:any) {
     }
 }
 
-async function mpkt_status(user:any) {
+async function mpkt_status(user: any) {
     try {
         if (!user || !user.accounts) return { error: "N/A" };
-        const mpktaccount = user.accounts.find((account:any) => account.name === "mpocket");
+        const mpktaccount = user.accounts.find((account: any) => account.name === "mpocket");
         if (!mpktaccount) return { error: "N/A" };
 
         return await fetchJson("http://13.201.83.62/api/v1/mpocket/status", {
@@ -108,10 +109,10 @@ async function mpkt_status(user:any) {
     }
 }
 
-async function cashe_status(user:any) {
+async function cashe_status(user: any) {
     try {
         if (!user || !user.accounts) return { error: "N/A" };
-        const casheaccount = user.accounts.find((account:any) => account.name === "cashe");
+        const casheaccount = user.accounts.find((account: any) => account.name === "cashe");
         if (!casheaccount) return { error: "N/A" };
 
         return await fetchJson("https://credmantra.com/api/v1/partner-api/cashe/status", {
@@ -124,10 +125,10 @@ async function cashe_status(user:any) {
     }
 }
 
-async function fibe_status(user:any) {
+async function fibe_status(user: any) {
     try {
         if (!user || !user.accounts) return { error: "N/A" };
-        const fibeaccount = user.accounts.find((account:any) => account.name === "fibe");
+        const fibeaccount = user.accounts.find((account: any) => account.name === "fibe");
         if (!fibeaccount) return { error: "N/A" };
 
         return await fetchJson("https://credmantra.com/api/v1/partner-api/fibe/customer-status", {
@@ -140,10 +141,10 @@ async function fibe_status(user:any) {
     }
 }
 
-async function moneytap_status(user:any) {
+async function moneytap_status(user: any) {
     try {
         if (!user || !user.accounts) return { error: "N/A" };
-        const moneytapaccount = user.accounts.find((account:any) => account.name === "moneytap");
+        const moneytapaccount = user.accounts.find((account: any) => account.name === "moneytap");
         if (!moneytapaccount) return { error: "N/A" };
 
         return await fetchJson("https://credmantra.com/api/v1/partner-api/moneytap/moneytap/status", {

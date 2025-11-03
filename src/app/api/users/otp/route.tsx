@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
-import axios from "axios";
+import fromAPI from "@/lib/api";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -15,30 +15,17 @@ export async function GET(req: NextRequest) {
     console.log(otp);
 
     try {
-        await axios.get("https://www.fast2sms.com/dev/bulkV2", {
-            params: {
-                authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
-                route: "dlt",
-                sender_id: "CredML",
-                message: 181108,
-                // 181108
-                variables_values: otp,
-                flash: 0,
-                numbers: phone,
-            },
-        });
+        await fromAPI.get(
+            `https://www.fast2sms.com/dev/bulkV2?` +
+                `authorization=kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f` +
+                `&route=dlt` +
+                `&sender_id=CredML` +
+                `&message=181108` +
+                `&variables_values=${otp}` +
+                `&flash=0` +
+                `&numbers=${phone}`,
+        );
 
-        // await axios.get("https://www.fast2sms.com/dev/bulkV2", {
-        //     params: {
-        //         authorization: "kuM9ZYAPpRt0hFqVW71UbOxygli64dDrQzew3JLojN5HTfaIvskCR4bYSDAznIa6VxGmuq0ytT72LZ5f",
-        //         variables_values: otp,
-        //         route: "otp",
-        //         numbers: phone,
-        //     },
-        // });
-
-        // Save OTP and expiration time to the user's
-        // ecord in the database
         await connectToMongoDB();
         await User.updateOne({ phone }, { phoneOtp: otp, phoneOtpExpire: otpExpire }, { upsert: true });
 

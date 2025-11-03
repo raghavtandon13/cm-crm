@@ -31,7 +31,8 @@ async function getData(phone: string): Promise<UserData | string> {
     }
 }
 
-export default async function Phone({ searchParams }: { searchParams: { phone: string; accountsOnly: string } }) {
+export default async function Phone(props: { searchParams: Promise<{ phone: string; accountsOnly: string }> }) {
+    const searchParams = await props.searchParams;
     let phone = "";
     let accountsOnly = false;
 

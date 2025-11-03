@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "../../../../../lib/db";
+import { Agent } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
     try {
@@ -62,7 +63,10 @@ export async function GET(req: NextRequest) {
         const endDate = req.nextUrl.searchParams.get("endDate");
 
         if (!startDate || !endDate) {
-            return NextResponse.json({ status: "failure", message: "startDate or endDate not provided" }, { status: 400 });
+            return NextResponse.json(
+                { status: "failure", message: "startDate or endDate not provided" },
+                { status: 400 },
+            );
         }
 
         const start = new Date(startDate);
@@ -72,7 +76,7 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ status: "failure", message: "Invalid date format" }, { status: 400 });
         }
 
-        let agents:any;
+        let agents: Partial<Agent>[];
 
         if (agentid) {
             const agent = await db.agent.findUnique({ where: { id: agentid } });
@@ -104,7 +108,7 @@ export async function GET(req: NextRequest) {
             const data = agents.map((agent: any) => {
                 const attendanceRecords = agentAttendance.filter((r) => r.agentId === agent.id);
 
-                const summary = {
+                const summary: Record<string, any> = {
                     agentId: agent.id,
                     agentName: agent.name,
                     active: agent.active,
@@ -128,18 +132,21 @@ export async function GET(req: NextRequest) {
 
             return NextResponse.json({ status: "success", data });
         } else {
-            return NextResponse.json({ status: "failure", message: "Provide either 'agentid' or 'full=true'" }, { status: 400 });
+            return NextResponse.json(
+                { status: "failure", message: "Provide either 'agentid' or 'full=true'" },
+                { status: 400 },
+            );
         }
 
         const attendanceData = await db.agentAttendance.findMany({
             where: { date: { gte: start, lte: end } },
         });
 
-        const attendanceByAgent = agents.map((agent:any) => {
+        const attendanceByAgent = agents.map((agent: any) => {
             const attendanceRecords = attendanceData.filter((record) => record.agentId === agent.id);
 
             // Map attendance to { date: status }
-            const attendance = {};
+            const attendance: Record<string, string | null> = {};
             for (const record of attendanceRecords) {
                 attendance[record.date.toISOString().split("T")[0]] = record.type;
             }

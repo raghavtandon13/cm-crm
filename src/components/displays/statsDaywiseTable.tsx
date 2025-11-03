@@ -62,7 +62,10 @@ export function StatsDaywiseTable() {
             });
         } else if (type === "manual" && manualStartDate && manualEndDate) {
             return data.map((lenderData) => {
-                const manualCounts: Record<string, { Accepted: number; Rejected: number; Deduped: number; Rest: number }> = {};
+                const manualCounts: Record<
+                    string,
+                    { Accepted: number; Rejected: number; Deduped: number; Rest: number }
+                > = {};
                 lenderData.partnerStatuses.forEach((ps) => {
                     ps.counts.forEach(({ status, dates }) => {
                         Object.entries(dates).forEach(([date, count]) => {
@@ -143,7 +146,10 @@ export function StatsDaywiseTable() {
                             <Button
                                 id="date"
                                 variant="outline"
-                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                className={cn(
+                                    "w-[300px] justify-start text-left font-normal",
+                                    !date && "text-muted-foreground",
+                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -170,7 +176,10 @@ export function StatsDaywiseTable() {
                             />
                         </PopoverContent>
                     </Popover>
-                    <Select onValueChange={(value) => setAggregationType(value as "total" | "manual")} defaultValue="total">
+                    <Select
+                        onValueChange={(value) => setAggregationType(value as "total" | "manual")}
+                        defaultValue="total"
+                    >
                         <SelectTrigger className="w-[180px] bg-white">
                             <SelectValue placeholder="Select aggregation type" />
                         </SelectTrigger>
@@ -194,7 +203,8 @@ export function StatsDaywiseTable() {
                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                         {manualStartDate && manualEndDate ? (
                                             <>
-                                                {format(manualStartDate, "yyyy-MM-dd")} - {format(manualEndDate, "yyyy-MM-dd")}
+                                                {format(manualStartDate, "yyyy-MM-dd")} -{" "}
+                                                {format(manualEndDate, "yyyy-MM-dd")}
                                             </>
                                         ) : (
                                             <span>Pick a date range</span>
@@ -218,7 +228,10 @@ export function StatsDaywiseTable() {
                             </Popover>
                         </>
                     )}
-                    <Select onValueChange={(value) => setPartnerStatusFilter(value as "new" | "dedupe" | "all")} defaultValue="all">
+                    <Select
+                        onValueChange={(value) => setPartnerStatusFilter(value as "new" | "dedupe" | "all")}
+                        defaultValue="all"
+                    >
                         <SelectTrigger className="w-[180px] bg-white">
                             <SelectValue placeholder="Select partner status" />
                         </SelectTrigger>

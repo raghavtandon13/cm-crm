@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { CMUser, Lead } from "@/lib/types";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
-import axios from "axios";
+import fromAPI from "@/lib/api";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const data = (await req.json()) as Lead & { inject?: boolean };
-	console.log(data);
+        console.log(data);
         const inject = data.inject === true ? true : false;
 
         let user = await User.findOne({ phone: data.phone });
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
         let injectRes = { data: {} };
         if (inject) {
-            injectRes = await axios.post(
+            injectRes = await fromAPI.post(
                 "https://credmantra.com/api/v1/leads/inject2",
                 { lead: data },
                 { headers: { "x-api-key": "vs65Cu06K1GB2qSdJejP", "Content-Type": "application/json" } },

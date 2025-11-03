@@ -30,7 +30,9 @@ export default function Attendance() {
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`);
+            const response = await fromAPI.get(
+                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`,
+            );
             return response.data.data;
         },
     });
@@ -115,11 +117,13 @@ export default function Attendance() {
         end: new Date(endDate),
     }).map((date) => format(date, "yyyy-MM-dd"));
 
-    const filteredData = data.filter((agent: any) => agent.active === true && Object.keys(agent.attendance || {}).length >= 0);
+    const filteredData = data.filter(
+        (agent: any) => agent.active === true && Object.keys(agent.attendance || {}).length >= 0,
+    );
 
     const formattedData = filteredData.map((agent: any) => {
         const attendance = dates.reduce((acc: any, date) => {
-            acc[date] = agent.attendance[date] || ""; 
+            acc[date] = agent.attendance[date] || "";
             return acc;
         }, {});
 
@@ -254,7 +258,10 @@ export default function Attendance() {
                         <Button
                             id="date"
                             variant="outline"
-                            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
@@ -288,7 +295,10 @@ export default function Attendance() {
                         <Search className="w-4" />
                     )}
                 </Button>
-                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/attendance/overview">
+                <Link
+                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                    href="/dashboard/attendance/overview"
+                >
                     Overview -{">"}{" "}
                 </Link>
             </div>
@@ -307,7 +317,10 @@ export default function Attendance() {
                 ) : leaveRequestsQuery.isError ? (
                     <div className="flex items-center justify-center h-96">
                         Error loading leave requests.{" "}
-                        <button onClick={() => leaveRequestsQuery.refetch()} className="ml-2 text-blue-500 hover:underline">
+                        <button
+                            onClick={() => leaveRequestsQuery.refetch()}
+                            className="ml-2 text-blue-500 hover:underline"
+                        >
                             Retry
                         </button>
                     </div>

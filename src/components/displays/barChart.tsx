@@ -17,14 +17,28 @@ interface BarChartProps {
     multi?: boolean;
 }
 
-export function BarChartComponent({ data, title, description, config, size = "sm", loading, multi = true }: BarChartProps) {
+export function BarChartComponent({
+    data,
+    title,
+    description,
+    config,
+    size = "sm",
+    loading,
+    multi = true,
+}: BarChartProps) {
     const [chartSize, setChartSize] = useState(size);
     const toggleSize = () => setChartSize((prevSize) => (prevSize === "sm" ? "lg" : "sm"));
 
     const renderSkeletonBars = () => {
         const bars = [];
         for (let i = 0; i < 5; i++) {
-            bars.push(<Skeleton key={i} className="h-full w-1/6 mx-1 animate-blink" style={{ height: `${Math.random() * 100 + 50}px` }} />);
+            bars.push(
+                <Skeleton
+                    key={i}
+                    className="h-full w-1/6 mx-1 animate-blink"
+                    style={{ height: `${Math.random() * 100 + 50}px` }}
+                />,
+            );
         }
         return bars;
     };
@@ -41,7 +55,11 @@ export function BarChartComponent({ data, title, description, config, size = "sm
             </CardHeader>
             <CardContent>
                 {loading ? (
-                    <div className={chartSize === "sm" ? "h-[250px] w-[350px] flex items-end" : "h-full w-full flex items-end"}>
+                    <div
+                        className={
+                            chartSize === "sm" ? "h-[250px] w-[350px] flex items-end" : "h-full w-full flex items-end"
+                        }
+                    >
                         {renderSkeletonBars()}
                     </div>
                 ) : (

@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "../../../../../../lib/db";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function GET(req: NextRequest) {
     const agentid = req.nextUrl.searchParams.get("agentid");
 
     if (!agentid) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
     const { agentid, startDate, endDate, reason } = await req.json();
 
     if (!agentid || !startDate || !endDate || !reason) {

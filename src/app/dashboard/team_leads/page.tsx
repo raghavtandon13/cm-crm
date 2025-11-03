@@ -16,7 +16,12 @@ import { Input } from "@/components/ui/input";
 
 function formatDate(utcDateStr: any) {
     const utcDate = new Date(utcDateStr);
-    return utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric", month: "short", day: "numeric" });
+    return utcDate.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
 }
 
 const statusMap = {
@@ -91,7 +96,7 @@ export default function MyLeads() {
         if (agentsData) {
             return Object.entries(agentsData).map(([_, agentData]) => ({
                 agentName: agentData.agentName,
-                assignmentsCount: agentData.assignments.length,
+                assignmentsCount: agentData?.assignments?.length,
             }));
         }
         return [];
@@ -99,7 +104,7 @@ export default function MyLeads() {
 
     const allAssignments = () => {
         const assignments: any[] = [];
-        if (agentsData) {
+        if (agentsData && Array.isArray(agentsData.assignments)) {
             Object.entries(agentsData).forEach(([agentId, agentData]) => {
                 agentData.assignments.forEach((assignment) => {
                     assignments.push({ ...assignment, agentId, agentName: agentData.agentName });
@@ -135,7 +140,15 @@ export default function MyLeads() {
     });
 
     const statusMutation = useMutation({
-        mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
+        mutationFn: async ({
+            assignmentId,
+            status,
+            subStatus,
+        }: {
+            assignmentId: string;
+            status: string;
+            subStatus: string;
+        }) => {
             await fromAPI.post("/agents/assignments/change", {
                 assignmentId,
                 status,
@@ -152,7 +165,11 @@ export default function MyLeads() {
         },
     });
 
-    const handleStatusChangeLocal = (e: React.ChangeEvent<HTMLSelectElement>, type: "status" | "subStatus", lead: Assignment) => {
+    const handleStatusChangeLocal = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+        type: "status" | "subStatus",
+        lead: Assignment,
+    ) => {
         const value = e.target.value;
         if (type === "status") {
             statusMutation.mutate({ assignmentId: lead.assignmentId, status: value, subStatus: lead.subStatus });
@@ -161,7 +178,8 @@ export default function MyLeads() {
         }
     };
 
-    const handleTransfer = (assignmentId: string, newAgentId: string) => transferMutation.mutate({ assignmentId, newAgentId });
+    const handleTransfer = (assignmentId: string, newAgentId: string) =>
+        transferMutation.mutate({ assignmentId, newAgentId });
     const handleDelete = (assignmentId: string) => deleteMutation.mutate({ assignmentId });
 
     const agentsMapValue = agentsMap();
@@ -181,7 +199,10 @@ export default function MyLeads() {
                             <Button
                                 id="date"
                                 variant="outline"
-                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                className={cn(
+                                    "w-[300px] justify-start text-left font-normal",
+                                    !date && "text-muted-foreground",
+                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -235,7 +256,9 @@ export default function MyLeads() {
                             onChange={(e) => setSearchPhone(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && searchPhone.length === 10) {
-                                    const result = allAssignmentsValue.find((asg) => asg.userPhone === String(searchPhone));
+                                    const result = allAssignmentsValue.find(
+                                        (asg) => asg.userPhone === String(searchPhone),
+                                    );
                                     if (result) setSearchResult(`${result.agentName}`);
                                     else setSearchResult("No results found");
                                 }
@@ -284,12 +307,19 @@ export default function MyLeads() {
                         <TableBody>
                             {filteredAssignments.map((asg) => (
                                 <TableRow key={asg.assignmentId}>
-                                    <TableCell className="text-center border-r border-gray-200">{asg.userPhone}</TableCell>
+                                    <TableCell className="text-center border-r border-gray-200">
+                                        {asg.userPhone}
+                                    </TableCell>
                                     {/* <TableCell className="text-center">{asg.userEmail}</TableCell> */}
                                     <TableCell className="text-left border-r border-gray-200">{asg.userName}</TableCell>
-                                    <TableCell className="text-left border-r border-gray-200">{formatDate(asg.assignedAt)}</TableCell>
+                                    <TableCell className="text-left border-r border-gray-200">
+                                        {formatDate(asg.assignedAt)}
+                                    </TableCell>
                                     <TableCell className="text-left border-r border-gray-200 pointer">
-                                        <select onChange={(e) => handleStatusChangeLocal(e, "status", asg)} defaultValue={asg.status}>
+                                        <select
+                                            onChange={(e) => handleStatusChangeLocal(e, "status", asg)}
+                                            defaultValue={asg.status}
+                                        >
                                             <option value="" disabled>
                                                 Select Status
                                             </option>
@@ -301,7 +331,10 @@ export default function MyLeads() {
                                         </select>
                                     </TableCell>
                                     <TableCell className="text-left border-r border-gray-200 pointer">
-                                        <select onChange={(e) => handleStatusChangeLocal(e, "subStatus", asg)} defaultValue={asg.subStatus}>
+                                        <select
+                                            onChange={(e) => handleStatusChangeLocal(e, "subStatus", asg)}
+                                            defaultValue={asg.subStatus}
+                                        >
                                             <option value="" disabled>
                                                 Select Sub Status
                                             </option>
@@ -312,9 +345,14 @@ export default function MyLeads() {
                                             ))}
                                         </select>
                                     </TableCell>
-                                    <TableCell className="text-right border-r border-gray-200">{asg.agentName}</TableCell>
+                                    <TableCell className="text-right border-r border-gray-200">
+                                        {asg.agentName}
+                                    </TableCell>
                                     <TableCell className="text-left border-r border-gray-200">
-                                        <select onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)} defaultValue="">
+                                        <select
+                                            onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)}
+                                            defaultValue=""
+                                        >
                                             <option value="" disabled>
                                                 Select Agent
                                             </option>

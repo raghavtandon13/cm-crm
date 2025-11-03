@@ -25,7 +25,9 @@ export default function Overview() {
     const { data, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&overview=true`);
+            const response = await fromAPI.get(
+                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&overview=true`,
+            );
             return response.data.data;
         },
     });
@@ -71,7 +73,14 @@ export default function Overview() {
             <div className="font-semibold flex gap-4 mb-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button id="date" variant="outline" className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}>
+                        <Button
+                            id="date"
+                            variant="outline"
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
+                        >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -87,7 +96,14 @@ export default function Overview() {
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={date?.from}
+                            selected={date}
+                            onSelect={setDate}
+                            numberOfMonths={2}
+                        />
                     </PopoverContent>
                 </Popover>
             </div>
@@ -98,7 +114,11 @@ export default function Overview() {
                     <p className="ml-4">Fetching agent attendance data...</p>
                 </div>
             ) : (
-                <DataTable columns={summaryColumns} data={[...data, getSummaryRow(data)]} name="attendanceSummaryTable" />
+                <DataTable
+                    columns={summaryColumns}
+                    data={[...data, getSummaryRow(data)]}
+                    name="attendanceSummaryTable"
+                />
             )}
         </>
     );
