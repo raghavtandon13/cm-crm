@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
@@ -68,7 +68,6 @@ export default function LenderStatus({ phone }: { phone: string }) {
     return (
         <div className="flex flex-col  py-10 gap-6">
             <h1 className="font-bold">Lender Status</h1>
-
             <div className="flex gap-4 flex-wrap">
                 {lenders.map((lender) => (
                     <Dialog

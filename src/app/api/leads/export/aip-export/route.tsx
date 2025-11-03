@@ -38,7 +38,9 @@ async function buildAIPMatchQuery({
                                 $gte: [
                                     {
                                         $dateDiff: {
-                                            startDate: { $convert: { input: "$dob", to: "date", onError: null, onNull: null } },
+                                            startDate: {
+                                                $convert: { input: "$dob", to: "date", onError: null, onNull: null },
+                                            },
                                             endDate: "$$NOW",
                                             unit: "year",
                                         },
@@ -50,7 +52,9 @@ async function buildAIPMatchQuery({
                                 $lte: [
                                     {
                                         $dateDiff: {
-                                            startDate: { $convert: { input: "$dob", to: "date", onError: null, onNull: null } },
+                                            startDate: {
+                                                $convert: { input: "$dob", to: "date", onError: null, onNull: null },
+                                            },
                                             endDate: "$$NOW",
                                             unit: "year",
                                         },
@@ -90,7 +94,17 @@ async function buildAIPMatchQuery({
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { minAge, maxAge, minIncome, pincodeCollection, pincodeMatching = "R", employment = "Salaried", startDate, endDate, limit } = body;
+        const {
+            minAge,
+            maxAge,
+            minIncome,
+            pincodeCollection,
+            pincodeMatching = "R",
+            employment = "Salaried",
+            startDate,
+            endDate,
+            limit,
+        } = body;
 
         await connectToMongoDB();
 

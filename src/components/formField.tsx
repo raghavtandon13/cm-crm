@@ -31,7 +31,9 @@ export function FormField({
             <Label htmlFor={name}>
                 {label}
                 {errors[name] && (
-                    <span className="m-2 sm:ml-4 bg-red-200 px-1 rounded text-sm text-red-500">{errors[name]?.message as string}</span>
+                    <span className="m-2 sm:ml-4 bg-red-200 px-1 rounded text-sm text-red-500">
+                        {errors[name]?.message as string}
+                    </span>
                 )}
             </Label>
             <Controller
@@ -55,7 +57,14 @@ export function FormField({
                             </SelectContent>
                         </Select>
                     ) : (
-                        <Input id={name} type={type} placeholder={placeholder} className="bg-white" {...field} disabled={disabled} />
+                        <Input
+                            id={name}
+                            type={type}
+                            placeholder={placeholder}
+                            className="bg-white"
+                            {...field}
+                            disabled={disabled}
+                        />
                     )
                 }
             />

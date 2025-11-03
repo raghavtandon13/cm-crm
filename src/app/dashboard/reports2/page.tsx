@@ -26,16 +26,88 @@ const fakeApiFetch = (): Promise<{
                     { partner: "zype", total: 12252, new: 1452, deduped: 1458 },
                 ],
                 total: [
-                    { lender: "zype", total: 111305, Accepted: 5310, Rejected: 1302, Deduped: 104691, Errors: 0, Rest: 2, aipEligible: null },
-                    { lender: "moneyview", total: 31669, Accepted: 5177, Rejected: 8948, Deduped: 16730, Errors: 761, Rest: 53, aipEligible: null },
-                    { lender: "creditlinks", total: 30922, Accepted: 2599, Rejected: 28007, Deduped: 316, Errors: 0, Rest: 0, aipEligible: null },
-                    { lender: "mpocket", total: 33080, Accepted: 395, Rejected: 32685, Deduped: 0, Errors: 0, Rest: 0, aipEligible: null },
+                    {
+                        lender: "zype",
+                        total: 111305,
+                        Accepted: 5310,
+                        Rejected: 1302,
+                        Deduped: 104691,
+                        Errors: 0,
+                        Rest: 2,
+                        aipEligible: null,
+                    },
+                    {
+                        lender: "moneyview",
+                        total: 31669,
+                        Accepted: 5177,
+                        Rejected: 8948,
+                        Deduped: 16730,
+                        Errors: 761,
+                        Rest: 53,
+                        aipEligible: null,
+                    },
+                    {
+                        lender: "creditlinks",
+                        total: 30922,
+                        Accepted: 2599,
+                        Rejected: 28007,
+                        Deduped: 316,
+                        Errors: 0,
+                        Rest: 0,
+                        aipEligible: null,
+                    },
+                    {
+                        lender: "mpocket",
+                        total: 33080,
+                        Accepted: 395,
+                        Rejected: 32685,
+                        Deduped: 0,
+                        Errors: 0,
+                        Rest: 0,
+                        aipEligible: null,
+                    },
                 ],
                 fresh: [
-                    { lender: "zype", total: 111000, Accepted: 5000, Rejected: 1200, Deduped: 104000, Errors: 0, Rest: 2, aipEligible: 100 },
-                    { lender: "moneyview", total: 31000, Accepted: 5000, Rejected: 8900, Deduped: 16000, Errors: 700, Rest: 50, aipEligible: 200 },
-                    { lender: "creditlinks", total: 30000, Accepted: 2500, Rejected: 27000, Deduped: 300, Errors: 0, Rest: 0, aipEligible: 150 },
-                    { lender: "mpocket", total: 32000, Accepted: 350, Rejected: 31500, Deduped: 0, Errors: 0, Rest: 0, aipEligible: 80 },
+                    {
+                        lender: "zype",
+                        total: 111000,
+                        Accepted: 5000,
+                        Rejected: 1200,
+                        Deduped: 104000,
+                        Errors: 0,
+                        Rest: 2,
+                        aipEligible: 100,
+                    },
+                    {
+                        lender: "moneyview",
+                        total: 31000,
+                        Accepted: 5000,
+                        Rejected: 8900,
+                        Deduped: 16000,
+                        Errors: 700,
+                        Rest: 50,
+                        aipEligible: 200,
+                    },
+                    {
+                        lender: "creditlinks",
+                        total: 30000,
+                        Accepted: 2500,
+                        Rejected: 27000,
+                        Deduped: 300,
+                        Errors: 0,
+                        Rest: 0,
+                        aipEligible: 150,
+                    },
+                    {
+                        lender: "mpocket",
+                        total: 32000,
+                        Accepted: 350,
+                        Rejected: 31500,
+                        Deduped: 0,
+                        Errors: 0,
+                        Rest: 0,
+                        aipEligible: 80,
+                    },
                 ],
                 meta: {
                     computedAt: "2025-07-24T11:00:00.000Z",
@@ -52,7 +124,9 @@ export default function Reports() {
     const [freshData, setFreshData] = useState<any[]>([]);
     const [meta, setMeta] = useState<{ computedAt: string; date: string } | null>(null);
     const [activeTab, setActiveTab] = useState("total");
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(new Date().setDate(new Date().getDate() - 1)));
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+        new Date(new Date().setDate(new Date().getDate() - 1)),
+    );
 
     useEffect(() => {
         fakeApiFetch().then((res) => {
@@ -148,7 +222,14 @@ export default function Reports() {
                 <div className="font-semibold flex gap-4">
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button id="date" variant="outline" className={cn("justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}>
+                            <Button
+                                id="date"
+                                variant="outline"
+                                className={cn(
+                                    "justify-start text-left font-normal",
+                                    !selectedDate && "text-muted-foreground",
+                                )}
+                            >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {selectedDate ? format(selectedDate, "yyyy MMM dd") : "Pick a date"}
                             </Button>
@@ -188,13 +269,18 @@ export default function Reports() {
                             </TabsList>
                             {activeTab === "fresh" && (
                                 <span className="text-muted-foreground text-sm ml-2">
-                                    Total Fresh Leads: {freshData.reduce((sum, item) => sum + item.total, 0).toLocaleString()}
+                                    Total Fresh Leads:{" "}
+                                    {freshData.reduce((sum, item) => sum + item.total, 0).toLocaleString()}
                                 </span>
                             )}
                         </div>
 
-                        <TabsContent value="total">{loading ? renderLoadingSkeleton() : renderLenderTable(totalData)}</TabsContent>
-                        <TabsContent value="fresh">{loading ? renderLoadingSkeleton() : renderLenderTable(freshData)}</TabsContent>
+                        <TabsContent value="total">
+                            {loading ? renderLoadingSkeleton() : renderLenderTable(totalData)}
+                        </TabsContent>
+                        <TabsContent value="fresh">
+                            {loading ? renderLoadingSkeleton() : renderLenderTable(freshData)}
+                        </TabsContent>
                     </Tabs>
                 </CardContent>
             </Card>

@@ -7,7 +7,7 @@ import NewSubDsa from "./newSubDsa";
 const secret = process.env.JWT_SECRET as string;
 
 export default async function DsaHome() {
-    const { id } = jwt.verify(await cookies().get("cm-token").value, secret) as { id: string };
+    const { id } = jwt.verify(await (await cookies()).get("cm-token").value, secret) as { id: string };
     if (!id) redirect("/dashboard/partner_create");
 
     const dsas = await db.partner.findMany({

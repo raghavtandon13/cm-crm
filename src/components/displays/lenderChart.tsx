@@ -448,7 +448,9 @@ export function LenderCharts() {
 
     return (
         <>
-            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>Accepted Leads per Lender &#8628;</h1>
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>
+                Accepted Leads per Lender &#8628;
+            </h1>
             <Card className="max-w-full">
                 <CardHeader className="p-4">
                     <CardTitle className="text-sm">Accepted Leads</CardTitle>
@@ -459,7 +461,9 @@ export function LenderCharts() {
                         {Object.keys(lenders).map((lender) => (
                             <button
                                 key={lender}
-                                className={cn(buttonVariants({ variant: "outline" }), { "bg-gray-200": visibleLenders[lender] })}
+                                className={cn(buttonVariants({ variant: "outline" }), {
+                                    "bg-gray-200": visibleLenders[lender],
+                                })}
                                 onClick={() => toggleLenderVisibility(lender)}
                             >
                                 {lender}
@@ -492,7 +496,13 @@ export function LenderCharts() {
                             }}
                         >
                             <CartesianGrid vertical={false} />
-                            <XAxis dataKey="week" tickLine={false} axisLine={false} tickMargin={4} tickFormatter={(value) => value} />
+                            <XAxis
+                                dataKey="week"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={4}
+                                tickFormatter={(value) => value}
+                            />
                             <YAxis />
                             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                             {Object.keys(visibleLenders).map(

@@ -14,7 +14,9 @@ async function mv_status(user: any): Promise<any> {
 
         if (!tokenresponse.ok) {
             const errortext = await tokenresponse.text();
-            return { error: `failed to fetch token: ${tokenresponse.status} ${tokenresponse.statusText}. ${errortext}` };
+            return {
+                error: `failed to fetch token: ${tokenresponse.status} ${tokenresponse.statusText}. ${errortext}`,
+            };
         }
 
         const tokendata = await tokenresponse.json();
@@ -29,7 +31,9 @@ async function mv_status(user: any): Promise<any> {
 
         if (!leadstatusresponse.ok) {
             const errortext = await leadstatusresponse.text();
-            return { error: `failed to fetch lead status: ${leadstatusresponse.status} ${leadstatusresponse.statusText}. ${errortext}` };
+            return {
+                error: `failed to fetch lead status: ${leadstatusresponse.status} ${leadstatusresponse.statusText}. ${errortext}`,
+            };
         }
 
         const leadstatusdata = await leadstatusresponse.json();

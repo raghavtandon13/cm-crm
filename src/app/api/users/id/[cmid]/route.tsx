@@ -2,7 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
 
-export async function GET(_req: NextRequest, { params }: { params: { cmid: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ cmid: string }> }) {
+    const params = await props.params;
     await connectToMongoDB();
     try {
         const cmid = params.cmid;

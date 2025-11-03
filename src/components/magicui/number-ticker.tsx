@@ -12,7 +12,14 @@ interface NumberTickerProps extends ComponentPropsWithoutRef<"span"> {
     decimalPlaces?: number;
 }
 
-export function NumberTicker({ value, direction = "up", delay = 0, className, decimalPlaces = 0, ...props }: NumberTickerProps) {
+export function NumberTicker({
+    value,
+    direction = "up",
+    delay = 0,
+    className,
+    decimalPlaces = 0,
+    ...props
+}: NumberTickerProps) {
     const ref = useRef<HTMLSpanElement>(null);
     const motionValue = useMotionValue(value);
     const springValue = useSpring(motionValue, {
@@ -39,5 +46,11 @@ export function NumberTicker({ value, direction = "up", delay = 0, className, de
         [springValue, decimalPlaces],
     );
 
-    return <span ref={ref} className={cn("inline-block tabular-nums tracking-wider text-black dark:text-white", className)} {...props} />;
+    return (
+        <span
+            ref={ref}
+            className={cn("inline-block tabular-nums tracking-wider text-black dark:text-white", className)}
+            {...props}
+        />
+    );
 }

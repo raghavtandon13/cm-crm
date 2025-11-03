@@ -65,7 +65,10 @@ export default function UserProfile() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
-                                <AlertDialogAction onClick={handlePasswordChange} className={buttonVariants({ variant: "default" })}>
+                                <AlertDialogAction
+                                    onClick={handlePasswordChange}
+                                    className={buttonVariants({ variant: "default" })}
+                                >
                                     Submit
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -85,7 +88,10 @@ export default function UserProfile() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleLogout} className={buttonVariants({ variant: "destructive" })}>
+                            <AlertDialogAction
+                                onClick={handleLogout}
+                                className={buttonVariants({ variant: "destructive" })}
+                            >
                                 Log Out
                             </AlertDialogAction>
                         </AlertDialogFooter>

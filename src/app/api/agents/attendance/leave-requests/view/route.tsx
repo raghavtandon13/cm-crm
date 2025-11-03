@@ -21,7 +21,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     const { leaveReqId, decision } = await req.json();
 
-    if (!leaveReqId || !decision) return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
+    if (!leaveReqId || !decision)
+        return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
 
     try {
         // if startDate and endDate is same then leave is only for one day but if they are different then leave is for multiple days

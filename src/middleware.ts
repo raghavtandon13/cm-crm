@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import axios from "axios";
+import { http } from "./lib/api";
 
 export async function middleware(request: NextRequest) {
     const currentUser = request.cookies.get("cm-token")?.value;
@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (currentUser) {
-        const response = await axios.get("http://localhost:3000/api/auth/get", {
+        const response = await http.get("http://localhost:3000/api/auth/get", {
             headers: { Authorization: `Bearer ${currentUser}` },
         });
 

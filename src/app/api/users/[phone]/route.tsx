@@ -3,7 +3,8 @@ import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: NextRequest, { params }: { params: { phone: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ phone: string }> }) {
+    const params = await props.params;
     await connectToMongoDB();
     try {
         const phone = params.phone;

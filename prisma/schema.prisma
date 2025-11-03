@@ -132,13 +132,13 @@ model LeaveRequest {
 }
 
 model Partner {
-    id            String         @id @default(auto()) @map("_id") @db.ObjectId
-    email         String         @unique
-    name          String?
-    password      String
-    roleId        String         @db.ObjectId // ["DSA","subDSA","indiv"]
-    role          Role           @relation(fields: [roleId], references: [id])
-    partnerLeads  PartnerLeads[]
+    id           String         @id @default(auto()) @map("_id") @db.ObjectId
+    email        String         @unique
+    name         String?
+    password     String
+    roleId       String         @db.ObjectId // ["DSA","subDSA","indiv"]
+    role         Role           @relation(fields: [roleId], references: [id])
+    partnerLeads PartnerLeads[]
 
     // Self-referential relations for DSA and subDSA/indiv
     subPartners Partner[] @relation("PartnerHierarchy")

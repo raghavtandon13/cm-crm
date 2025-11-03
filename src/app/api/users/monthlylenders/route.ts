@@ -10,10 +10,60 @@ async function getPartnerDataForLast3Months() {
 
     const result = await User.aggregate([
         { $match: { createdAt: { $gte: threeMonthsAgo }, partner: { $in: targetPartners } } },
-        { $group: { _id: { partner: "$partner", month: { $month: "$createdAt" }, year: { $year: "$createdAt" } }, count: { $sum: 1 } } },
+        {
+            $group: {
+                _id: { partner: "$partner", month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+                count: { $sum: 1 },
+            },
+        },
         { $sort: { "_id.year": 1, "_id.month": 1 } },
-        { $group: { _id: "$_id.partner", monthlyCounts: { $push: { month: "$_id.month", year: "$_id.year", count: "$count" } } } },
-        { $project: { partner: "$_id", monthlyCounts: { $arrayToObject: { $map: { input: "$monthlyCounts", as: "item", in: { k: { $concat: [ { $arrayElemAt: [ [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" ], { $subtract: [ "$$item.month", 1 ] } ] }, " ", { $toString: "$$item.year" } ] }, v: "$$item.count" } } } } } },
+        {
+            $group: {
+                _id: "$_id.partner",
+                monthlyCounts: { $push: { month: "$_id.month", year: "$_id.year", count: "$count" } },
+            },
+        },
+        {
+            $project: {
+                partner: "$_id",
+                monthlyCounts: {
+                    $arrayToObject: {
+                        $map: {
+                            input: "$monthlyCounts",
+                            as: "item",
+                            in: {
+                                k: {
+                                    $concat: [
+                                        {
+                                            $arrayElemAt: [
+                                                [
+                                                    "Jan",
+                                                    "Feb",
+                                                    "Mar",
+                                                    "Apr",
+                                                    "May",
+                                                    "Jun",
+                                                    "Jul",
+                                                    "Aug",
+                                                    "Sept",
+                                                    "Oct",
+                                                    "Nov",
+                                                    "Dec",
+                                                ],
+                                                { $subtract: ["$$item.month", 1] },
+                                            ],
+                                        },
+                                        " ",
+                                        { $toString: "$$item.year" },
+                                    ],
+                                },
+                                v: "$$item.count",
+                            },
+                        },
+                    },
+                },
+            },
+        },
         { $project: { _id: 0, partner: 1, monthlyCounts: 1 } },
     ]);
 

@@ -10,7 +10,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogFooter,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
@@ -127,7 +134,9 @@ export default function Create() {
 
     return (
         <>
-            <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-8">{phone ? "Edit Existing Lead" : "Create New Lead"}</h1>
+            <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-8">
+                {phone ? "Edit Existing Lead" : "Create New Lead"}
+            </h1>
             <form onSubmit={handleSubmit(onSubmit)} className="mx-2 my-4 sm:mx-8">
                 <div className="grid gap-4">
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
@@ -199,7 +208,13 @@ export default function Create() {
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                        <FormField label="Address" name="address" control={control} errors={errors} placeholder="Enter your address" />
+                        <FormField
+                            label="Address"
+                            name="address"
+                            control={control}
+                            errors={errors}
+                            placeholder="Enter your address"
+                        />
                         <FormField
                             label="Pincode"
                             name="pincode"
@@ -214,7 +229,13 @@ export default function Create() {
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
-                        <FormField label="City" name="city" control={control} errors={errors} placeholder="Enter your city" />
+                        <FormField
+                            label="City"
+                            name="city"
+                            control={control}
+                            errors={errors}
+                            placeholder="Enter your city"
+                        />
                         <FormField
                             label="State"
                             name="state"
@@ -237,7 +258,13 @@ export default function Create() {
                                 { value: "No-employment", label: "Non Employed" },
                             ]}
                         />
-                        <FormField label="Company Name" name="company" control={control} errors={errors} placeholder="Enter company name" />
+                        <FormField
+                            label="Company Name"
+                            name="company"
+                            control={control}
+                            errors={errors}
+                            placeholder="Enter company name"
+                        />
                     </div>
 
                     <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
@@ -289,8 +316,19 @@ export default function Create() {
                             <Button type="submit" className="w-full flex-1" onClick={() => setInject(false)}>
                                 Save
                             </Button>
-                            <Button type="submit" className="w-full flex-1" disabled={isPending} onClick={() => setInject(true)}>
-                                {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
+                            <Button
+                                type="submit"
+                                className="w-full flex-1"
+                                disabled={isPending}
+                                onClick={() => setInject(true)}
+                            >
+                                {isPending
+                                    ? phone
+                                        ? "Updating..."
+                                        : "Creating..."
+                                    : phone
+                                      ? "Update Lead"
+                                      : "Create Lead"}
                             </Button>
                         </div>
                     </div>

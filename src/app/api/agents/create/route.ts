@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
-    if (user.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    if (user.role.title !== "BOSS")
+        return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
 
     try {
         const { email, firstName, lastName, password } = await req.json();

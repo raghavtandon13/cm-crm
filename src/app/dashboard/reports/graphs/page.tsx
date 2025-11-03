@@ -17,7 +17,10 @@ export default function Graphs() {
     const [lender, setLender] = useState("SmartCoin");
     const [partner, setPartner] = useState("Zype_LS");
     const [datetype, setDatetype] = useState("resp");
-    const [date, setDate] = useState<DateRange | undefined>({ from: startOfMonth(new Date("2025-01-01")), to: new Date() });
+    const [date, setDate] = useState<DateRange | undefined>({
+        from: startOfMonth(new Date("2025-01-01")),
+        to: new Date(),
+    });
     const startDate = date?.from ? format(date.from, "yyyy-MM-dd") : "";
     const endDate = date?.to ? format(date.to, "yyyy-MM-dd") : "";
 
@@ -130,8 +133,16 @@ export default function Graphs() {
 
     // Configuration for the bar charts
     const ageConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
-    const employmentConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
-    const genderConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
+    const employmentConfig = {
+        Accepted: { color: "#8884d8" },
+        Deduped: { color: "#82ca9d" },
+        Errors: { color: "#ffc658" },
+    };
+    const genderConfig = {
+        Accepted: { color: "#8884d8" },
+        Deduped: { color: "#82ca9d" },
+        Errors: { color: "#ffc658" },
+    };
     const ardConfig = { Accepted: { color: "#8884d8" }, Deduped: { color: "#82ca9d" }, Errors: { color: "#ffc658" } };
 
     // refetch all function
@@ -194,7 +205,10 @@ export default function Graphs() {
                         <Button
                             id="date"
                             variant="outline"
-                            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground",
+                            )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
@@ -231,15 +245,31 @@ export default function Graphs() {
             </div>
             {/* Display bar charts for age, employment, and gender distributions */}
             <div className="flex flex-wrap gap-4">
-                <BarChart data={transformedAgeData} title="Age Distribution" config={ageConfig} loading={isFetchingAge} />
+                <BarChart
+                    data={transformedAgeData}
+                    title="Age Distribution"
+                    config={ageConfig}
+                    loading={isFetchingAge}
+                />
                 <BarChart
                     data={transformedEmploymentData}
                     title="Employment Distribution"
                     config={employmentConfig}
                     loading={isFetchingEmployment}
                 />
-                <BarChart data={transformedGenderData} title="Gender Distribution" config={genderConfig} loading={isFetchingGender} />
-                <BarChart data={transformedArdData} multi={false} title="Total ARD" config={ardConfig} loading={isFetchingARD} />
+                <BarChart
+                    data={transformedGenderData}
+                    title="Gender Distribution"
+                    config={genderConfig}
+                    loading={isFetchingGender}
+                />
+                <BarChart
+                    data={transformedArdData}
+                    multi={false}
+                    title="Total ARD"
+                    config={ardConfig}
+                    loading={isFetchingARD}
+                />
             </div>
         </div>
     );

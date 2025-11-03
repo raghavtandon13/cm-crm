@@ -11,10 +11,12 @@ export async function POST(req: NextRequest) {
 
         // Getting Partner
         const partner = await db.partner.findUnique({ where: { email } });
-        if (!partner) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        if (!partner)
+            return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
         const isMatch = await bcrypt.compare(pass, partner.password);
-        if (!isMatch) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        if (!isMatch)
+            return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
         const token = jwt.sign({ id: partner.id, email: partner.email }, secret, { expiresIn: "10h" });
 

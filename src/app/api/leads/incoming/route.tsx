@@ -116,7 +116,8 @@ export async function POST(_req: NextRequest) {
     try {
         const { startDay, endDay } = await _req.json();
         // Set default values
-        const startDate = startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
+        const startDate =
+            startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
         const endDate = endDay || new Date().toISOString().split("T")[0];
 
         await connectToMongoDB();

@@ -27,13 +27,22 @@ export default function Reports() {
         <>
             {/* <RealtimeStats /> */}
             <div>
-                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/incoming">
+                <Link
+                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                    href="/dashboard/reports/incoming"
+                >
                     Incoming Leads -{">"}{" "}
                 </Link>
-                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/stats">
+                <Link
+                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                    href="/dashboard/reports/stats"
+                >
                     ARD Lender Stats -{">"}{" "}
                 </Link>
-                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/graphs">
+                <Link
+                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                    href="/dashboard/reports/graphs"
+                >
                     Grapshs -{">"}{" "}
                 </Link>
             </div>
