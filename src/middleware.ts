@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { DASHBOARD_ROUTES, DEFAULT_REDIRECTS } from "@/lib/roles";
 import axios from "axios";
 
 export async function middleware(request: NextRequest) {
@@ -12,66 +13,17 @@ export async function middleware(request: NextRequest) {
         const response = await axios.get("http://localhost:3000/api/auth/get", {
             headers: { Authorization: `Bearer ${currentUser}` },
         });
-
         const role = response.data.role.title;
         const pathname = request.nextUrl.pathname;
+        const allowedRoutes = DASHBOARD_ROUTES.filter((route) => route.roles.includes(role)).map((route) => route.path);
 
-        const roleRoutes = {
-            BOSS: [
-                "/dashboard/create",
-                "/dashboard/myleads",
-                "/dashboard/team_leads",
-                "/dashboard/search",
-                "/dashboard/reports",
-                "/dashboard/reports2",
-                "/dashboard/register",
-                "/dashboard/database",
-                "/dashboard/attendance",
-                "/dashboard/export",
-            ],
-            DSA: [
-                "/dashboard/partner_create",
-                "/dashboard/partner_leads",
-                "/dashboard/partner_search",
-                "/dashboard/partner_dsa",
-            ],
-            HR: ["/dashboard/register", "/dashboard/attendance", "/dashboard/agent_attendance"],
-            INDIV: ["/dashboard/partner_create", "/dashboard/partner_leads", "/dashboard/partner_search"],
-            OE: ["/dashboard/create", "/dashboard/myleads", "/dashboard/search", "/dashboard/agent_attendance"],
-            SUBDSA: ["/dashboard/partner_create", "/dashboard/partner_leads", "/dashboard/partner_search"],
-            TE: ["/dashboard/agent_attendance"],
-            TL: [
-                "/dashboard/create",
-                "/dashboard/myleads",
-                "/dashboard/search",
-                "/dashboard/agent_attendance",
-                "/dashboard/attendance",
-                "/dashboard/team_leads",
-                "/dashboard/export",
-            ],
-        };
-
-        const allowedRoutes = roleRoutes[role] || [];
-
-        const defaultRedirects = {
-            BOSS: "/dashboard/reports",
-            DSA: "/dashboard/partner_create",
-            HR: "/dashboard/attendance",
-            INDIV: "/dashboard/partner_create",
-            OE: "/dashboard/create",
-            SUBDSA: "/dashboard/partner_create",
-            TE: "/dashboard/agent_attendance",
-            TL: "/dashboard/team_leads",
-        };
-
-        if (pathname === "/dashboard" && defaultRedirects[role]) {
-            return Response.redirect(new URL(defaultRedirects[role], request.url));
+        if (pathname === "/dashboard" && DEFAULT_REDIRECTS[role]) {
+            return Response.redirect(new URL(DEFAULT_REDIRECTS[role], request.url));
         }
 
-        const isAllowed = allowedRoutes.some((route) => pathname.startsWith(route));
-
+        const isAllowed = allowedRoutes.some((route) => pathname === route);
         if (!isAllowed) {
-            return Response.redirect(new URL(defaultRedirects[role], request.url));
+            return Response.redirect(new URL(DEFAULT_REDIRECTS[role], request.url));
         }
     }
 }

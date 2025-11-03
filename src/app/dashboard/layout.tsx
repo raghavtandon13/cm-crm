@@ -1,18 +1,7 @@
 "use client";
 import { useUser } from "@/context/UserContext";
-import {
-    Library,
-    LineChart,
-    Search,
-    UserPlus,
-    Users,
-    Database,
-    UserRound,
-    BookUser,
-    ChevronLeft,
-    ChevronRight,
-    Download,
-} from "lucide-react";
+import { DASHBOARD_ROUTES, RoleTitle } from "@/lib/roles";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -41,19 +30,6 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     const path = usePathname();
     const user = useUser();
     const [collapsed, setCollapsed] = useState(false);
-
-    // testing
-    // const user = { role: { title: "QA" } };
-
-    const admin = user?.role.title === "BOSS";
-    const agent = user?.role.title === "OE";
-    const tech = user?.role.title === "TE";
-    const tl = user?.role.title === "TL";
-    const hr = user?.role.title === "HR";
-    const indiv = user?.role.title === "INDIV";
-    const dsa = user?.role.title === "DSA";
-    const subdsa = user?.role.title === "SUBDSA";
-    const qa = user?.role.title === "QA";
     const shouldAddPadding = !path.includes("dashboard/database");
 
     return (
@@ -68,21 +44,18 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                     >
                         {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                     </button>
-                    {/* prettier-ignore */}
                     <nav className="grid gap-2 text-sm font-medium">
-                        {(tl || admin || agent) && <NavItem href="/dashboard/create" icon={UserPlus} label="Create New Lead" collapsed={collapsed} />}
-                        {( indiv || dsa || subdsa ) && <NavItem href="/dashboard/patner_create" icon={UserPlus} label="Create New Lead" collapsed={collapsed} />}
-                        {(tl || admin || agent) && <NavItem href="/dashboard/myleads" icon={Library} label="My Leads" collapsed={collapsed} />}
-                        {( indiv || dsa || subdsa ) && <NavItem href="/dashboard/partner_leads" icon={Library} label="Partner Leads" collapsed={collapsed} />}
-                        {(tl || admin) && <NavItem href="/dashboard/team_leads" icon={BookUser} label="Team Leads" collapsed={collapsed} />}
-                        {(tl || admin || agent) && <NavItem href="/dashboard/search" icon={Search} label="Search" collapsed={collapsed} />}
-                        {admin && <NavItem href="/dashboard/reports" icon={LineChart} label="Reports" collapsed={collapsed} />}
-                        {(admin || hr) && <NavItem href="/dashboard/register" icon={Users} label="Agents" collapsed={collapsed} />}
-                        {(dsa) && <NavItem href="/dashboard/partner_dsa" icon={Users} label="Agents" collapsed={collapsed} />}
-                        {admin && <NavItem href="/dashboard/database" icon={Database} label="Database" collapsed={collapsed} />}
-                        {(tl || admin || hr) && <NavItem href="/dashboard/attendance" icon={UserRound} label="Attendance" collapsed={collapsed} />}
-                        {(tl || admin || tech) && <NavItem href="/dashboard/agent_attendance" icon={UserRound} label="My Attendance" collapsed={collapsed} />}
-                        {(tl || admin || qa) && <NavItem href="/dashboard/export" icon={Download} label="Export" collapsed={collapsed} />}
+                        {DASHBOARD_ROUTES.filter(
+                            (route) => route.showInSidebar && route.roles.includes(user?.role.title as RoleTitle),
+                        ).map((route) => (
+                            <NavItem
+                                key={route.path}
+                                href={route.path}
+                                icon={route.icon}
+                                label={route.label}
+                                collapsed={collapsed}
+                            />
+                        ))}
                     </nav>
                 </div>
             </aside>

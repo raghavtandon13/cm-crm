@@ -1,20 +1,20 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useUser } from "@/context/UserContext";
+import { DASHBOARD_ROUTES, RoleTitle } from "@/lib/roles";
+import { Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import UserProfile from "./role";
-import { Button } from "@/components/ui/button";
-import { Menu, UserPlus, Library, Search, LineChart, Users, Database, UserRound } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
+    const [open, setOpen] = useState(false);
+    const path = usePathname();
     const user = useUser();
-    const admin = user?.role.title === "BOSS";
-    const agent = user?.role.title === "OE";
-    const tech = user?.role.title === "TE";
-    const hr = user?.role.title === "HR";
-    const indiv = user?.role.title === "INDIV";
 
     return (
         <header className="bg-background sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6">
@@ -27,7 +27,7 @@ export function Navbar() {
                     <UserProfile />
                 </div>
             </nav>
-            <Sheet>
+            <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                     <Button variant="outline" size="icon" className="ml-auto md:hidden">
                         <Menu className="h-5 w-5" />
@@ -38,87 +38,19 @@ export function Navbar() {
                     <nav className="grid gap-6 text-lg font-medium">
                         <UserProfile />
                         <hr />
-                        {(admin || agent) && (
+                        {DASHBOARD_ROUTES.filter(
+                            (route) => route.showInNavbar && route.roles.includes(user?.role.title as RoleTitle),
+                        ).map((route) => (
                             <Link
-                                href="/dashboard/create"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
+                                key={route.path}
+                                href={route.path}
+                                onClick={() => setOpen(false)}
+                                className={`${path === route.path ? "bg-slate-200" : "hover:bg-muted"} flex items-center gap-3 rounded-lg px-3 py-2 transition-all`}
                             >
-                                <UserPlus className="h-4 w-4" />
-                                Create New Lead
+                                <route.icon className="h-4 w-4" />
+                                {route.label}
                             </Link>
-                        )}
-                        {(admin || agent) && (
-                            <Link
-                                href="/dashboard/myleads"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <Library className="h-4 w-4" />
-                                My Leads
-                            </Link>
-                        )}
-                        {(admin || agent) && (
-                            <Link
-                                href="/dashboard/search"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <Search className="h-4 w-4" />
-                                Search
-                            </Link>
-                        )}
-                        {admin && (
-                            <Link
-                                href="/dashboard/reports"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <LineChart className="h-4 w-4" />
-                                Reports
-                            </Link>
-                        )}
-                        {(admin || hr) && (
-                            <Link
-                                href="/dashboard/register"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <Users className="h-4 w-4" />
-                                Agents
-                            </Link>
-                        )}
-                        {admin && (
-                            <Link
-                                href="/dashboard/database"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <Database className="h-4 w-4" />
-                                Database
-                            </Link>
-                        )}
-                        {(admin || hr) && (
-                            <Link
-                                href="/dashboard/attendance"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <UserRound className="h-4 w-4" />
-                                Attendance
-                            </Link>
-                        )}
-                        {(agent || tech) && (
-                            <Link
-                                href="/dashboard/agent_attendance"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <UserRound className="h-4 w-4" />
-                                My Attendance
-                            </Link>
-                        )}
-                        {indiv && (
-                            <Link
-                                href="/dashboard/partner_create"
-                                className="hover:bg-muted flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
-                            >
-                                <UserRound className="h-4 w-4" />
-                                Create New Lead
-                            </Link>
-                        )}
+                        ))}
                     </nav>
                 </SheetContent>
             </Sheet>
