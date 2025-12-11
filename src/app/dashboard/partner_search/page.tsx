@@ -55,7 +55,7 @@ async function getData(phone: string, partnerId: string): Promise<UserData | str
 
 export default async function Phone(props: { searchParams: Promise<{ phone: string; accountsOnly: string }> }) {
     const searchParams = await props.searchParams;
-    const { id } = jwt.verify(await (await cookies()).get("cm-token").value, secret) as { id: string };
+    const { id } = jwt.verify((await (await cookies()).get("cm-token")?.value) ?? "", secret) as { id: string };
 
     let phone = "";
     let accountsOnly = true;

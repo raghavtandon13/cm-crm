@@ -1,10 +1,10 @@
 "use client";
-import { useUser } from "@/context/UserContext";
-import { DASHBOARD_ROUTES, RoleTitle } from "@/lib/roles";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState } from "react";
+import { useUser } from "@/context/UserContext";
+import { DASHBOARD_ROUTES, type RoleTitle } from "@/lib/roles";
 
 type NavItemProps = {
     href: string;
@@ -39,6 +39,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             >
                 <div className="sticky top-0 p-4">
                     <button
+                        type="button"
                         onClick={() => setCollapsed(!collapsed)}
                         className="flex items-center justify-center w-full mb-4 p-2 border rounded-lg"
                     >
@@ -46,7 +47,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
                     </button>
                     <nav className="grid gap-2 text-sm font-medium">
                         {DASHBOARD_ROUTES.filter(
-                            (route) => route.showInSidebar && route.roles.includes(user?.role.title as RoleTitle),
+                            (route) =>
+                                route.showInSidebar &&
+                                (user?.role?.title ? route.roles.includes(user.role.title as RoleTitle) : false),
                         ).map((route) => (
                             <NavItem
                                 key={route.path}

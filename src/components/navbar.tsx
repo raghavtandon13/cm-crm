@@ -39,7 +39,9 @@ export function Navbar() {
                         <UserProfile />
                         <hr />
                         {DASHBOARD_ROUTES.filter(
-                            (route) => route.showInNavbar && route.roles.includes(user?.role.title as RoleTitle),
+                            (route) =>
+                                route.showInSidebar &&
+                                (user?.role?.title ? route.roles.includes(user.role.title as RoleTitle) : false),
                         ).map((route) => (
                             <Link
                                 key={route.path}

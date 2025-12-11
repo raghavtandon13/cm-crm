@@ -476,7 +476,7 @@ export function LenderCharts() {
                             })}
                             onClick={() => {
                                 const allVisible = Object.values(visibleLenders).every(Boolean);
-                                const newVisibility = Object.keys(visibleLenders).reduce((acc, lender) => {
+                                const newVisibility = Object.keys(visibleLenders).reduce((acc:any, lender) => {
                                     acc[lender] = !allVisible;
                                     return acc;
                                 }, {});

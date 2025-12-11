@@ -160,7 +160,9 @@ export default function Reports() {
                                 <span className="text-muted-foreground text-sm ml-2">
                                     Total Fresh Leads:{" "}
                                     {formatNumberIndianStyle(
-                                        lenders.filter((l) => l.isFreshRelevant).reduce((sum, l) => sum + l.total, 0),
+                                        lenders
+                                            .filter((l: any) => l.isFreshRelevant)
+                                            .reduce((sum: any, l: any) => sum + l.total, 0),
                                     )}
                                 </span>
                             )}
@@ -179,7 +181,7 @@ export default function Reports() {
                             {isPending ? (
                                 renderLoadingSkeleton()
                             ) : result ? (
-                                renderLenderTable(lenders.filter((l:any) => l.isFreshRelevant))
+                                renderLenderTable(lenders.filter((l: any) => l.isFreshRelevant))
                             ) : (
                                 <div className="text-muted-foreground">Run the report to see data.</div>
                             )}

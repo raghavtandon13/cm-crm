@@ -32,7 +32,7 @@ export default function UserAttendance() {
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
             const response = await fromAPI.get(
-                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user.id}`,
+                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user?.id}`,
             );
             return response.data.data; // Access the `data` array directly
         },
@@ -46,7 +46,7 @@ export default function UserAttendance() {
     } = useQuery({
         queryKey: ["leaveRequests"],
         queryFn: async () => {
-            const response = await fromAPI.get(`/agents/attendance/leave-requests?agentid=${user.id}`);
+            const response = await fromAPI.get(`/agents/attendance/leave-requests?agentid=${user?.id}`);
             return response.data.data; // Access the `data` array directly
         },
     });
@@ -71,7 +71,7 @@ export default function UserAttendance() {
         const leaveEndDate = leaveDate.to ? format(leaveDate.to, "yyyy-MM-dd") : leaveStartDate;
 
         mutation.mutate({
-            agentid: user.id,
+            agentid: user?.id,
             startDate: leaveStartDate,
             endDate: leaveEndDate,
             reason: leaveReason,

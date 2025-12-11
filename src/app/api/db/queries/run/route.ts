@@ -5,7 +5,7 @@ import { connectToMongoDB } from "../../../../../../lib/db";
 import { ObjectId } from "mongodb";
 // import superjson from "superjson";
 
-function convertSpecialOperators(query: any) {
+function convertSpecialOperators(query: any):any {
     if (Array.isArray(query)) {
         return query.map(convertSpecialOperators);
     } else if (query && typeof query === "object") {
@@ -71,7 +71,7 @@ export async function POST(_req: NextRequest) {
         const result = await User.aggregate(aggregationPipeline);
 
         return NextResponse.json(result, { status: 200 });
-    } catch (error) {
+    } catch (error:any) {
         console.error("Error executing query:", error);
 
         // More specific error handling

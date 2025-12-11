@@ -45,7 +45,7 @@ export default function UserProfile() {
     };
 
     return (
-        user && (
+        user && user.role && (
             <>
                 <div className="flex items-center justify-center gap-5">
                     <p>

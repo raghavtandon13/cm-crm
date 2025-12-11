@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
                 email: email,
                 name: firstName + " " + lastName,
                 password: hashedPassword,
-                roleId: "66b1f154acdf2c3f9384f59c", // AGENT
+                roleId: "693a7b3d285364c8b2954510", // AGENT
             },
             include: { role: true },
         });

@@ -1,15 +1,15 @@
 import {
-    UserPlus,
-    Library,
     BookUser,
-    Search,
-    LineChart,
-    Users,
     Database,
-    UserRound,
     Download,
-    FireExtinguisher,
+    Library,
+    LineChart,
+    type LucideIcon,
+    Search,
     Sparkles,
+    UserPlus,
+    UserRound,
+    Users,
 } from "lucide-react";
 
 export type RoleTitle = "BOSS" | "OE" | "TE" | "TL" | "QA" | "HR" | "DSA" | "SUBDSA" | "INDIV";
@@ -17,7 +17,7 @@ export type RoleTitle = "BOSS" | "OE" | "TE" | "TL" | "QA" | "HR" | "DSA" | "SUB
 export type DashboardRoute = {
     path: string;
     label: string;
-    icon: any; // Lucide icon component
+    icon: LucideIcon;
     roles: RoleTitle[];
     showInSidebar?: boolean;
     showInNavbar?: boolean;

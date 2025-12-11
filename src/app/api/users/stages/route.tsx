@@ -5,6 +5,7 @@ import { Parser } from "json2csv";
 
 export async function GET() {
     await connectToMongoDB();
+    if (!mongoose.connection.db) return NextResponse.json({ message: "Internal server error" }, { status: 500 });
 
     const otpUsers = await mongoose.connection.db
         .collection("stages")

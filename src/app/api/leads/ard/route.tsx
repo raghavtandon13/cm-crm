@@ -5,7 +5,7 @@ import { getLenderStats } from "@/lib/ard";
 const ardCache = new Map();
 const ARD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
-function getCacheKey(startDate, endDate, options) {
+function getCacheKey(startDate: any, endDate: any, options: any) {
     return JSON.stringify({ startDate, endDate, options });
 }
 

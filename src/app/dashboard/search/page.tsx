@@ -4,10 +4,12 @@ import User from "@/lib/users";
 // import Image from "next/image";
 import Link from "next/link";
 import { CMUser } from "@/lib/types";
-import { buttonVariants } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { History, Pencil } from "lucide-react";
 import LenderStatus from "@/components/displays/lenderStatus";
 import { StagesTable } from "@/components/stagesTable";
+import { getARDStatus } from "@/lib/lenderConfigArd";
+
 interface UserData {
     accounts: Record<string, any>[];
     details: Omit<CMUser, "accounts">;
@@ -24,6 +26,19 @@ async function getData(phone: string): Promise<UserData | string> {
                 res.details = details;
             }
         }
+
+        const collections = await User.db.listCollections();
+        const accColls = collections.filter((coll) => coll.name.endsWith("-accounts"));
+        res.accounts = [];
+        // works till here
+        for (const coll of accColls) {
+            const collData = await User.db.collection(coll.name).findOne({ phone: phone, latest: true });
+            if (collData) {
+                res.accounts.push(collData);
+                console.log(res.accounts);
+            }
+        }
+
         return res;
     } catch (error) {
         console.log("Error:", error);
@@ -31,28 +46,53 @@ async function getData(phone: string): Promise<UserData | string> {
     }
 }
 
-export default async function Phone(props: { searchParams: Promise<{ phone: string; accountsOnly: string }> }) {
+async function getDataPerAcc(phone: string, acc: string) {
+    return {
+        accounts: await User.db
+            .collection(acc.toLowerCase() + "-accounts")
+            .find({ phone: phone })
+            .toArray(),
+    };
+}
+
+async function ARDComponent({ account }: { account: any }) {
+    const status = getARDStatus(account);
+    const statusColors: Record<string, string> = {
+        Accepted: "text-green-600 bg-green-100",
+        Rejected: "text-red-600 bg-red-100",
+        Deduped: "text-orange-600 bg-orange-100",
+        Errors: "text-purple-600 bg-purple-100",
+    };
+    const defaultColor = "text-gray-700 bg-gray-200";
+    const colorClass = statusColors[status] ?? defaultColor;
+    return <div className={`px-2 rounded ml-2 font-semibold ${colorClass}`}>{status}</div>;
+}
+
+export default async function Phone(props: {
+    searchParams: Promise<{ phone: string; accountsOnly: string; account: string }>;
+}) {
     const searchParams = await props.searchParams;
     let phone = "";
     let accountsOnly = false;
+    let account = "";
 
     if (searchParams.phone === undefined) {
         return (
             <main className="flex flex-col items-stretch md:p-8 ">
                 <UserSearch phone={phone} />
-		<StagesTable />
+                <StagesTable />
             </main>
         );
     }
-
-    if (searchParams.phone) {
-        phone = searchParams.phone.toString();
+    if (searchParams.phone) phone = searchParams.phone.toString();
+    if (searchParams.accountsOnly) accountsOnly = searchParams.accountsOnly === "true";
+    if (searchParams.account) {
+        account = searchParams.account;
+        accountsOnly = true;
     }
 
-    if (searchParams.accountsOnly) {
-        accountsOnly = searchParams.accountsOnly === "true";
-    }
-    const res = await getData(phone);
+    const res = account ? await getDataPerAcc(phone, account) : await getData(phone);
+    console.log(res);
 
     if (typeof res === "string") {
         return (
@@ -75,17 +115,20 @@ export default async function Phone(props: { searchParams: Promise<{ phone: stri
                     </p>
                     {Object.entries(account)
                         .filter(([key]) => !["res", "req", "sent", "name", "status_code"].includes(key))
-                        .map(([key, value]: any, entryIndex, arr) =>
-                            value ? (
+                        .map(([key, value]: any, entryIndex, arr) => {
+                            if (!value) return null;
+                            const displayValue = Array.isArray(value) && value.length > 0 ? value[0] : value;
+                            return (
                                 <div key={key}>
                                     <div className="flex justify-between">
-                                        <p className="flex-[1]">{key.toUpperCase()}:</p>
-                                        <pre className="flex-[4] w-full">{JSON.stringify(value, null, 1)}</pre>
+                                        <p className="flex-[1]">{key}:</p>
+                                        <pre className="flex-[4] w-full">{JSON.stringify(displayValue, null, 1)}</pre>
                                     </div>
+
                                     {entryIndex < arr.length - 1 && <hr />}
                                 </div>
-                            ) : null,
-                        )}
+                            );
+                        })}
                 </div>
             </div>
         ));
@@ -155,7 +198,19 @@ export default async function Phone(props: { searchParams: Promise<{ phone: stri
                     <h1 className="py-10 font-bold">Account Details</h1>
                     {res.accounts.map((account: any, index: any) => (
                         <div key={index} className="items-center justify-center pb-10">
-                            <h1 className="text-l w-full text-center font-semibold">{account.name}</h1>
+                            <Button variant="card" className="text-l w-full text-center font-semibold">
+                                <div className="flex w-full items-center justify-between">
+                                    {account.name}
+                                    <ARDComponent account={account} />
+                                    <Link
+                                        href={`/dashboard/search?phone=${phone}&account=${account.name}`}
+                                        className="ml-2"
+                                        title={`View ${account.name} History`}
+                                    >
+                                        <History className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </Button>
                             <Table>
                                 <TableBody>
                                     {Object.entries(account)

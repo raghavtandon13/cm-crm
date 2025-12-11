@@ -28,7 +28,7 @@ export function CsvExportModal({
     const handleExport = async () => {
         setLoading(true);
         try {
-            let route: string;
+            let route: string = "";
             if (usage === "statsTable") {
                 route = "stats";
             } else if (usage === "incoming") {

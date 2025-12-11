@@ -58,7 +58,7 @@ interface AgentData {
 
 export default function MyLeads() {
     const user = useUser();
-    let qa = user?.role.title === "QA";
+    let qa = user?.role?.title === "QA";
 
     const [searchPhone, setSearchPhone] = useState("");
     const [searchResult, setSearchResult] = useState("");

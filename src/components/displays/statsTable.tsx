@@ -41,12 +41,15 @@ export function StatsTable() {
 
     const formattedData = data
         ? data
-              .map(({ lender, counts }) => {
-                  const statusMap = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
-                  counts.forEach(({ status, count }) => (statusMap[status] = count));
+              .map(({ lender, counts }: { lender: any; counts: any }) => {
+                  const statusMap: any = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
+                  counts.forEach(({ status, count }: { status: any; count: any }) => (statusMap[status] = count));
                   return { lender: lender || "N/A", ...statusMap };
               })
-              .filter(({ Accepted, Rejected, Deduped }) => Accepted !== 0 || Rejected !== 0 || Deduped !== 0)
+              .filter(
+                  ({ Accepted, Rejected, Deduped }: { Accepted: any; Rejected: any; Deduped: any }) =>
+                      Accepted !== 0 || Rejected !== 0 || Deduped !== 0,
+              )
         : [];
 
     const columns: ColumnDef<(typeof formattedData)[0]>[] = [

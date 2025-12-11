@@ -42,7 +42,7 @@ function UserForm({
                             id="firstName"
                             placeholder="Priya"
                             value={formData.firstName}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+                            onChange={(e) => setFormData((prev:any) => ({ ...prev, firstName: e.target.value }))}
                             required
                         />
                     </div>
@@ -52,7 +52,7 @@ function UserForm({
                             id="lastName"
                             placeholder="Sharma"
                             value={formData.lastName}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
+                            onChange={(e) => setFormData((prev:any) => ({ ...prev, lastName: e.target.value }))}
                             required
                         />
                     </div>
@@ -64,7 +64,7 @@ function UserForm({
                         type="email"
                         placeholder="m@example.com"
                         value={formData.email}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) => setFormData((prev:any) => ({ ...prev, email: e.target.value }))}
                         required
                     />
                 </div>
@@ -74,7 +74,7 @@ function UserForm({
                         id="password"
                         type="password"
                         value={formData.password}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                        onChange={(e) => setFormData((prev:any) => ({ ...prev, password: e.target.value }))}
                         required
                     />
                 </div>
@@ -139,9 +139,10 @@ function SubDsaForm({ onSuccess }: { onSuccess?: () => void }) {
 export default function NewSubDsa() {
     const router = useRouter();
     const user = useUser();
+    
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    if (user?.role.title === "OE") {
+    if (user?.role?.title === "OE") {
         router.push("/dashboard/create");
     }
 

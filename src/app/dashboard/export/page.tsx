@@ -272,8 +272,8 @@ export default function ExportPage() {
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={filters.startDate}
-                                onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date }))}
+                                selected={filters.startDate || undefined}
+                                onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
                             />
                         </PopoverContent>
                     </Popover>
@@ -290,14 +290,13 @@ export default function ExportPage() {
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={filters.endDate}
-                                onSelect={(date) => setFilters((prev) => ({ ...prev, endDate: date }))}
+                                selected={filters.endDate || undefined}
+                                onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
                             />
                         </PopoverContent>
                     </Popover>
                 </div>
             </div>
-
             <Button onClick={handleExport} className="mt-6 w-full text-white bg-black hover:bg-gray-800">
                 Export CSV
             </Button>

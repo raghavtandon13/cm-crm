@@ -18,23 +18,27 @@ export async function GET(req: NextRequest) {
         console.log(page, limit);
 
         const partner = await db.partner.findUnique({ where: { id }, include: { role: true } });
-        const partnerRole = partner.role.title;
+        const partnerRole = partner?.role?.title;
         let leadsRes: any, groupRes: any, countRes: any;
 
         if (partnerRole !== "DSA") {
             [leadsRes, groupRes, countRes] = await Promise.allSettled([
                 db.partnerLeads.findMany({
-                    where: { partnerId: partner.id },
+                    where: { partnerId: partner?.id },
                     skip: (page - 1) * limit,
                     take: limit,
                     orderBy: { assignedAt: "desc" },
                 }),
-                db.partnerLeads.groupBy({ by: ["status"], where: { partnerId: partner.id }, _count: { status: true } }),
-                db.partnerLeads.count({ where: { partnerId: partner.id } }),
+                db.partnerLeads.groupBy({
+                    by: ["status"],
+                    where: { partnerId: partner?.id },
+                    _count: { status: true },
+                }),
+                db.partnerLeads.count({ where: { partnerId: partner?.id } }),
             ]);
         } else {
             const subDsas = await db.partner
-                .findMany({ where: { parentId: partner.id }, select: { id: true } })
+                .findMany({ where: { parentId: partner?.id }, select: { id: true } })
                 .then((dsas) => dsas.map((dsa) => dsa.id));
 
             [leadsRes, groupRes, countRes] = await Promise.allSettled([
@@ -63,7 +67,7 @@ export async function GET(req: NextRequest) {
 
         // Find users for each cmUserId in partnerLeads
         const users = await Promise.all(
-            partnerLeads.map(async (lead) => {
+            partnerLeads.map(async (lead: any) => {
                 const user = await User.findById(lead.cmUserId).select("name email phone");
                 return { ...lead, user };
             }),

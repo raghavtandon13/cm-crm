@@ -86,7 +86,7 @@ export default function Graphs() {
         return data
             .map((item: any) => {
                 const transformedCounts = item.groupCounts.map((groupCount: any) => {
-                    const transformedGroup = { group: groupCount.group };
+                    const transformedGroup:any = { group: groupCount.group };
                     groupCount.counts.forEach((count: any) => {
                         transformedGroup[count.status] = count.count;
                     });

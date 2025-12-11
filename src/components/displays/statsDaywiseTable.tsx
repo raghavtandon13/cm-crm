@@ -52,7 +52,7 @@ export function StatsDaywiseTable() {
     const aggregateData = (data: LenderData[], type: "total" | "manual") => {
         if (type === "total") {
             return data.map((lenderData) => {
-                const statusMap = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
+                const statusMap: any = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
                 lenderData.partnerStatuses.forEach((ps) => {
                     ps.counts.forEach(({ status, count }) => {
                         statusMap[status] += count;
@@ -68,13 +68,14 @@ export function StatsDaywiseTable() {
                 > = {};
                 lenderData.partnerStatuses.forEach((ps) => {
                     ps.counts.forEach(({ status, dates }) => {
+                        const s = status as "Accepted" | "Rejected" | "Deduped" | "Rest";
                         Object.entries(dates).forEach(([date, count]) => {
                             const currentDate = new Date(date);
                             if (currentDate >= manualStartDate && currentDate <= manualEndDate) {
                                 if (!manualCounts[date]) {
                                     manualCounts[date] = { Accepted: 0, Rejected: 0, Deduped: 0, Rest: 0 };
                                 }
-                                manualCounts[date][status] += count;
+                                manualCounts[date][s] += count;
                             }
                         });
                     });

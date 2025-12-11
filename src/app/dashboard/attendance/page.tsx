@@ -144,7 +144,7 @@ export default function Attendance() {
         ...dates.map((date) => ({
             accessorKey: date,
             header: () => <div className="min-w-[100px] text-center">{date}</div>,
-            cell: ({ row }) => {
+            cell: ({ row }: { row: any }) => {
                 const agentid = row.original.agentid;
                 const currentType = row.getValue(date) || "";
                 const comment = row.original.comments?.[date] || ""; // Fetch comment for the date

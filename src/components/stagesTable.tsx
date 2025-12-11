@@ -8,6 +8,9 @@ import ExportStagesButton from "./ExportStagesButton";
 
 async function getData() {
     await connectToMongoDB();
+
+    if (!mongoose.connection.db) return "Error Occurred: Database not connected";
+
     try {
         const otpUsers = await mongoose.connection.db
             .collection("stages")
@@ -20,7 +23,7 @@ async function getData() {
             .sort({ date: -1 })
             .toArray();
         return otpUsers;
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error fetching data:", error);
         return "Error Occurred: " + error.message;
     }
@@ -42,7 +45,7 @@ export async function StagesTable() {
                 <h2 className="text-xl font-semibold mb-4">Stages (Last 24 Hours)</h2>
                 {/*lets make this export button work*/}
                 {/*use export data function and donwload csv on click*/}
-		<ExportStagesButton/>
+                <ExportStagesButton />
                 {/* <Button variant="ghost" className="flex items-center justify-center hover:bg-slate-200"> */}
                 {/*     <FileDown strokeWidth={1.25} className="w-4" /> */}
                 {/* </Button> */}

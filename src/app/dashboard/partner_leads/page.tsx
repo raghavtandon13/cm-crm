@@ -62,7 +62,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.reduce((sum, entry) => sum + entry._count.status, 0)}
+                                {data.partnerARD.reduce((sum:any, entry:any) => sum + entry._count.status, 0)}
                             </div>
                             <p className="text-xs text-muted-foreground">All leads in the system</p>
                         </CardContent>
@@ -75,7 +75,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry) => entry.status === "PENDING")?._count.status || 0}
+                                {data.partnerARD.find((entry:any) => entry.status === "PENDING")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Awaiting review</p>
                         </CardContent>
@@ -88,7 +88,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry) => entry.status === "ACCEPTED")?._count.status || 0}
+                                {data.partnerARD.find((entry:any) => entry.status === "ACCEPTED")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Successfully converted</p>
                         </CardContent>
@@ -101,7 +101,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry) => entry.status === "DUPLICATE")?._count.status || 0}
+                                {data.partnerARD.find((entry:any) => entry.status === "DUPLICATE")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Marked as duplicates</p>
                         </CardContent>
