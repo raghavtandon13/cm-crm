@@ -160,7 +160,7 @@ export default function Reports() {
                             </TabsList>
                             {activeTab === "fresh" && (
                                 <span className="text-muted-foreground text-sm ml-2">
-                                    Total Fresh Leads: {formatNumberIndianStyle(result.options.freshLeadsCount)}
+                                    Total Fresh Leads: {formatNumberIndianStyle(result?.options?.freshLeadsCount)}
                                 </span>
                             )}
                         </div>

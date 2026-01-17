@@ -58,5 +58,6 @@ jobs:
                   key: ${{ secrets.EC2_SSH_KEY }}
                   script: |
                       cd /home/ec2-user/crm2
-                      npm install --force --omit=dev
+                      pm2 stop all
+                      npm install --force
                       pm2 restart crm2 || pm2 start npm --name "crm2" -- start
