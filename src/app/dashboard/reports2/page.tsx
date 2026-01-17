@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import fromAPI from "@/lib/api"; // axios instance
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { Calendar } from "@/components/ui/calendar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { addDays, format, parseISO, subMonths } from "date-fns";
-import { DateRange } from "react-day-picker";
+import { CalendarIcon, Loader2 } from "lucide-react";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import fromAPI from "@/lib/api"; // axios instance
+import { cn } from "@/lib/utils";
 
 // Format number with Indian-style commas
 function formatNumberIndianStyle(number: number | string) {
@@ -36,13 +36,12 @@ export default function Reports() {
     const [result, setResult] = useState<any>(null);
     const ardMutation = useMutation({
         mutationFn: async () => {
-            const payload: any = {
+            const payload = {
                 startDate: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
                 endDate: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
+                options: undefined,
             };
-            if (activeTab === "fresh") {
-                payload.options = { fresh: true };
-            }
+            if (activeTab === "fresh") payload.options = { fresh: true };
             const response = await fromAPI.post(`/leads/ard`, payload);
             return response.data.data;
         },
@@ -74,17 +73,20 @@ export default function Reports() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {lenders.map((lender) => (
-                    <TableRow key={lender.lender}>
-                        <TableCell>{lender.lender}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.total)}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.Accepted)}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.Rejected)}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.Deduped)}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.Errors)}</TableCell>
-                        <TableCell>{formatNumberIndianStyle(lender.Rest)}</TableCell>
-                    </TableRow>
-                ))}
+                {lenders
+                    .sort((a, b) => a.lender.localeCompare(b.lender))
+                    .filter((l) => !["creditlinks", "moneyview2", "lendenclub", "ramfin"].includes(l.lender))
+                    .map((lender) => (
+                        <TableRow key={lender.lender}>
+                            <TableCell>{lender.lender}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.total)}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.Accepted)}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.Rejected)}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.Deduped)}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.Errors)}</TableCell>
+                            <TableCell>{formatNumberIndianStyle(lender.Rest)}</TableCell>
+                        </TableRow>
+                    ))}
             </TableBody>
         </Table>
     );
@@ -158,12 +160,7 @@ export default function Reports() {
                             </TabsList>
                             {activeTab === "fresh" && (
                                 <span className="text-muted-foreground text-sm ml-2">
-                                    Total Fresh Leads:{" "}
-                                    {formatNumberIndianStyle(
-                                        lenders
-                                            .filter((l: any) => l.isFreshRelevant)
-                                            .reduce((sum: any, l: any) => sum + l.total, 0),
-                                    )}
+                                    Total Fresh Leads: {formatNumberIndianStyle(result.options.freshLeadsCount)}
                                 </span>
                             )}
                         </div>
@@ -181,7 +178,7 @@ export default function Reports() {
                             {isPending ? (
                                 renderLoadingSkeleton()
                             ) : result ? (
-                                renderLenderTable(lenders.filter((l: any) => l.isFreshRelevant))
+                                renderLenderTable(lenders.filter((l: any) => true))
                             ) : (
                                 <div className="text-muted-foreground">Run the report to see data.</div>
                             )}

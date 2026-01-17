@@ -91,7 +91,7 @@ export default async function Phone(props: {
         accountsOnly = true;
     }
 
-    const res = account ? await getDataPerAcc(phone, account) : await getData(phone);
+    const res:any = account ? await getDataPerAcc(phone, account) : await getData(phone);
     console.log(res);
 
     if (typeof res === "string") {

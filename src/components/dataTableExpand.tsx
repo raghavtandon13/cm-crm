@@ -111,7 +111,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                                                 <TableCell key={cell.id} className="w-4">
                                                     {row.getCanExpand() ? (
                                                         <Button
-                                                            className="hover:bg-gray-50"
+                                                            className="hover:bg-gray-50 bg-white"
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={row.getToggleExpandedHandler()}
