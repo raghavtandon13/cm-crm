@@ -1,8 +1,6 @@
 "use client";
-import fromAPI from "@/lib/api";
-import { useUser } from "@/context/UserContext";
-import { Button, buttonVariants } from "./ui/button";
 import { Power } from "lucide-react";
+import { useState } from "react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,8 +12,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useUser } from "@/context/UserContext";
+import fromAPI from "@/lib/api";
+import { Button, buttonVariants } from "./ui/button";
 
 export default function UserProfile() {
     const user = useUser();
@@ -45,7 +45,7 @@ export default function UserProfile() {
     };
 
     return (
-        user && user.role && (
+        user?.role && (
             <>
                 <div className="flex items-center justify-center gap-5">
                     <p>
@@ -53,7 +53,7 @@ export default function UserProfile() {
                         {user.name}
                     </p>
                     <p>
-                        <span className="text-gray-500">Access:</span>
+                        <span className="text-gray-500">Access: </span>
                         {user.role.title}
                     </p>
                 </div>

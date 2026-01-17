@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/context/UserContext";
-import { DASHBOARD_ROUTES, RoleTitle } from "@/lib/roles";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import UserProfile from "./role";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useUser } from "@/context/UserContext";
+import { DASHBOARD_ROUTES, type RoleTitle } from "@/lib/roles";
+import UserProfile from "./role";
 
 export function Navbar() {
     const [open, setOpen] = useState(false);
