@@ -1,7 +1,7 @@
-name: Manual Deploy CRM2 (Standalone)
+name: Manual Deploy CRM2 (npm start)
 
 on:
-    workflow_dispatch:
+    workflow_dispatch: # manual trigger only
 
 jobs:
     deploy:
@@ -18,32 +18,20 @@ jobs:
                   cache: "npm"
 
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --force
 
-            - name: Build Next.js (standalone)
+            - name: Build Next.js
               run: npm run build
 
-            # Upload standalone server + minimal node_modules
-            - name: Upload standalone build
+            - name: Upload .next build
               uses: appleboy/scp-action@v0.1.7
               with:
                   host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
                   username: ec2-user
                   key: ${{ secrets.EC2_SSH_KEY }}
-                  source: ".next/standalone"
+                  source: ".next"
                   target: "/home/ec2-user/crm2"
 
-            # Upload static assets
-            - name: Upload static assets
-              uses: appleboy/scp-action@v0.1.7
-              with:
-                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
-                  username: ec2-user
-                  key: ${{ secrets.EC2_SSH_KEY }}
-                  source: ".next/static"
-                  target: "/home/ec2-user/crm2/.next"
-
-            # Upload public folder
             - name: Upload public folder
               uses: appleboy/scp-action@v0.1.7
               with:
@@ -53,7 +41,15 @@ jobs:
                   source: "public"
                   target: "/home/ec2-user/crm2"
 
-            # Restart app with PM2 (no npm install)
+            - name: Upload package files
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
+                  username: ec2-user
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: "package.json,package-lock.json"
+                  target: "/home/ec2-user/crm2"
+
             - name: Restart app (PM2)
               uses: appleboy/ssh-action@v1.0.3
               with:
@@ -63,4 +59,6 @@ jobs:
                   script: |
                       cd /home/ec2-user/crm2
                       source ~/.nvm/nvm.sh
-                      pm2 restart crm2 || pm2 start server.js --name crm2
+                      pm2 stop all
+                      npm install --force
+                      pm2 restart crm2 || pm2 start npm --name "crm2" -- start
