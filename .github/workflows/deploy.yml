@@ -1,66 +1,66 @@
 name: Manual Deploy CRM2 (Standalone)
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Build Next.js (standalone)
-        run: npm run build
+            - name: Build Next.js (standalone)
+              run: npm run build
 
-      # Upload standalone server + minimal node_modules
-      - name: Upload standalone build
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".next/standalone"
-          target: "/home/ec2-user/crm2"
+            # Upload standalone server + minimal node_modules
+            - name: Upload standalone build
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
+                  username: ec2-user
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: ".next/standalone"
+                  target: "/home/ec2-user/crm2"
 
-      # Upload static assets
-      - name: Upload static assets
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: ".next/static"
-          target: "/home/ec2-user/crm2/.next"
+            # Upload static assets
+            - name: Upload static assets
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
+                  username: ec2-user
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: ".next/static"
+                  target: "/home/ec2-user/crm2/.next"
 
-      # Upload public folder
-      - name: Upload public folder
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "public"
-          target: "/home/ec2-user/crm2"
+            # Upload public folder
+            - name: Upload public folder
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
+                  username: ec2-user
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  source: "public"
+                  target: "/home/ec2-user/crm2"
 
-      # Restart app with PM2 (no npm install)
-      - name: Restart app (PM2)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ec2-user/crm2
-            source ~/.nvm/nvm.sh
-            pm2 restart crm2 || pm2 start server.js --name crm2
+            # Restart app with PM2 (no npm install)
+            - name: Restart app (PM2)
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ec2-13-201-83-62.ap-south-1.compute.amazonaws.com
+                  username: ec2-user
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  script: |
+                      cd /home/ec2-user/crm2
+                      source ~/.nvm/nvm.sh
+                      pm2 restart crm2 || pm2 start server.js --name crm2

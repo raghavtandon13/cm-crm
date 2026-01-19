@@ -81,6 +81,14 @@ export const DASHBOARD_ROUTES: DashboardRoute[] = [
         showInNavbar: true,
     },
     {
+        path: "/dashboard/reports2/LS",
+        label: "ARD",
+        icon: Sparkles,
+        roles: ["BOSS"],
+        showInSidebar: false,
+        showInNavbar: false,
+    },
+    {
         path: "/dashboard/register",
         label: "Agents",
         icon: Users,

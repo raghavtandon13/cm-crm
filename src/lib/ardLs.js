@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Table from "cli-table3";
 import User from "./users.ts";
-import { connectToMongoDB } from "../../lib/db.ts";
+import { connectToLS } from "../../lib/db.ts";
 const DEBUG = false;
 
 function formatNumberIndianStyle(number) {
@@ -248,13 +248,13 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
     const startTime = Date.now();
 
     // Ensure mongoose is connected
-    await connectToMongoDB();
+    const conn = await connectToLS();
 
     const startDate = new Date(startDateStr);
     const endDate = new Date(endDateStr);
     DEBUG && console.log(startDate, endDate);
 
-    const db = mongoose.connection.db;
+    const db = conn.db;
     const collections = await db.listCollections().toArray();
 
     const accountCollections = collections.map((c) => c.name).filter((name) => name.endsWith("-accounts"));

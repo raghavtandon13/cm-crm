@@ -43,7 +43,7 @@ export default function Reports() {
                 options: undefined,
             };
             if (activeTab === "fresh") payload.options = { fresh: true };
-            const response = await fromAPI.post(`/leads/ard`, payload);
+            const response = await fromAPI.post(`/leads/ard/ls`, payload);
             return response.data.data;
         },
         onSuccess: (data) => setResult(data),
@@ -151,9 +151,11 @@ export default function Reports() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <span className="text-green-600">CredMantra </span> Lender Summary
-                        <Link href="/dashboard/reports2/LS" className="ml-auto">
-                            <Button size="sm" variant="outline">LoanSparrow →</Button>
+                        <span className="text-red-600">LoanSparrow</span>Lender Summary
+                        <Link href="/dashboard/reports2/" className="ml-auto">
+                            <Button size="sm" variant="outline">
+                                CredMantra →
+                            </Button>
                         </Link>
                     </CardTitle>
                 </CardHeader>
