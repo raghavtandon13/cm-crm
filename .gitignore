@@ -9,6 +9,7 @@
 # testing
 /coverage
 /crm
+/releases
 
 # next.js
 /.next/

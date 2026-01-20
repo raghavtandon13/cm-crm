@@ -4,7 +4,7 @@ Boss can create  DSA or indiv. then role id should be  1 for dsa and 2 for  indi
 DSA can create  subDSA. then role id should be 3 for subdsa
 */
 
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { db } from "../../../../../lib/db";
 import { NextResponse, NextRequest } from "next/server";

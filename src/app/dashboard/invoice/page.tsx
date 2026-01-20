@@ -1,0 +1,128 @@
+"use client";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FormField } from "@/components/formField";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
+import fromAPI from "@/lib/api";
+import { CMUser, type Lead } from "@/lib/types";
+
+export default function InvoicePage() {
+    // Form State
+    const {
+        handleSubmit,
+        reset,
+        setValue,
+        control,
+        formState: { errors },
+    } = useForm();
+
+    // Submit Handler
+    const onSubmit: SubmitHandler<any> = (data) => {};
+
+    // API Call
+    const { mutate: mutateLead, isPending } = useMutation({
+        mutationFn: (data: Lead & { inject?: boolean }) => {},
+        onSuccess: (_, data: Lead) => toast("User updated successfully"),
+        onError: (error: any) => {
+            console.error("Error creating lead:", error);
+            toast.error(error.response.data.message || "Error creating lead");
+        },
+    });
+
+    return (
+        <>
+            <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-8">Invoice</h1>
+            <hr />
+            <form onSubmit={handleSubmit(onSubmit)} className="mx-2 my-4 sm:mx-8">
+                <div className="grid gap-4">
+                    <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
+                        <FormField
+                            label="Invoice Number"
+                            name="firstName"
+                            control={control}
+                            errors={errors}
+                            rules={{ required: "First name is required" }}
+                            // placeholder="Priya"
+                        />
+                        <FormField
+                            label="Lender"
+                            name="lastName"
+                            control={control}
+                            errors={errors}
+                            rules={{ required: "Last name is required" }}
+                            // placeholder="Sharma"
+                        />
+                    </div>
+
+                    <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
+                        <FormField
+                            label="GST Number"
+                            name="phone"
+                            errors={errors}
+                            control={control}
+                            rules={{
+                                required: "Phone is required",
+                                pattern: {
+                                    value: /^\d{10}$/,
+                                    message: "Phone number must be a 10-digit number.",
+                                },
+                            }}
+                            // placeholder="98XXXXXXXX"
+                        />
+                        <FormField
+                            label="Date"
+                            name="email"
+                            control={control}
+                            errors={errors}
+                            rules={{ required: "Email is required" }}
+                            type="email"
+                            // placeholder="m@example.com"
+                        />
+                    </div>
+
+                    <div className="mt-4 flex gap-4">
+                        <div className="hidden w-1/2 sm:flex"></div>
+                        <div className="flex w-full gap-4 sm:w-1/2">
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                className="w-full flex-1"
+                                onClick={() =>
+                                    reset({
+                                        firstName: "",
+                                        lastName: "",
+                                        phone: "",
+                                        email: "",
+                                        dob: "",
+                                        address: "",
+                                        pincode: "",
+                                        city: "",
+                                        company: "",
+                                    })
+                                }
+                            >
+                                Reset
+                            </Button>
+                            <Button type="submit" className="w-full flex-1">
+                                Save
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </>
+    );
+}

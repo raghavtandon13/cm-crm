@@ -10,8 +10,19 @@ export async function middleware(request: NextRequest) {
     }
 
     if (currentUser) {
-        const response = await http.get("http://localhost:3000/api/auth/get", {
-            headers: { Authorization: `Bearer ${currentUser}` },
+        // const response = await http.get("http://localhost:3000/api/auth/get", {
+        //     headers: { Authorization: `Bearer ${currentUser}` },
+        // });
+
+        const url = request.nextUrl.clone();
+        url.pathname = "/api/auth/get";
+        url.protocol = "http:";
+
+        const response = await http.get(url.toString(), {
+            headers: {
+                Authorization: `Bearer ${currentUser}`,
+                cookie: request.headers.get("cookie") ?? "",
+            },
         });
         const role = response.data.role.title as RoleTitle;
         const pathname = request.nextUrl.pathname;

@@ -4,10 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "next dev --turbopack",
-        "dev+cron": "concurrently \"next dev --turbo\" \"node src/helpers/hello.js\"",
         "build": "next build",
         "start": "next start",
-        "start+cron": "concurrently \"next start\" \"node src/helpers/hello.js\"",
         "lint": "next lint",
         "typecheck": "tsc --noEmit",
         "format": "prettier --write ."
@@ -31,7 +29,7 @@
         "@radix-ui/react-tooltip": "^1.1.2",
         "@tanstack/react-query": "^5.51.23",
         "@tanstack/react-table": "^8.20.1",
-        "bcrypt": "^5.1.1",
+        "bcryptjs": "^3.0.3",
         "class-variance-authority": "^0.7.0",
         "cli-table3": "^0.6.5",
         "clsx": "^2.1.1",
@@ -60,7 +58,6 @@
         "tailwindcss-animate": "^1.0.7"
     },
     "devDependencies": {
-        "@types/bcrypt": "^5.0.2",
         "@types/js-cookie": "^3.0.6",
         "@types/json2csv": "^5.0.7",
         "@types/jsonwebtoken": "^9.0.6",

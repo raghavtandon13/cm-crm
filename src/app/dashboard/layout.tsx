@@ -37,7 +37,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             <aside
                 className={`hidden overflow-y-auto border-r bg-white md:block ${collapsed ? "w-[60px]" : "w-[220px]"} lg:${collapsed ? "w-[60px]" : "w-[280px]"}`}
             >
-                <div className="sticky top-0 p-4">
+                <div className={`sticky top-0 p-4 flex flex-col ${collapsed ? "items-center" : ""}`}>
                     <button
                         type="button"
                         onClick={() => setCollapsed(!collapsed)}
