@@ -10,6 +10,7 @@ import {
     UserPlus,
     UserRound,
     Users,
+    Biohazard,
 } from "lucide-react";
 
 export type RoleTitle = "BOSS" | "OE" | "TE" | "TL" | "QA" | "HR" | "DSA" | "SUBDSA" | "INDIV";
@@ -159,14 +160,22 @@ export const DASHBOARD_ROUTES: DashboardRoute[] = [
         roles: ["BOSS", "TL", "QA"],
         showInSidebar: true,
     },
-    // {
-    //     path: "/dashboard/invoice",
-    //     label: "Invoices",
-    //     icon: UserPlus,
-    //     roles: ["BOSS", "OE", "TL"],
-    //     showInSidebar: true,
-    //     showInNavbar: true,
-    // },
+    {
+        path: "/dashboard/invoice",
+        label: "Invoices",
+        icon: UserPlus,
+        roles: ["BOSS", "TL"],
+        showInSidebar: true,
+        showInNavbar: true,
+    },
+    {
+        path: "/dashboard/temp",
+        label: "TEMP",
+        icon: Biohazard,
+        roles: ["BOSS", "TL"],
+        showInSidebar: true,
+        showInNavbar: true,
+    },
 ];
 
 export const DEFAULT_REDIRECTS: Record<RoleTitle, string> = {

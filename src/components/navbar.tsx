@@ -35,7 +35,7 @@ export function Navbar() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right">
-                    <nav className="grid gap-6 text-lg font-medium">
+                    <nav className="grid gap-6 text-lg font-medium overflow-auto">
                         <UserProfile />
                         <hr />
                         {DASHBOARD_ROUTES.filter(
