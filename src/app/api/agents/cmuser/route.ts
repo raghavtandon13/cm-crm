@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         if (user) {
             // check for assignment
             const prevAsg = await db.assignment.findFirst({
-                where: { cmUserId: user._id as string },
+                where: { cmUserId: user._id.toString() },
                 include: { agent: true },
             });
 
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         let assignment = null;
         if (!extraMsg) {
             assignment = await db.assignment.create({
-                data: { cmUserId: user._id as string, agentId: agent.id },
+                data: { cmUserId: user._id.toString(), agentId: agent.id },
             });
         }
 

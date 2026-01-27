@@ -168,14 +168,14 @@ export const DASHBOARD_ROUTES: DashboardRoute[] = [
         showInSidebar: true,
         showInNavbar: true,
     },
-    {
-        path: "/dashboard/temp",
-        label: "TEMP",
-        icon: Biohazard,
-        roles: ["BOSS", "TL"],
-        showInSidebar: true,
-        showInNavbar: true,
-    },
+    // {
+    //     path: "/dashboard/temp",
+    //     label: "TEMP",
+    //     icon: Biohazard,
+    //     roles: ["BOSS"],
+    //     showInSidebar: true,
+    //     showInNavbar: true,
+    // },
 ];
 
 export const DEFAULT_REDIRECTS: Record<RoleTitle, string> = {

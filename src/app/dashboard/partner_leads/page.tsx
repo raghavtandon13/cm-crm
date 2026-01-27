@@ -1,13 +1,13 @@
 "use client";
-import { DataTable } from "@/components/dataTable";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import fromAPI from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, Clock, Copy, RefreshCcw, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { DataTable } from "@/components/dataTable";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import fromAPI from "@/lib/api";
 
 const columns: ColumnDef<any>[] = [
     { accessorKey: "user.name", header: () => <div className=" text-left">Name</div> },
@@ -62,7 +62,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.reduce((sum:any, entry:any) => sum + entry._count.status, 0)}
+                                {data.partnerARD.reduce((sum: any, entry: any) => sum + entry._count.status, 0)}
                             </div>
                             <p className="text-xs text-muted-foreground">All leads in the system</p>
                         </CardContent>
@@ -75,7 +75,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry:any) => entry.status === "PENDING")?._count.status || 0}
+                                {data.partnerARD.find((entry: any) => entry.status === "PENDING")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Awaiting review</p>
                         </CardContent>
@@ -88,7 +88,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry:any) => entry.status === "ACCEPTED")?._count.status || 0}
+                                {data.partnerARD.find((entry: any) => entry.status === "ACCEPTED")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Successfully converted</p>
                         </CardContent>
@@ -101,7 +101,7 @@ export default function PartnerLeadsTable() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.partnerARD.find((entry:any) => entry.status === "DUPLICATE")?._count.status || 0}
+                                {data.partnerARD.find((entry: any) => entry.status === "DUPLICATE")?._count.status || 0}
                             </div>
                             <p className="text-xs text-muted-foreground">Marked as duplicates</p>
                         </CardContent>
@@ -109,10 +109,10 @@ export default function PartnerLeadsTable() {
                 </div>
 
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>Partner Leads</h1>
+                    <h1 className={`${buttonVariants({ variant: "secondary" })} font-semibold`}>Partner Leads</h1>
 
                     {/* this changes page */}
-                    <div className={`${buttonVariants({ variant: "card" })} font-semibold`}>
+                    <div className={`${buttonVariants({ variant: "secondary" })} font-semibold`}>
                         <Button disabled={page === 1} variant={"link"} onClick={() => setPage(page - 1)}>
                             {"<"}
                         </Button>

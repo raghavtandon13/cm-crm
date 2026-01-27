@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { connectToMongoDB } from "../../../../../lib/db";
 import mongoose from "mongoose";
-import { Parser } from "json2csv";
+import { NextResponse } from "next/server";
+import Papa from "papaparse";
+import { connectToMongoDB } from "../../../../../lib/db";
 
 export async function GET() {
     await connectToMongoDB();
@@ -35,10 +35,10 @@ export async function GET() {
         .sort({ date: -1 })
         .toArray();
 
-    // Convert to CSV
-    const fields = ["date", "phone", "stage", "ref", "name", "email", "income"];
-    const parser = new Parser({ fields });
-    const csv = parser.parse(otpUsers);
+    // Convert to CSV - Papa Parse is simpler!
+    const csv = Papa.unparse(otpUsers, {
+        columns: ["date", "phone", "stage", "ref", "name", "email", "income"],
+    });
 
     return new NextResponse(csv, {
         headers: {

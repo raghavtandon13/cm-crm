@@ -1,305 +1,221 @@
 "use client";
-
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle, FileText, Upload } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { format } from "date-fns";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type Filters = {
-    minAge: number;
-    maxAge: number;
-    minIncome: number;
-    pincodeCollection: string;
-    pincodeMatching: "R" | "B";
-    employment: "Salaried" | "Self-employed";
-    startDate: Date | null;
-    endDate: Date | null;
-    limit: number;
+const uploadCsv = async ({ file, aggType }: { file: File; aggType: "smartcoin" | "moneyview" | "phone" }) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/temp", { method: "POST", headers: { "x-agg-type": aggType }, body: formData });
+    if (!res.ok) throw new Error(await res.text());
+
+    const aggCount = res.headers.get("agg-count");
+    const blob = await res.blob();
+
+    // Trigger download
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${aggType}-output.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return { aggCount: aggCount ? aggCount : 0 };
 };
 
-type ApiResponse = {
-    pincode: string[];
-    presets: {
-        _id: string;
-        label: string;
-        minAge?: number;
-        maxAge?: number;
-        minIncome?: number;
-        pincodeCollection?: string;
-        pincodeMatching?: "R" | "B";
-        employment?: "Salaried" | "Self-employed";
-    }[];
-};
+type AggType = "smartcoin" | "moneyview" | "phone";
 
-export default function ExportPage() {
-    const [filters, setFilters] = useState<Filters>({
-        minAge: 21,
-        maxAge: 45,
-        minIncome: 15000,
-        pincodeCollection: "",
-        pincodeMatching: "R",
-        employment: "Salaried",
-        startDate: null,
-        endDate: null,
-        limit: 100,
-    });
+export default function TempPage() {
+    const [file, setFile] = useState<File | null>(null);
+    const [dragActive, setDragActive] = useState(false);
+    const [aggType, setAggType] = useState<AggType>("smartcoin");
 
-    const { data, isLoading, isError } = useQuery<ApiResponse>({
-        queryKey: ["aip-export-options"],
-        queryFn: async () => {
-            const res = await fetch("/api/leads/export/aip-export");
-            if (!res.ok) throw new Error("Failed to fetch AIP export config");
-            return res.json();
+    const uploadMutation = useMutation({
+        mutationFn: uploadCsv,
+        onSuccess: (data) => {
+            toast.success(`CSV processed successfully! Found ${data.aggCount} IDs`);
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Failed to upload CSV");
         },
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFilters((prev) => ({ ...prev, [name]: Number(value) }));
-    };
-
-    const handleExport = async () => {
-        try {
-            const res = await fetch("/api/leads/export/aip-export", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...filters,
-                    minAge: String(filters.minAge),
-                    maxAge: String(filters.maxAge),
-                    minIncome: String(filters.minIncome),
-                    startDate: filters.startDate?.toISOString(),
-                    endDate: filters.endDate?.toISOString(),
-                }),
-            });
-
-            if (!res.ok) {
-                toast.error("Export failed");
-                return;
-            }
-
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "aip-export.csv";
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-
-            toast.success("CSV downloaded!");
-        } catch (err) {
-            console.error(err);
-            toast.error("Something went wrong");
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile && selectedFile.name.endsWith(".csv")) {
+            setFile(selectedFile);
+        } else if (selectedFile) {
+            toast.error("Please select a valid CSV file");
         }
     };
 
-    const applyPreset = (preset: Partial<Filters>) => {
-        setFilters((prev) => ({ ...prev, ...preset }));
-        toast.success("Applied preset");
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
     };
 
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+
+        const droppedFile = e.dataTransfer.files?.[0];
+        if (droppedFile && droppedFile.name.endsWith(".csv")) {
+            setFile(droppedFile);
+        } else if (droppedFile) {
+            toast.error("Please drop a valid CSV file");
+        }
+    };
+
+    const handleUpload = () => {
+        if (file) {
+            uploadMutation.mutate({ file, aggType });
+        }
+    };
+
+    const progress = uploadMutation.isPending ? 75 : 0;
+
     return (
-        <div className="max-w-xl mx-auto mt-10 space-y-6 p-6 bg-white rounded-2xl shadow-lg">
-            <h1 className="text-xl font-semibold text-center">Export Filtered Users (AIP)</h1>
+        <div className="container mx-auto p-6 max-w-2xl">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Upload className="h-5 w-5" />
+                        CSV Upload
+                    </CardTitle>
+                    <CardDescription>Upload a CSV file containing an &apos;ids&apos; column</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {/* File Upload Area */}
+                    <div
+                        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"} `}
+                        onDragEnter={handleDrag}
+                        onDragOver={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDrop={handleDrop}
+                    >
+                        <div className="flex flex-col items-center gap-4 pointer-events-none">
+                            {file ? (
+                                <>
+                                    <FileText className="h-12 w-12 text-green-600" />
+                                    <div>
+                                        <p className="font-medium">{file.name}</p>
+                                        <p className="text-sm text-gray-500">
+                                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                                        </p>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload className="h-12 w-12 text-gray-400" />
+                                    <div>
+                                        <p className="font-medium">Drag & drop a CSV here or click to browse</p>
+                                        <p className="text-sm text-gray-500">Only CSV files are accepted</p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
-            {/* Preset Dropdown */}
-            <div className="space-y-2">
-                <Label>Presets</Label>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full bg-white text-left font-normal">
-                            Select Preset
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-full">
-                        <DropdownMenuLabel>Choose a preset</DropdownMenuLabel>
-                        {isLoading && <DropdownMenuItem disabled>Loading...</DropdownMenuItem>}
-                        {isError && <DropdownMenuItem disabled>Error loading presets</DropdownMenuItem>}
-                        {data?.presets.map((preset) => (
-                            <DropdownMenuItem key={preset._id} onClick={() => applyPreset(preset)}>
-                                {preset.label}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-
-            {/* Filter Inputs */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6 items-end">
-                <Label className="space-y-2">
-                    <span>Min Age</span>
-                    <Input
-                        name="minAge"
-                        value={filters.minAge}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
-                </Label>
-
-                <Label className="space-y-2">
-                    <span>Max Age</span>
-                    <Input
-                        name="maxAge"
-                        value={filters.maxAge}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
-                </Label>
-
-                <Label className="space-y-2">
-                    <span>Min Income</span>
-                    <Input
-                        name="minIncome"
-                        value={filters.minIncome}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
-                </Label>
-
-                <div className="space-y-2">
-                    <Label>Employment</Label>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
-                                {filters.employment}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full">
-                            {["Salaried", "Self-employed"].map((type) => (
-                                <DropdownMenuItem
-                                    key={type}
-                                    onClick={() =>
-                                        setFilters((prev) => ({ ...prev, employment: type as Filters["employment"] }))
-                                    }
-                                >
-                                    {type}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
-                <Label className="space-y-2">
-                    <span>Limit</span>
-                    <Input
-                        name="limit"
-                        value={filters.limit}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
-                </Label>
-
-                <div className="space-y-2">
-                    <Label>Pincode Collection</Label>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
-                                {filters.pincodeCollection || "Select Collection"}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full">
-                            <DropdownMenuLabel>Select Pincode Collection</DropdownMenuLabel>
-                            {isLoading && <DropdownMenuItem disabled>Loading...</DropdownMenuItem>}
-                            {isError && <DropdownMenuItem disabled>Error loading</DropdownMenuItem>}
-                            {data?.pincode.map((col) => (
-                                <DropdownMenuItem
-                                    key={col}
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: col }))}
-                                >
-                                    {col}
-                                </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuItem
-                                onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: "" }))}
-                            >
-                                None
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
-                {filters.pincodeCollection && (
-                    <div className="space-y-2 col-span-2">
-                        <Label>Pincode Matching</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full bg-white text-left font-normal">
-                                    {filters.pincodeMatching === "R" ? "Include (R)" : "Exclude (B)"}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-full">
-                                <DropdownMenuItem
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "R" }))}
-                                >
-                                    Include (R)
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "B" }))}
-                                >
-                                    Exclude (B)
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {/* Hidden File Input */}
+                        <Input
+                            type="file"
+                            accept=".csv"
+                            onChange={handleFileChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
                     </div>
-                )}
+                    {/* Upload Progress */}
+                    {uploadMutation.isPending && (
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                                <span>Processing CSV...</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <Progress value={progress} className="w-full" />
+                        </div>
+                    )}
 
-                <div className="space-y-2">
-                    <Label>Start Date</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
-                                {filters.startDate ? format(filters.startDate, "PPP") : "Pick a date"}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={filters.startDate || undefined}
-                                onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
+                    {/* Status Messages */}
+                    {/* {uploadMutation.isSuccess && ( */}
+                    {/*     <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg"> */}
+                    {/*         <CheckCircle className="h-5 w-5 text-green-600" /> */}
+                    {/*         <div> */}
+                    {/*             <p className="font-medium text-green-800">Upload Successful</p> */}
+                    {/*             <p className="text-sm text-green-600">Processed {add r.headers.get("agg-count") here} IDs</p> */}
+                    {/*         </div> */}
+                    {/*     </div> */}
+                    {/* )} */}
 
-                <div className="space-y-2">
-                    <Label>End Date</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
-                                {filters.endDate ? format(filters.endDate, "PPP") : "Pick a date"}
+                    {uploadMutation.isSuccess && (
+                        <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <div>
+                                <p className="font-medium text-green-800">Upload Successful</p>
+                                <p className="text-sm text-green-600">
+                                    Processed {uploadMutation.data?.aggCount ?? 0} records
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {uploadMutation.isError && (
+                        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <AlertCircle className="h-5 w-5 text-red-600" />
+                            <div>
+                                <p className="font-medium text-red-800">Upload Failed</p>
+                                <p className="text-sm text-red-600">
+                                    {uploadMutation.error instanceof Error
+                                        ? uploadMutation.error.message.includes("Data should not be empty")
+                                            ? "Nothing Found"
+                                            : uploadMutation.error.message
+                                        : "Unknown error occurred"}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Upload Button */}
+                    <div className="flex justify-end gap-2">
+                        <div className="flex items-center gap-2">
+                            <Select
+                                value={aggType}
+                                onValueChange={(value) => setAggType(value as AggType)}
+                                disabled={uploadMutation.isPending}
+                            >
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select aggregation" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="smartcoin">Smartcoin</SelectItem>
+                                    <SelectItem value="moneyview">MoneyView</SelectItem>
+                                    <SelectItem value="phone">Phone</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {file && (
+                            <Button onClick={() => setFile(null)} variant="outline" disabled={uploadMutation.isPending}>
+                                Clear
                             </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={filters.endDate || undefined}
-                                onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-            </div>
-            <Button onClick={handleExport} className="mt-6 w-full text-white bg-black hover:bg-gray-800">
-                Export CSV
-            </Button>
+                        )}
+                        <Button onClick={handleUpload} disabled={!file || uploadMutation.isPending}>
+                            {uploadMutation.isPending ? "Processing..." : "Upload CSV"}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

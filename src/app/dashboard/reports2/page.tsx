@@ -31,7 +31,7 @@ export default function Reports() {
     const [activeTab, setActiveTab] = useState<"total" | "fresh">("total");
     const [dateRange, setDateRange] = useState<DateRange>({
         from: new Date(new Date().setDate(new Date().getDate() - 1)),
-        to: new Date(),
+        to: new Date(new Date().setDate(new Date().getDate() + 1)),
     });
 
     const [result, setResult] = useState<any>(null);
@@ -127,9 +127,11 @@ export default function Reports() {
                                 onSelect={(range) =>
                                     setDateRange(range ?? { from: new Date(), to: addDays(new Date(), 1) })
                                 }
-                                fromDate={twoMonthsAgo}
-                                toDate={today}
-                                initialFocus
+                                // fromDate={twoMonthsAgo}
+                                // toDate={today}
+                                // initialFocus
+                                data-range-start={twoMonthsAgo}
+                                data-range-end={today}
                             />
                         </PopoverContent>
                     </Popover>
@@ -153,7 +155,9 @@ export default function Reports() {
                     <CardTitle className="flex items-center gap-2">
                         <span className="text-green-600">CredMantra </span> Lender Summary
                         <Link href="/dashboard/reports2/LS" className="ml-auto">
-                            <Button size="sm" variant="outline">LoanSparrow →</Button>
+                            <Button size="sm" variant="outline">
+                                LoanSparrow →
+                            </Button>
                         </Link>
                     </CardTitle>
                 </CardHeader>

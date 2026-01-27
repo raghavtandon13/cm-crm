@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         if (user) {
             // check for assignment
             const prevLead = await db.partnerLeads.findFirst({
-                where: { cmUserId: user._id as string },
+                where: { cmUserId: user._id.toString() },
                 include: { partner: true },
             });
 
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         let partnerLead = null;
         if (!extraMsg) {
             partnerLead = await db.partnerLeads.create({
-                data: { cmUserId: user._id as string, partnerId: partner.id },
+                data: { cmUserId: user._id.toString(), partnerId: partner.id },
             });
         }
 

@@ -14,13 +14,234 @@ function formatNumberIndianStyle(number) {
 }
 
 // prettier-ignore
+// export const lenderConditions = {
+//     creditlinks: [
+//         { case: { $eq: ["$message", "Not eligible"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "The lead is already created."] }, then: "Deduped" },
+//         { case: { $and: [ { $ne: [ "$leadId", null ] }, { $or: [ { $eq: [ "$message", null ] }, { $not: [ "$message" ] } ] } ] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Eligible"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Lead created successfully."] }, then: "Accepted" },
+//     ],
+//
+//     brightloan: [
+//         { case: { $eq: ["$Message", "Customer Already Exist"] }, then: "Deduped" },
+//         { case: { $eq: ["$Message", "Lead Created Successfully"] }, then: "Accepted" },
+//         { case: { $eq: [ "$Message", "Lead Creation Failed, Please try again after some time. Eligibility is not match" ] }, then: "Rejected" },
+//         { case: { $eq: ["$Error", "Age must be between 21 and 56 years."] }, then: "Errors" },
+//     ],
+//
+//     fatakpay: [
+//         { case: { $eq: ["$status", "Ineligible"] }, then: "Rejected" },
+//         { case: { $eq: ["$status", "Deduped"] }, then: "Deduped" },
+//         { case: { $ne: ["$max_eligibility_amount", null] }, then: "Accepted" },
+//     ],
+//
+//     fimoney: [{ case: { $eq: ["$status.message", "Lead created successfully"] }, then: "Accepted" }],
+//
+//     fatakpay_pl: [
+//         { case: { $and: [ { $ne: [ { $type: "$max_eligibility_amount" }, "missing" ] }, { $ne: [ "$max_eligibility_amount", null ] } ] }, then: "Accepted" },
+//         { case: { $and: [ { $ne: [ { $type: "$data.max_eligibility_amount" }, "missing" ] }, { $ne: [ "$data.max_eligibility_amount", null ] } ] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Lead already exists"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "User already exists in the system."] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "Loan Application already exists"] }, then: "Deduped" },
+//     ],
+//
+//     kamakshi: [
+//         { case: { $eq: ["$msg", "Lead created successfully."] }, then: "Accepted" },
+//         { case: { $eq: ["$status", "Ineligible"] }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$status", regex: /(required)/i } }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$status", regex: /(Issue)/i } }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$status", regex: /(Unexpected data)/i } }, then: "Rejected" },
+//         { case: { $eq: ["$status", "Trailing data"] }, then: "Errors" },
+//         { case: { $eq: ["$status", "Gateway Time-out"] }, then: "Errors" },
+//         { case: { $eq: ["$status", "Not enough data available to satisfy format"] }, then: "Errors" },
+//         { case: { $eq: ["$status", "Bad Gateway"] }, then: "Errors" },
+//         { case: { $eq: ["$status", "Date is Incorrect."] }, then: "Errors" },
+//         { case: { $eq: ["$status", "Too Many Attempts."] }, then: "Errors" },
+//         { case: { $regexMatch: { input: "$status", regex: /(SQLSTATE)/i } }, then: "Errors" },
+//         { case: { $eq: ["$status", "Dedupe"] }, then: "Deduped" },
+//     ],
+//
+//     lendenclub: [
+//         { case: { $eq: ["$is_duplicate", true] }, then: "Deduped" },
+//         { case: { $eq: ["$is_duplicate", false] }, then: "Accepted" },
+//         { case: { $regexMatch: { input: "$status", regex: /(required)/i } }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$status", regex: /(Issue)/i } }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$status", regex: /(Unexpected data)/i } }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$error", regex: /(Mandatory)/i } }, then: "Errors" },
+//         { case: { $regexMatch: { input: "$error", regex: /(Invalid)/i } }, then: "Errors" },
+//         { case: { $eq: ["$error", "Decryption Failed"] }, then: "Errors" },
+//         { case: { $eq: ["$error", "An unexpected error occurred"] }, then: "Errors" },
+//         { case: { $eq: ["$error", "Unable to process the request"] }, then: "Errors" },
+//     ],
+//
+//     loantap: [
+//         { case: { $eq: ["$message", "Application created successfully"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Application created successfully."] }, then: "Accepted" },
+//     ],
+//
+//     moneyview3: [
+//         { case: { $gt: [ { $cond: { if: { $isArray: "$offerObjects" }, then: { $size: "$offerObjects" }, else: 0 } }, 0 ] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Duplicate lead found in MV"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "dedupe found"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "Lead has been expired."] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "Lead has been rejected."] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "No dedupe found"] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Invalid employment type"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid Age"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid PAN"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid or Missing phone number"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid education level"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid data to get offer for lead"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Server call failed. Please try again."] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Error while verification of lead"] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Loan Application status is invalid."] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Error in fetching offers"] }, then: "Errors" }, // repunch
+//     ],
+//
+//     moneyview: [
+//         { case: { $in: ["$message", ["Duplicate lead found in MV", "dedupe found"]] }, then: "Deduped" },
+//         { case: { $in: ["$message", ["Lead has been expired.", "Lead has been rejected."]] }, then: "Rejected" },
+//         { case: { $in: [ "$message", [ "No dedupe found", "Invalid employment type", "Invalid Age", "Invalid PAN", "Invalid or Missing phone number", "Invalid education level", "Invalid data to get offer for lead", "Server call failed. Please try again.", "Error while verification of lead", "Loan Application status is invalid.", "Error in fetching offers" ] ] }, then: "Errors" },
+//         { case: { $gt: [ { $cond: [ { $isArray: "$offerObjects" }, { $size: "$offerObjects" }, 0 ] }, 0 ] }, then: "Accepted" },
+//     ],
+//
+//     moneyview2: [
+//         { case: { $gt: [ { $cond: { if: { $isArray: "$offerObjects" }, then: { $size: "$offerObjects" }, else: 0 } }, 0 ] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Duplicate lead found in MV"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "dedupe found"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "Lead has been expired."] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "Lead has been rejected."] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "No dedupe found"] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Invalid employment type"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid Age"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid PAN"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid or Missing phone number"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid education level"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Invalid data to get offer for lead"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Server call failed. Please try again."] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Error while verification of lead"] }, then: "Errors" }, // repunch
+//         { case: { $eq: ["$message", "Loan Application status is invalid."] }, then: "Errors" },
+//         { case: { $eq: ["$message", "Error in fetching offers"] }, then: "Errors" }, // repunch
+//     ],
+//
+//     mpocket: [
+//         { case: { $eq: ["$message", "User Eligible for Loan"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "New User"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Data Accepted Successfully"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "User Profile Rejected on System"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "User Not Eligible for Loan"] }, then: "Rejected" },
+//         { case: { $or: [{ $eq: ["$message", null] }, { $not: ["$message"] }] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "Bad Request"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "socket hang up"] }, then: "Errors" },
+//     ],
+//
+//     ramfin: [
+//         { case: { $eq: ["$dedupe", "Success"] }, then: "Accepted" },
+//         { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $ne: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Accepted" },
+//         { case: { $eq: ["$status", "Dedupe"] }, then: "Deduped" },
+//         { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $eq: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Rejected" },
+//         { case: { $regexMatch: { input: "$message", regex: /Issue/i } }, then: "Rejected" },
+//         { case: { $eq: ["$message", "The pancard field is required."] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "Too Many Attempts."] }, then: "Errors" },
+//         { case: { $regexMatch: { input: "$message", regex: /(SQLSTATE)/i } }, then: "Errors" },
+//         { case: { $regexMatch: { input: "$message", regex: /(errno)/i } }, then: "Errors" },
+//     ],
+//
+//     smartcoin: [
+//         { case: { $eq: ["$isDuplicateLead", "true"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "duplicate found and partner can reject this lead"] }, then: "Deduped" },
+//         { case: { $eq: ["$isDuplicateLead", "false"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Lead created successfully"] }, then: "Accepted" },
+//         // { case: { $eq: ["$status", "failure"] }, then: "Rejected" },
+//         // { case: { $eq: ["$message", "unauthorised client id "] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "socket hang up"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "read ECONNRESET"] }, then: "Errors" },
+//         { case: { $eq: [ "$message", "Client network socket disconnected before secure TLS connection was established" ] }, then: "Errors" },
+//         { case: { $eq: ["$message", "write ETIMEDOUT"] }, then: "Errors" },
+//         { case: { $eq: ["$message", "write EPIPE"] }, then: "Errors" },
+//         { case: { $regexMatch: { input: "$message", regex: /(Request failed)/i } }, then: "Errors" },
+//     ],
+//
+//     spheet: [
+//         { case: { $ne: ["$loanOffers", null] }, then: "Accepted" },
+//         { case: { $eq: ["$status", "failure"] }, then: "Rejected" },
+//     ],
+//
+//     payme: [
+//         { case: { $or: [ { $eq: [ "$message", "Signed-in Successfully" ] }, { $eq: [ "$message", "Limit get successfully" ] }, { $eq: [ "$message", "Document status get api worked well!!" ] } ] }, then: "Accepted" },
+//         { case: { $or: [ { $eq: [ "$message", "user_found" ] }, { $eq: [ "$message", "User register api stucked into exception!!" ] } ] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "user_not_found"] }, then: "Rejected" },
+//         { case: { $or: [ { $eq: [ "$detail", "Request was throttled. Expected available in 1 second." ] }, { $eq: [ "$error", "Please Enter Valid Email" ] } ] }, then: "Errors" },
+//     ],
+//
+//     myflot: [
+//         { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Fresh_Lead" ] } ] }, then: "Accepted" },
+//         { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Rejected" ] } ] }, then: "Rejected" },
+//         { case: { $eq: ["$status", "existing"] }, then: "Deduped" },
+//         { case: { $or: [ { $eq: [ "$message", "Some error occurred" ] }, { $eq: [ "$message", "System is under maintenance Please try after some time :)" ] } ] }, then: "Errors" },
+//         { case: { $or: [ { $eq: [ "$message", "Invalid occupation" ] }, { $eq: [ "$message", "Invalid monthly income" ] }, { $eq: [ "$message", "Invalid or missing pincode" ] } ] }, then: "Errors" },
+//     ],
+//
+//     sot: [
+//         { case: { $eq: ["$Message", "Lead generated successfully."] }, then: "Accepted" },
+//         { case: { $eq: ["$Message", "Eligibility Failed"] }, then: "Rejected" },
+//         { case: { $eq: ["$Message", "Monthly income is not eligible for the loan."] }, then: "Rejected" },
+//         { case: { $eq: [ "$Message", "You are not eligible for the loan as there is an active loan with the same PAN number." ] }, then: "Deduped" },
+//     ],
+//
+//     zype: [
+//         { case: { $eq: ["$status", "ACCEPT"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "PRE_APPROVAL_OFFER_ALREADY_GENERATED"] }, then: "Accepted" },
+//         { case: { $eq: ["$status", "REJECT"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "DOB_OUT_OF_RANGE"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "DOB_INVALID"] }, then: "Rejected" },
+//         { case: { $eq: ["$status", "Dedupe"] }, then: "Deduped" },
+//         { case: { $eq: ["$status", "Deduped"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "SUCCESS_DEDUPE_NOT_FOUND"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "DEDUPE_IN_PROGRESS"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "APPLICATION_ALREADY_EXISTS"] }, then: "Deduped" },
+//     ],
+//
+//     digicredit: [
+//         { case: { $eq: ["$message", "success"] }, then: "Accepted" },
+//         { case: { $eq: ["$error.message", "This mobile number is already present"] }, then: "Deduped" },
+//     ],
+//
+//     loanwithin: [
+//         { case: { $eq: ["$isSuccess", true] }, then: "Accepted" },
+//         { case: { $eq: ["$error.title", "One or more validation errors occurred."] }, then: "Errors" },
+//     ],
+//
+//     cashkuber: [
+//         { case: { $eq: ["$message", "Failed due to Dedupe found"] }, then: "Deduped" },
+//         { case: { $eq: ["$status", "Success"] }, then: "Accepted" },
+//     ],
+//
+//     salarynow: [
+//         { case: { $eq: ["$message", "Customer passed soft check"] }, then: "Accepted" },
+//         { case: { $eq: ["$message", "Pincode not serviceable"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "Customer already exists"] }, then: "Deduped" },
+//         { case: { $eq: ["$message", "Salary must be greater than 21000"] }, then: "Rejected" },
+//         { case: { $eq: ["$message", "New customer"] }, then: "Errors" }, // repunch
+//     ],
+//
+//     creditplus: [
+//         { case: { $eq: ["$message", "SUCCESS"] }, then: "Accepted" },
+//         { case: { $eq: ["$error.message", "DUPLICATE"] }, then: "Deduped" },
+//     ],
+// };
+
 export const lenderConditions = {
-    creditlinks: [
-        { case: { $eq: ["$message", "Not eligible"] }, then: "Rejected" },
-        { case: { $eq: ["$message", "The lead is already created."] }, then: "Deduped" },
-        { case: { $and: [ { $ne: [ "$leadId", null ] }, { $or: [ { $eq: [ "$message", null ] }, { $not: [ "$message" ] } ] } ] }, then: "Accepted" },
-        { case: { $eq: ["$message", "Eligible"] }, then: "Accepted" },
-        { case: { $eq: ["$message", "Lead created successfully."] }, then: "Accepted" },
+    bharatloan: [
+	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
     ],
 
     brightloan: [
@@ -30,13 +251,34 @@ export const lenderConditions = {
         { case: { $eq: ["$Error", "Age must be between 21 and 56 years."] }, then: "Errors" },
     ],
 
+    cashkuber: [
+        { case: { $eq: ["$message", "Failed due to Dedupe found"] }, then: "Deduped" },
+        { case: { $eq: ["$status", "Success"] }, then: "Accepted" },
+    ],
+
+    creditlinks: [
+        { case: { $eq: ["$message", "Not eligible"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "The lead is already created."] }, then: "Deduped" },
+        { case: { $and: [ { $ne: [ "$leadId", null ] }, { $or: [ { $eq: [ "$message", null ] }, { $not: [ "$message" ] } ] } ] }, then: "Accepted" },
+        { case: { $eq: ["$message", "Eligible"] }, then: "Accepted" },
+        { case: { $eq: ["$message", "Lead created successfully."] }, then: "Accepted" },
+    ],
+
+    creditplus: [
+        { case: { $eq: ["$message", "SUCCESS"] }, then: "Accepted" },
+        { case: { $eq: ["$error.message", "DUPLICATE"] }, then: "Deduped" },
+    ],
+
+    digicredit: [
+        { case: { $eq: ["$message", "success"] }, then: "Accepted" },
+        { case: { $eq: ["$error.message", "This mobile number is already present"] }, then: "Deduped" },
+    ],
+
     fatakpay: [
         { case: { $eq: ["$status", "Ineligible"] }, then: "Rejected" },
         { case: { $eq: ["$status", "Deduped"] }, then: "Deduped" },
         { case: { $ne: ["$max_eligibility_amount", null] }, then: "Accepted" },
     ],
-
-    fimoney: [{ case: { $eq: ["$status.message", "Lead created successfully"] }, then: "Accepted" }],
 
     fatakpay_pl: [
         { case: { $and: [ { $ne: [ { $type: "$max_eligibility_amount" }, "missing" ] }, { $ne: [ "$max_eligibility_amount", null ] } ] }, then: "Accepted" },
@@ -45,6 +287,13 @@ export const lenderConditions = {
         { case: { $eq: ["$message", "User already exists in the system."] }, then: "Deduped" },
         { case: { $eq: ["$message", "Loan Application already exists"] }, then: "Deduped" },
     ],
+
+    fimoney: [
+        { case: { $eq: ["$status.message", "Lead created successfully"] }, then: "Accepted" },
+        { case: { $eq: ["$status.message", "Lead already exists with given user identifiers"] }, then: "Deduped" },
+    ],
+
+
 
     kamakshi: [
         { case: { $eq: ["$msg", "Lead created successfully."] }, then: "Accepted" },
@@ -75,35 +324,25 @@ export const lenderConditions = {
         { case: { $eq: ["$error", "Unable to process the request"] }, then: "Errors" },
     ],
 
+    loan112 : [
+	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+    ],
+
     loantap: [
         { case: { $eq: ["$message", "Application created successfully"] }, then: "Accepted" },
         { case: { $eq: ["$message", "Application created successfully."] }, then: "Accepted" },
     ],
 
-    moneyview3: [
-        { case: { $gt: [ { $cond: { if: { $isArray: "$offerObjects" }, then: { $size: "$offerObjects" }, else: 0 } }, 0 ] }, then: "Accepted" },
-        { case: { $eq: ["$message", "Duplicate lead found in MV"] }, then: "Deduped" },
-        { case: { $eq: ["$message", "dedupe found"] }, then: "Deduped" },
-        { case: { $eq: ["$message", "Lead has been expired."] }, then: "Rejected" },
-        { case: { $eq: ["$message", "Lead has been rejected."] }, then: "Rejected" },
-        { case: { $eq: ["$message", "No dedupe found"] }, then: "Errors" }, // repunch
-        { case: { $eq: ["$message", "Invalid employment type"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Invalid Age"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Invalid PAN"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Invalid or Missing phone number"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Invalid education level"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Invalid data to get offer for lead"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Server call failed. Please try again."] }, then: "Errors" }, // repunch
-        { case: { $eq: ["$message", "Error while verification of lead"] }, then: "Errors" }, // repunch
-        { case: { $eq: ["$message", "Loan Application status is invalid."] }, then: "Errors" },
-        { case: { $eq: ["$message", "Error in fetching offers"] }, then: "Errors" }, // repunch
-    ],
-
-    moneyview: [
-        { case: { $in: ["$message", ["Duplicate lead found in MV", "dedupe found"]] }, then: "Deduped" },
-        { case: { $in: ["$message", ["Lead has been expired.", "Lead has been rejected."]] }, then: "Rejected" },
-        { case: { $in: [ "$message", [ "No dedupe found", "Invalid employment type", "Invalid Age", "Invalid PAN", "Invalid or Missing phone number", "Invalid education level", "Invalid data to get offer for lead", "Server call failed. Please try again.", "Error while verification of lead", "Loan Application status is invalid.", "Error in fetching offers" ] ] }, then: "Errors" },
-        { case: { $gt: [ { $cond: [ { $isArray: "$offerObjects" }, { $size: "$offerObjects" }, 0 ] }, 0 ] }, then: "Accepted" },
+    loanwithin: [
+        { case: { $eq: ["$isSuccess", true] }, then: "Accepted" },
+        { case: { $eq: ["$error.title", "One or more validation errors occurred."] }, then: "Errors" },
     ],
 
     moneyview2: [
@@ -112,17 +351,24 @@ export const lenderConditions = {
         { case: { $eq: ["$message", "dedupe found"] }, then: "Deduped" },
         { case: { $eq: ["$message", "Lead has been expired."] }, then: "Rejected" },
         { case: { $eq: ["$message", "Lead has been rejected."] }, then: "Rejected" },
-        { case: { $eq: ["$message", "No dedupe found"] }, then: "Errors" }, // repunch
+        { case: { $eq: ["$message", "No dedupe found"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid employment type"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid Age"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid PAN"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid or Missing phone number"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid education level"] }, then: "Errors" },
         { case: { $eq: ["$message", "Invalid data to get offer for lead"] }, then: "Errors" },
-        { case: { $eq: ["$message", "Server call failed. Please try again."] }, then: "Errors" }, // repunch
-        { case: { $eq: ["$message", "Error while verification of lead"] }, then: "Errors" }, // repunch
+        { case: { $eq: ["$message", "Server call failed. Please try again."] }, then: "Errors" },
+        { case: { $eq: ["$message", "Error while verification of lead"] }, then: "Errors" },
         { case: { $eq: ["$message", "Loan Application status is invalid."] }, then: "Errors" },
-        { case: { $eq: ["$message", "Error in fetching offers"] }, then: "Errors" }, // repunch
+        { case: { $eq: ["$message", "Error in fetching offers"] }, then: "Errors" },
+    ],
+
+    moneyview: [
+        { case: { $in: ["$message", ["Duplicate lead found in MV", "dedupe found"]] }, then: "Deduped" },
+        { case: { $in: ["$message", ["Lead has been expired.", "Lead has been rejected."]] }, then: "Rejected" },
+        { case: { $in: [ "$message", [ "No dedupe found", "Invalid employment type", "Invalid Age", "Invalid PAN", "Invalid or Missing phone number", "Invalid education level", "Invalid data to get offer for lead", "Server call failed. Please try again.", "Error while verification of lead", "Loan Application status is invalid.", "Error in fetching offers" ] ] }, then: "Errors" },
+        { case: { $gt: [ { $cond: [ { $isArray: "$offerObjects" }, { $size: "$offerObjects" }, 0 ] }, 0 ] }, then: "Accepted" },
     ],
 
     mpocket: [
@@ -136,8 +382,23 @@ export const lenderConditions = {
         { case: { $eq: ["$message", "socket hang up"] }, then: "Errors" },
     ],
 
+    myflot: [
+        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Fresh_Lead" ] } ] }, then: "Accepted" },
+        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Rejected" ] } ] }, then: "Rejected" },
+        { case: { $eq: [ "$status", "existing" ] }, then: "Deduped" },
+        { case: { $or: [ { $eq: [ "$message", "Some error occurred" ] }, { $eq: [ "$message", "System is under maintenance Please try after some time :)" ] } ] }, then: "Errors" },
+        { case: { $or: [ { $eq: [ "$message", "Invalid occupation" ] }, { $eq: [ "$message", "Invalid monthly income" ] }, { $eq: [ "$message", "Invalid or missing pincode" ] } ] }, then: "Errors" },
+    ],
+
+    payme: [
+        { case: { $or: [ { $eq: [ "$message", "Signed-in Successfully" ] }, { $eq: [ "$message", "Limit get successfully" ] }, { $eq: [ "$message", "Document status get api worked well!!" ] } ] }, then: "Accepted" },
+        { case: { $or: [ { $eq: [ "$message", "user_found" ] }, { $eq: [ "$message", "User register api stucked into exception!!" ] } ] }, then: "Deduped" },
+        { case: { $eq: ["$message", "user_not_found"] }, then: "Rejected" },
+        { case: { $or: [ { $eq: [ "$detail", "Request was throttled. Expected available in 1 second." ] }, { $eq: [ "$error", "Please Enter Valid Email" ] } ] }, then: "Errors" },
+    ],
+
     ramfin: [
-        { case: { $eq: ["$dedupe", "Success"] }, then: "Accepted" },
+        { case: { $eq: [ "$dedupe", "Success" ] }, then: "Accepted" },
         { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $ne: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Accepted" },
         { case: { $eq: ["$status", "Dedupe"] }, then: "Deduped" },
         { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $eq: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Rejected" },
@@ -148,13 +409,41 @@ export const lenderConditions = {
         { case: { $regexMatch: { input: "$message", regex: /(errno)/i } }, then: "Errors" },
     ],
 
+    rupee112: [
+	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+    ],
+
+    rupeeontime: [
+	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+    ],
+
+    salarynow: [
+        { case: { $eq: ["$message", "Customer passed soft check"] }, then: "Accepted" },
+        { case: { $eq: ["$message", "Pincode not serviceable"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "Customer already exists"] }, then: "Deduped" },
+        { case: { $eq: ["$message", "Salary must be greater than 21000"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "New customer"] }, then: "Errors" },
+    ],
+
     smartcoin: [
         { case: { $eq: ["$isDuplicateLead", "true"] }, then: "Deduped" },
         { case: { $eq: ["$message", "duplicate found and partner can reject this lead"] }, then: "Deduped" },
         { case: { $eq: ["$isDuplicateLead", "false"] }, then: "Accepted" },
         { case: { $eq: ["$message", "Lead created successfully"] }, then: "Accepted" },
-        // { case: { $eq: ["$status", "failure"] }, then: "Rejected" },
-        // { case: { $eq: ["$message", "unauthorised client id "] }, then: "Rejected" },
         { case: { $eq: ["$message", "socket hang up"] }, then: "Errors" },
         { case: { $eq: ["$message", "read ECONNRESET"] }, then: "Errors" },
         { case: { $eq: [ "$message", "Client network socket disconnected before secure TLS connection was established" ] }, then: "Errors" },
@@ -163,31 +452,16 @@ export const lenderConditions = {
         { case: { $regexMatch: { input: "$message", regex: /(Request failed)/i } }, then: "Errors" },
     ],
 
-    spheet: [
-        { case: { $ne: ["$loanOffers", null] }, then: "Accepted" },
-        { case: { $eq: ["$status", "failure"] }, then: "Rejected" },
-    ],
-
-    payme: [
-        { case: { $or: [ { $eq: [ "$message", "Signed-in Successfully" ] }, { $eq: [ "$message", "Limit get successfully" ] }, { $eq: [ "$message", "Document status get api worked well!!" ] } ] }, then: "Accepted" },
-        { case: { $or: [ { $eq: [ "$message", "user_found" ] }, { $eq: [ "$message", "User register api stucked into exception!!" ] } ] }, then: "Deduped" },
-        { case: { $eq: ["$message", "user_not_found"] }, then: "Rejected" },
-        { case: { $or: [ { $eq: [ "$detail", "Request was throttled. Expected available in 1 second." ] }, { $eq: [ "$error", "Please Enter Valid Email" ] } ] }, then: "Errors" },
-    ],
-
-    myflot: [
-        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Fresh_Lead" ] } ] }, then: "Accepted" },
-        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Rejected" ] } ] }, then: "Rejected" },
-        { case: { $eq: ["$status", "existing"] }, then: "Deduped" },
-        { case: { $or: [ { $eq: [ "$message", "Some error occurred" ] }, { $eq: [ "$message", "System is under maintenance Please try after some time :)" ] } ] }, then: "Errors" },
-        { case: { $or: [ { $eq: [ "$message", "Invalid occupation" ] }, { $eq: [ "$message", "Invalid monthly income" ] }, { $eq: [ "$message", "Invalid or missing pincode" ] } ] }, then: "Errors" },
-    ],
-
     sot: [
         { case: { $eq: ["$Message", "Lead generated successfully."] }, then: "Accepted" },
         { case: { $eq: ["$Message", "Eligibility Failed"] }, then: "Rejected" },
         { case: { $eq: ["$Message", "Monthly income is not eligible for the loan."] }, then: "Rejected" },
         { case: { $eq: [ "$Message", "You are not eligible for the loan as there is an active loan with the same PAN number." ] }, then: "Deduped" },
+    ],
+
+    spheet: [
+        { case: { $ne: ["$loanOffers", null] }, then: "Accepted" },
+        { case: { $eq: ["$status", "failure"] }, then: "Rejected" },
     ],
 
     zype: [
@@ -202,35 +476,9 @@ export const lenderConditions = {
         { case: { $eq: ["$message", "DEDUPE_IN_PROGRESS"] }, then: "Deduped" },
         { case: { $eq: ["$message", "APPLICATION_ALREADY_EXISTS"] }, then: "Deduped" },
     ],
-
-    digicredit: [
-        { case: { $eq: ["$message", "success"] }, then: "Accepted" },
-        { case: { $eq: ["$error.message", "This mobile number is already present"] }, then: "Deduped" },
-    ],
-
-    loanwithin: [
-        { case: { $eq: ["$isSuccess", true] }, then: "Accepted" },
-        { case: { $eq: ["$error.title", "One or more validation errors occurred."] }, then: "Errors" },
-    ],
-
-    cashkuber: [
-        { case: { $eq: ["$message", "Failed due to Dedupe found"] }, then: "Deduped" },
-        { case: { $eq: ["$status", "Success"] }, then: "Accepted" },
-    ],
-
-    salarynow: [
-        { case: { $eq: ["$message", "Customer passed soft check"] }, then: "Accepted" },
-        { case: { $eq: ["$message", "Pincode not serviceable"] }, then: "Rejected" },
-        { case: { $eq: ["$message", "Customer already exists"] }, then: "Deduped" },
-        { case: { $eq: ["$message", "Salary must be greater than 21000"] }, then: "Rejected" },
-        { case: { $eq: ["$message", "New customer"] }, then: "Errors" }, // repunch
-    ],
-
-    creditplus: [
-        { case: { $eq: ["$message", "SUCCESS"] }, then: "Accepted" },
-        { case: { $eq: ["$error.message", "DUPLICATE"] }, then: "Deduped" },
-    ],
 };
+
+
 
 // prettier-ignore
 const lenderAIPConfig = [

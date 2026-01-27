@@ -1,91 +1,72 @@
-import csv from "csv-parser";
+import { Readable } from "node:stream";
+import { format } from "@fast-csv/format";
+import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
-import { Readable } from "stream";
 import { connectToMongoDB } from "../../../../lib/db";
-import { Parser } from "json2csv";
 
 export async function POST(request: NextRequest) {
-    try {
-        await connectToMongoDB();
+    await connectToMongoDB();
 
-        if (!mongoose.connection.db) {
-            return NextResponse.json({ message: "DB not connected" }, { status: 500 });
-        }
+    if (!mongoose.connection.db) return NextResponse.json({ message: "DB not connected" }, { status: 500 });
 
-        const aggType = request.headers.get("x-agg-type"); // sm | mv
+    const aggType = request.headers.get("x-agg-type");
 
-        const formData = await request.formData();
-        const file = formData.get("file");
+    const formData = await request.formData();
+    const file = formData.get("file");
 
-        if (!file || !(file instanceof File)) {
-            return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
-        }
+    if (!file || !(file instanceof File)) return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+    // ---- Stream file → extract IDs ----
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-        const ids: string[] = await new Promise((resolve, reject) => {
-            const extractedIds: string[] = [];
-            let hasIdsColumn = false;
+    const ids: string[] = [];
 
-            Readable.from([buffer])
-                .pipe(csv())
-                .on("data", (row) => {
-                    if ("ids" in row) {
-                        hasIdsColumn = true;
-                        if (row.ids) extractedIds.push(String(row.ids).trim());
-                    }
-                })
-                .on("end", () => {
-                    if (!hasIdsColumn) {
-                        reject(new Error("CSV must contain an 'ids' column"));
-                        return;
-                    }
-                    resolve(extractedIds);
-                })
-                .on("error", reject);
-        });
+    await new Promise<void>((resolve, reject) => {
+        Readable.from(buffer)
+            .pipe(csvParser({ mapHeaders: ({ header }) => header.trim().toLowerCase() }))
+            .on("data", (row) => {
+                const id = row.ids?.toString().trim();
+                if (id) ids.push(id);
+            })
+            .on("end", () => resolve())
+            .on("error", reject);
+    });
 
-        if (!ids.length) {
-            return NextResponse.json({ message: "No IDs found in CSV" }, { status: 400 });
-        }
-
-        let aggregationResults: any[];
-
-        switch (aggType) {
-            case "moneyview":
-                aggregationResults = await mvAgg(ids);
-                break;
-            case "smartcoin":
-                aggregationResults = await smAgg(ids);
-                break;
-
-            case "phone":
-                aggregationResults = await phoneAgg(ids);
-                break;
-            default:
-                aggregationResults = [];
-        }
-
-        // Convert result → CSV
-        const parser = new Parser();
-        const csvData = parser.parse(aggregationResults);
-
-        return new NextResponse(csvData, {
-            status: 200,
-            headers: {
-                "Content-Type": "text/csv",
-                "agg-count": `${aggregationResults.length}/${ids.length}`,
-                "Content-Disposition": `attachment; filename="${aggType ?? "result"}-output.csv"`,
-            },
-        });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json(
-            { message: error instanceof Error ? error.message : "Internal error" },
-            { status: 500 },
-        );
+    if (!ids.length) {
+        return NextResponse.json({ message: "CSV must contain a non-empty 'ids' column" }, { status: 400 });
     }
+
+    // ---- Run aggregation ----
+    let results: any[] = [];
+
+    switch (aggType) {
+        case "moneyview":
+            results = await mvAgg(ids);
+            break;
+        case "smartcoin":
+            results = await smAgg(ids);
+            break;
+        case "phone":
+            results = await phoneAgg(ids);
+            break;
+        default:
+            return NextResponse.json({ message: "Invalid or missing x-agg-type header" }, { status: 400 });
+    }
+
+    // ---- Stream JSON → CSV response ----
+    const csvStream = format({ headers: true });
+    const readable = Readable.from(results);
+
+    const responseStream = readable.pipe(csvStream);
+
+    return new NextResponse(responseStream as any, {
+        headers: {
+            "Content-Type": "text/csv",
+            "agg-count": `${results.length}/${ids.length}`,
+            "Content-Disposition": `attachment; filename="${aggType}-output.csv"`,
+        },
+    });
 }
 
 async function smAgg(ids: string[]) {

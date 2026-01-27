@@ -1,21 +1,21 @@
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { eachDayOfInterval, format } from "date-fns";
+import { CalendarIcon, Search } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { DataTable } from "@/components/dataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import fromAPI from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { format, eachDayOfInterval } from "date-fns";
-import { CalendarIcon, Search } from "lucide-react";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import Link from "next/link";
 
 export default function Attendance() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -296,7 +296,7 @@ export default function Attendance() {
                     )}
                 </Button>
                 <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
+                    className={cn(buttonVariants({ variant: "secondary" }), "font-semibold mb-1")}
                     href="/dashboard/attendance/overview"
                 >
                     Overview -{">"}{" "}

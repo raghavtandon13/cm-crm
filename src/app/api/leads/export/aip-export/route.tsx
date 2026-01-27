@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import { type NextRequest, NextResponse } from "next/server";
+import Papa from "papaparse";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
-import { Parser } from "json2csv";
-import mongoose from "mongoose";
 
 async function buildAIPMatchQuery({
     minAge,
@@ -129,12 +129,11 @@ export async function POST(req: NextRequest) {
             { $project: { phone: 1, pan: 1, email: 1, name: 1, dob: 1, income: 1, empName: 1 } },
             { $limit: limit },
         ];
-        console.log(JSON.stringify(pipeline));
 
         const users = await User.aggregate(pipeline);
-        console.log(users);
-        const parser = new Parser();
-        const csv = parser.parse(users);
+
+        // Convert to CSV
+        const csv = Papa.unparse(users);
 
         return new NextResponse(csv, {
             status: 200,
