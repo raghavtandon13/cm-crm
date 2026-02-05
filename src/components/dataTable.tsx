@@ -86,41 +86,39 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                 </div>
             )}
             {name === "table1" && (
-                <>
-                    <div className="flex items-center py-4">
-                        <Input
-                            placeholder="Search Lenders ..."
-                            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-                            className="max-w-xs bg-white"
-                        />
-                        <DateSearch dates={dateprops} />
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="ml-auto">
-                                    Fields
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {table
-                                    .getAllColumns()
-                                    .filter((column) => column.getCanHide())
-                                    .map((column) => {
-                                        return (
-                                            <DropdownMenuCheckboxItem
-                                                key={column.id}
-                                                className="capitalize"
-                                                checked={column.getIsVisible()}
-                                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                            >
-                                                {column.id}
-                                            </DropdownMenuCheckboxItem>
-                                        );
-                                    })}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </>
+                <div className="flex items-center py-4">
+                    <Input
+                        placeholder="Search Lenders ..."
+                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+                        className="max-w-xs bg-white"
+                    />
+                    <DateSearch dates={dateprops} />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="ml-auto">
+                                Fields
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {table
+                                .getAllColumns()
+                                .filter((column) => column.getCanHide())
+                                .map((column) => {
+                                    return (
+                                        <DropdownMenuCheckboxItem
+                                            key={column.id}
+                                            className="capitalize"
+                                            checked={column.getIsVisible()}
+                                            onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                        >
+                                            {column.id}
+                                        </DropdownMenuCheckboxItem>
+                                    );
+                                })}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             )}
             <div className="rounded-xl border bg-white px-4 py-2 shadow">
                 <Table>

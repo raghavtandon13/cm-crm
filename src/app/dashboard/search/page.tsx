@@ -1,14 +1,17 @@
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import UserSearch from "@/components/userSearch";
-import User from "@/lib/users";
+/** biome-ignore-all lint/suspicious/noExplicitAny: false */
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: false */
+
+import { ArrowDown, ArrowUp, History, Pencil } from "lucide-react";
 // import Image from "next/image";
 import Link from "next/link";
-import { CMUser } from "@/lib/types";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { History, Pencil } from "lucide-react";
 import LenderStatus from "@/components/displays/lenderStatus";
 import { StagesTable } from "@/components/stagesTable";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import UserSearch from "@/components/userSearch";
 import { getARDStatus } from "@/lib/lenderConfigArd";
+import type { CMUser } from "@/lib/types";
+import User from "@/lib/users";
 
 interface UserData {
     accounts: Record<string, any>[];
@@ -18,8 +21,8 @@ interface UserData {
 async function getData(phone: string): Promise<UserData | string> {
     try {
         const user1 = await User.find({ phone: phone }).lean();
-        let res: any = {};
-        if (user1[0] && user1[0].accounts) {
+        const res: any = {};
+        if (user1[0]?.accounts) {
             const { accounts, ...details } = user1[0];
             if (accounts !== undefined && details !== undefined) {
                 res.accounts = accounts;
@@ -35,7 +38,6 @@ async function getData(phone: string): Promise<UserData | string> {
             const collData = await User.db.collection(coll.name).findOne({ phone: phone, latest: true });
             if (collData) {
                 res.accounts.push(collData);
-                console.log(res.accounts);
             }
         }
 
@@ -48,10 +50,7 @@ async function getData(phone: string): Promise<UserData | string> {
 
 async function getDataPerAcc(phone: string, acc: string) {
     return {
-        accounts: await User.db
-            .collection(acc.toLowerCase() + "-accounts")
-            .find({ phone: phone })
-            .toArray(),
+        accounts: await User.db.collection(`${acc.toLowerCase()}-accounts`).find({ phone: phone }).toArray(),
     };
 }
 
@@ -91,8 +90,7 @@ export default async function Phone(props: {
         accountsOnly = true;
     }
 
-    const res:any = account ? await getDataPerAcc(phone, account) : await getData(phone);
-    console.log(res);
+    const res: any = account ? await getDataPerAcc(phone, account) : await getData(phone);
 
     if (typeof res === "string") {
         return (
@@ -110,9 +108,7 @@ export default async function Phone(props: {
         return res.accounts.map((account: any, index: any) => (
             <div key={index} className="mx-auto mb-4 items-center justify-center rounded-xl bg-white px-4 py-8 shadow">
                 <div className="px-4">
-                    <p className="mb-4 ml-[-8px] w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">
-                        {account.name}
-                    </p>
+                    <p className="mb-4 -ml-2 w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">{account.name}</p>
                     {Object.entries(account)
                         .filter(([key]) => !["res", "req", "sent", "name", "status_code"].includes(key))
                         .map(([key, value]: any, entryIndex, arr) => {
@@ -121,8 +117,8 @@ export default async function Phone(props: {
                             return (
                                 <div key={key}>
                                     <div className="flex justify-between">
-                                        <p className="flex-[1]">{key}:</p>
-                                        <pre className="flex-[4] w-full">{JSON.stringify(displayValue, null, 1)}</pre>
+                                        <p className="flex-1">{key}:</p>
+                                        <pre className="flex-4 w-full">{JSON.stringify(displayValue, null, 1)}</pre>
                                     </div>
 
                                     {entryIndex < arr.length - 1 && <hr />}
@@ -194,6 +190,46 @@ export default async function Phone(props: {
                             </TableBody>
                         </Table>
                     </div>
+
+                    <details className="group">
+                        <summary className="flex cursor-pointer items-center justify-between py-10 font-bold list-none">
+                            <span>Partner History</span>
+
+                            <span className="ml-2 flex items-center">
+                                {/* closed state */}
+                                <ArrowDown className="h-4 w-4 group-open:hidden" />
+
+                                {/* open state */}
+                                <ArrowUp className="h-4 w-4 hidden group-open:block" />
+                            </span>
+                        </summary>
+
+                        <div className="space-y-6">
+                            {res.details.partnerHistory.map((history: any, index: any) => (
+                                <div key={index} className="items-center justify-center">
+                                    <Table>
+                                        <TableBody className="border border-gray-200 rounded-xl">
+                                            {Object.entries(history)
+                                                .filter(([key]) => key !== "_id")
+                                                .map(
+                                                    ([key, value]: any) =>
+                                                        value && (
+                                                            <TableRow key={key}>
+                                                                <TableCell className="font-medium">{key}</TableCell>
+                                                                <TableCell className="max-w-xs truncate text-right">
+                                                                    {typeof value === "object"
+                                                                        ? JSON.stringify(value, null, 1)
+                                                                        : value.toString()}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ),
+                                                )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            ))}
+                        </div>
+                    </details>
 
                     <h1 className="py-10 font-bold">Account Details</h1>
                     {res.accounts.map((account: any, index: any) => (

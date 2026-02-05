@@ -154,7 +154,8 @@ export default function Reports() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <span className="text-green-600">CredMantra </span> Lender Summary
-                        <Link href="/dashboard/reports2/LS" className="ml-auto">
+                        {/* <Link href="/dashboard/reports2/LS" className="ml-auto"> */}
+                        <Link href="/dashboard/temp" className="ml-auto">
                             <Button size="sm" variant="outline">
                                 LoanSparrow →
                             </Button>

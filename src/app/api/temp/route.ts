@@ -2,13 +2,14 @@ import { Readable } from "node:stream";
 import { format } from "@fast-csv/format";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { connectToMongoDB } from "../../../../lib/db";
 
 export async function POST(request: NextRequest) {
     await connectToMongoDB();
+    const conn = mongoose.connection;
 
-    if (!mongoose.connection.db) return NextResponse.json({ message: "DB not connected" }, { status: 500 });
+    if (!conn.db) return NextResponse.json({ message: "DB not connected" }, { status: 500 });
 
     const aggType = request.headers.get("x-agg-type");
 

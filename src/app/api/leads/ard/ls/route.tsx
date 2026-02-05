@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getLenderStats } from "@/lib/ardLs";
 
 // In-memory cache for ARD results
-const ardCache = new Map();
-const ARD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+// const ardCacheLS = new Map();
+// const ARD_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 function getCacheKey(startDate: any, endDate: any, options: any) {
     return JSON.stringify({ startDate, endDate, options });
@@ -61,23 +61,23 @@ export async function POST(request: NextRequest) {
         // Caching logic
         const cacheKey = getCacheKey(startDate, endDate, { fresh, beta, selectedLenders, perday });
         const now = Date.now();
-        // Purge expired cache entries
-        for (const [key, entry] of ardCache.entries()) {
-            if (now - entry.timestamp > ARD_CACHE_TTL_MS) {
-                ardCache.delete(key);
-            }
-        }
-        // Check cache
-        if (ardCache.has(cacheKey)) {
-            const entry = ardCache.get(cacheKey);
-            if (now - entry.timestamp <= ARD_CACHE_TTL_MS) {
-                return NextResponse.json({
-                    success: true,
-                    data: entry.data,
-                    cached: true,
-                });
-            }
-        }
+        // // Purge expired cache entries
+        // for (const [key, entry] of ardCacheLS.entries()) {
+        //     if (now - entry.timestamp > ARD_CACHE_TTL_MS) {
+        //         ardCacheLS.delete(key);
+        //     }
+        // }
+        // // Check cache
+        // if (ardCacheLS.has(cacheKey)) {
+        //     const entry = ardCacheLS.get(cacheKey);
+        //     if (now - entry.timestamp <= ARD_CACHE_TTL_MS) {
+        //         return NextResponse.json({
+        //             success: true,
+        //             data: entry.data,
+        //             cached: true,
+        //         });
+        //     }
+        // }
         // Cache miss: run aggregation
         const statsData = await getLenderStats(startDate, endDate, {
             fresh,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
             selectedLenders,
             perday,
         });
-        ardCache.set(cacheKey, { data: statsData, timestamp: now });
+        // ardCacheLS.set(cacheKey, { data: statsData, timestamp: now });
         // Return successful response
         return NextResponse.json({
             success: true,

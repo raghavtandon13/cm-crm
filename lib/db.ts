@@ -33,7 +33,8 @@ export async function connectToLS() {
         return cachedConnectionLS;
     }
     try {
-        const cnx = await mongoose.connect(process.env.MONGODB_URI_LS!);
+        // const cnx = await mongoose.connect(process.env.MONGODB_URI_LS!);
+        const cnx = await mongoose.connect(process.env.MONGODB_URI!);
         cachedConnectionLS = cnx.connection;
         return cachedConnectionLS;
     } catch (error) {
