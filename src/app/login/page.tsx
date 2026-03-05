@@ -1,10 +1,10 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import fromAPI from "@/lib/api";
-import { useState } from "react";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ export default function LoginForm() {
                 setYay(true);
                 window.location.href = "/dashboard";
             }
-        } catch (error: any) {
+        } catch (_error: any) {
             setError(true);
         } finally {
             setLoading(false);
@@ -42,24 +42,11 @@ export default function LoginForm() {
                     <CardContent className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="m@example.com"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            <Input id="email" onChange={(e) => setEmail(e.target.value)} placeholder="m@example.com" required type="email" value={email} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
+                            <Input id="password" onChange={(e) => setPassword(e.target.value)} required type="password" value={password} />
                         </div>
                     </CardContent>
                     {error && (
@@ -74,7 +61,7 @@ export default function LoginForm() {
                         </div>
                     )}
                     <CardFooter>
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button className="w-full" disabled={loading} type="submit">
                             {loading ? "Signing in..." : "Sign in"}
                         </Button>
                     </CardFooter>

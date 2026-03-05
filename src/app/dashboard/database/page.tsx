@@ -1,12 +1,13 @@
 "use client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Text, Loader2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader2, Text } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import fromAPI from "@/lib/api";
+
 // import superjson from "superjson";
 
 type NavItemProps = {
@@ -26,10 +27,7 @@ function NavItem({ href, label }: NavItemProps) {
     const isActive = searchParams.get("id") === href.split("=")[1];
 
     return (
-        <Link
-            href={href}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${isActive ? "bg-slate-200" : "hover:bg-muted"}`}
-        >
+        <Link className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${isActive ? "bg-slate-200" : "hover:bg-muted"}`} href={href}>
             <Text className="h-4 w-4" />
             {label}
         </Link>
@@ -92,11 +90,7 @@ export default function Create() {
                 <thead className="bg-gray-50">
                     <tr>
                         {headers.map((header) => (
-                            <th
-                                key={header}
-                                scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" key={header} scope="col">
                                 {header}
                             </th>
                         ))}
@@ -106,7 +100,7 @@ export default function Create() {
                     {data.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             {headers.map((header) => (
-                                <td key={header} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" key={header}>
                                     {typeof row[header] === "object" && row[header] !== null
                                         ? Array.isArray(row[header])
                                             ? renderTable(row[header])
@@ -149,7 +143,7 @@ export default function Create() {
                 <div className="sticky top-0 p-4">
                     <nav className="grid gap-2 text-sm font-medium">
                         {data?.map((query) => (
-                            <NavItem key={query.id} href={`/dashboard/database?id=${query.id}`} label={query.name} />
+                            <NavItem href={`/dashboard/database?id=${query.id}`} key={query.id} label={query.name} />
                         ))}
                     </nav>
                 </div>
@@ -160,12 +154,12 @@ export default function Create() {
                         <h2 className="text-lg font-semibold">{selectedQuery?.name}</h2>
                         <div className="flex gap-2">
                             <Button
+                                disabled={!queryText || runMutation.isPending}
                                 onClick={() =>
                                     runMutation.mutate({
                                         queryText: queryText,
                                     })
                                 }
-                                disabled={!queryText || runMutation.isPending}
                             >
                                 {runMutation.isPending ? (
                                     <>
@@ -177,13 +171,13 @@ export default function Create() {
                                 )}
                             </Button>
                             <Button
+                                disabled={!queryText || !queryName || saveMutation.isPending}
                                 onClick={() =>
                                     saveMutation.mutate({
                                         name: queryName,
                                         queryText: queryText,
                                     })
                                 }
-                                disabled={!queryText || !queryName || saveMutation.isPending}
                             >
                                 {saveMutation.isPending ? (
                                     <>
@@ -199,19 +193,19 @@ export default function Create() {
                     <Card>
                         <CardContent className="p-4">
                             <input
-                                type="text"
                                 className="w-full p-3 mb-4 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Query Name"
-                                value={queryName}
-                                onChange={(e) => setQueryName(e.target.value)}
                                 disabled={saveMutation.isPending}
+                                onChange={(e) => setQueryName(e.target.value)}
+                                placeholder="Query Name"
+                                type="text"
+                                value={queryName}
                             />
                             <textarea
                                 className={`w-full min-h-[200px] p-3 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500
                                     ${runMutation.isPending ? "bg-slate-100 cursor-not-allowed" : ""}`}
-                                value={queryText}
-                                onChange={(e) => setQueryText(e.target.value)}
                                 disabled={runMutation.isPending}
+                                onChange={(e) => setQueryText(e.target.value)}
+                                value={queryText}
                             />
                         </CardContent>
                     </Card>
@@ -219,10 +213,7 @@ export default function Create() {
                         <CardContent className="p-4">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-md font-semibold">Results</h3>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setViewMode(viewMode === "table" ? "json" : "table")}
-                                >
+                                <Button onClick={() => setViewMode(viewMode === "table" ? "json" : "table")} variant="outline">
                                     {viewMode === "table" ? "JSON" : "Table"}
                                 </Button>
                             </div>
@@ -237,9 +228,7 @@ export default function Create() {
                                     viewMode === "table" ? (
                                         renderTable(runMutation.data)
                                     ) : (
-                                        <pre className="whitespace-pre-wrap">
-                                            {JSON.stringify(runMutation.data, null, 2)}
-                                        </pre>
+                                        <pre className="whitespace-pre-wrap">{JSON.stringify(runMutation.data, null, 2)}</pre>
                                     )
                                 ) : (
                                     <p className="text-slate-500">Query results will appear here</p>

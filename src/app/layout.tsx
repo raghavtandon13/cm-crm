@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
-import { connectToMongoDB } from "../../lib/db";
-import { UserProvider } from "@/context/UserContext";
-import Providers from "@/context/Query";
 import { Toaster } from "@/components/ui/sonner";
+import Providers from "@/context/Query";
+import { UserProvider } from "@/context/UserContext";
+import { connectToMongoDB } from "../../lib/db";
 
 const inter = Inter({ subsets: ["latin"] });
 

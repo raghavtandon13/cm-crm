@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type JSX } from "react";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { type JSX, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "../ui/button";
 
 type Lender = "moneyview" | "smartcoin" | "zype" | "fatakpay_pl";
@@ -72,11 +72,11 @@ export default function LenderStatus({ phone }: { phone: string }) {
                 {lenders.map((lender) => (
                     <Dialog
                         key={lender}
-                        open={dialogOpen === lender}
                         onOpenChange={(open) => {
                             setDialogOpen(open ? lender : null);
                             if (open) fetchStatus(lender);
                         }}
+                        open={dialogOpen === lender}
                     >
                         <DialogTrigger asChild>
                             <Button variant="outline">{lender.replace(/_/g, " ").toUpperCase()}</Button>

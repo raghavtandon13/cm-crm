@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../lib/db";
+import { type NextRequest, NextResponse } from "next/server";
 import User from "@/lib/users";
+import { db } from "../../../../../lib/db";
 
 export async function GET(req: NextRequest) {
     try {
@@ -13,9 +13,7 @@ export async function GET(req: NextRequest) {
             include: {
                 Assignment: {
                     where: {
-                        ...(startDate && endDate
-                            ? { assignedAt: { gte: new Date(startDate), lte: new Date(endDate) } }
-                            : {}),
+                        ...(startDate && endDate ? { assignedAt: { gte: new Date(startDate), lte: new Date(endDate) } } : {}),
                     },
                 },
             },

@@ -94,24 +94,14 @@ async function buildAIPMatchQuery({
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const {
-            minAge,
-            maxAge,
-            minIncome,
-            pincodeCollection,
-            pincodeMatching = "R",
-            employment = "Salaried",
-            startDate,
-            endDate,
-            limit,
-        } = body;
+        const { minAge, maxAge, minIncome, pincodeCollection, pincodeMatching = "R", employment = "Salaried", startDate, endDate, limit } = body;
 
         await connectToMongoDB();
 
         const aipMatch = await buildAIPMatchQuery({
-            minAge: parseInt(minAge),
-            maxAge: parseInt(maxAge),
-            minIncome: parseInt(minIncome),
+            minAge: parseInt(minAge, 10),
+            maxAge: parseInt(maxAge, 10),
+            minIncome: parseInt(minIncome, 10),
             pincodeCollection,
             pincodeMatching,
         });

@@ -7,10 +7,7 @@ import { cn } from "@/lib/utils";
 
 // @ts-expect-error
 const ResizablePanelGroup = ({ className, ...props }: any) => (
-    <ResizablePrimitive.PanelGroup
-        className={cn("flex h-full w-full data-[panel-group-direction=vertical]:flex-col", className)}
-        {...props}
-    />
+    <ResizablePrimitive.PanelGroup className={cn("flex h-full w-full data-[panel-group-direction=vertical]:flex-col", className)} {...props} />
 );
 
 const ResizablePanel = ResizablePrimitive.Panel;

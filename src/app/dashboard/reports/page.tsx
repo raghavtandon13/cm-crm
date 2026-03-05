@@ -1,16 +1,15 @@
 "use client";
+import Link from "next/link";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LenderCharts } from "@/components/displays/lenderChart";
 // import { Table1 } from "@/components/displays/table1";
 import { UsersTable } from "@/components/displays/usersTable";
-// import MonthlyLenders from "@/components/monthlyLenders";
-import { LeadsTable } from "@/components/displays/leadsTable";
-import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
-import { LenderCharts } from "@/components/displays/lenderChart";
+
 // import { RealtimeStats } from "@/components/realtime";
 
 const chartData = [
@@ -150,22 +149,13 @@ export default function Reports() {
         <>
             {/* <RealtimeStats /> */}
             <div>
-                <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
-                    href="/dashboard/reports/incoming"
-                >
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/incoming">
                     Incoming Leads -{">"}{" "}
                 </Link>
-                <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
-                    href="/dashboard/reports/stats"
-                >
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/stats">
                     ARD Lender Stats -{">"}{" "}
                 </Link>
-                <Link
-                    className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")}
-                    href="/dashboard/reports/graphs"
-                >
+                <Link className={cn(buttonVariants({ variant: "card" }), "font-semibold mb-1")} href="/dashboard/reports/graphs">
                     Grapshs -{">"}{" "}
                 </Link>
             </div>
@@ -190,25 +180,24 @@ export default function Reports() {
                     </div>
                 </CardHeader>
                 <CardContent className="px-2 sm:p-6">
-                    <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+                    <ChartContainer className="aspect-auto h-[250px] w-full" config={chartConfig}>
                         <BarChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
                             <CartesianGrid vertical={false} />
                             <XAxis
-                                dataKey="date"
-                                tickLine={false}
                                 axisLine={false}
-                                tickMargin={8}
+                                dataKey="date"
                                 minTickGap={32}
                                 tickFormatter={(value) => {
                                     const date = new Date(value);
                                     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
                                 }}
+                                tickLine={false}
+                                tickMargin={8}
                             />
                             <ChartTooltip
                                 content={
                                     <ChartTooltipContent
                                         className="w-[150px]"
-                                        nameKey="views"
                                         labelFormatter={(value) => {
                                             return new Date(value).toLocaleDateString("en-US", {
                                                 month: "short",
@@ -216,6 +205,7 @@ export default function Reports() {
                                                 year: "numeric",
                                             });
                                         }}
+                                        nameKey="views"
                                     />
                                 }
                             />

@@ -1,9 +1,9 @@
-import { CMUser, Lead } from "@/lib/types";
-import User from "@/lib/users";
 import jwt from "jsonwebtoken";
-import { NextRequest, NextResponse } from "next/server";
-import { connectToMongoDB, db } from "../../../../../lib/db";
+import { type NextRequest, NextResponse } from "next/server";
 import fromAPI from "@/lib/api";
+import type { CMUser, Lead } from "@/lib/types";
+import User from "@/lib/users";
+import { connectToMongoDB, db } from "../../../../../lib/db";
 
 const secret = process.env.JWT_SECRET as string;
 const injectUri = process.env.INJECT_URI as string;
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const data = (await req.json()) as Lead & { inject?: boolean };
-        const inject = data.inject === true ? true : false;
+        const inject = data.inject === true;
         // const inject = false;
 
         let user = await User.findOne({ phone: data.phone });
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
                 { phone: data.phone },
                 {
                     $set: {
-                        name: data.firstName + " " + data.lastName,
+                        name: `${data.firstName} ${data.lastName}`,
                         email: data.email,
                         dob: data.dob,
                         gender: data.gender,
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
         } else {
             // Create new user if not found
             const newUser = new User<Partial<CMUser>>({
-                name: data.firstName + " " + data.lastName,
+                name: `${data.firstName} ${data.lastName}`,
                 phone: data.phone,
                 email: data.email,
                 dob: data.dob,
@@ -84,8 +84,7 @@ export async function POST(req: NextRequest) {
             user = await newUser.save();
         }
 
-        if (!user)
-            return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
+        if (!user) return NextResponse.json({ status: "failure", message: "Could not create new user" }, { status: 500 });
 
         let injectRes = { data: {} };
         console.log("inject:", inject);
@@ -104,16 +103,9 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        if (!partnerLead)
-            return NextResponse.json(
-                { status: "failure", message: extraMsg || "Could not create Assignment" },
-                { status: 500 },
-            );
+        if (!partnerLead) return NextResponse.json({ status: "failure", message: extraMsg || "Could not create Assignment" }, { status: 500 });
 
-        return NextResponse.json(
-            { status: "success", message: "User created successfully", inject: injectRes.data },
-            { status: 201 },
-        );
+        return NextResponse.json({ status: "success", message: "User created successfully", inject: injectRes.data }, { status: 201 });
     } catch (error) {
         console.error("Error injecting:", error);
         return NextResponse.json({ status: "failure", message: "Internal server error" }, { status: 500 });

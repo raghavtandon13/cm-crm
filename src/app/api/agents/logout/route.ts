@@ -1,11 +1,10 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../lib/db";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import { db } from "../../../../../lib/db";
+
 const secret = process.env.JWT_SECRET as string;
 export const dynamic = "force-dynamic";
-const IST_TIMEZONE = "Asia/Kolkata"; // Timezone for IST
-import { format, startOfDay } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+const _IST_TIMEZONE = "Asia/Kolkata"; // Timezone for IST
 
 export async function GET(req: NextRequest) {
     try {
@@ -13,7 +12,7 @@ export async function GET(req: NextRequest) {
         const token = req.headers.get("Authorization")?.split(" ")[1];
         if (!token) return NextResponse.json({ message: "No token provided" }, { status: 401 });
         const { id } = jwt.verify(token, secret) as { id: string };
-        const agent = await db.agent.findUnique({ where: { id }, include: { role: true } });
+        const _agent = await db.agent.findUnique({ where: { id }, include: { role: true } });
 
         // Attendance
         //    if (agent) {

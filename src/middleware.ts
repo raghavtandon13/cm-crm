@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { DASHBOARD_ROUTES, DEFAULT_REDIRECTS, RoleTitle } from "@/lib/roles";
+import { DASHBOARD_ROUTES, DEFAULT_REDIRECTS, type RoleTitle } from "@/lib/roles";
 import { http } from "./lib/api";
 
 export async function middleware(request: NextRequest) {

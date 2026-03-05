@@ -10,7 +10,7 @@ const getHeaders = (data?: any, additionalHeaders?: Record<string, string>) => {
 
     const token = Cookie.get("cm-token");
     if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
     }
 
     /**

@@ -1,8 +1,9 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../lib/db";
-import { startOfDay } from "date-fns";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import { db } from "../../../../../lib/db";
+
 const secret = process.env.JWT_SECRET as string;
+
 import bcrypt from "bcryptjs";
 export const dynamic = "force-dynamic";
 

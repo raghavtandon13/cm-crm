@@ -1,16 +1,16 @@
 "use client";
-import fromAPI from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { format, startOfMonth } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { BarChartComponent as BarChart } from "@/components/displays/barChart";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { DateRange } from "react-day-picker";
-import { format, startOfMonth } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function Graphs() {
     // State and dates
@@ -83,18 +83,16 @@ export default function Graphs() {
 
     // Function to transform raw data into a graph data
     const transformData = (data: any) => {
-        return data
-            .map((item: any) => {
-                const transformedCounts = item.groupCounts.map((groupCount: any) => {
-                    const transformedGroup: any = { group: groupCount.group };
-                    groupCount.counts.forEach((count: any) => {
-                        transformedGroup[count.status] = count.count;
-                    });
-                    return transformedGroup;
+        return data.flatMap((item: any) => {
+            const transformedCounts = item.groupCounts.map((groupCount: any) => {
+                const transformedGroup: any = { group: groupCount.group };
+                groupCount.counts.forEach((count: any) => {
+                    transformedGroup[count.status] = count.count;
                 });
-                return transformedCounts;
-            })
-            .flat();
+                return transformedGroup;
+            });
+            return transformedCounts;
+        });
     };
 
     // Transform and filtered ARD data
@@ -113,9 +111,7 @@ export default function Graphs() {
         });
 
     // Transform employment data
-    const transformedEmploymentData = transformData(employmentData || []).filter((item: any) =>
-        ["Salaried", "Self-employed"].includes(item.group),
-    );
+    const transformedEmploymentData = transformData(employmentData || []).filter((item: any) => ["Salaried", "Self-employed"].includes(item.group));
 
     // Transform and aggregate gender data
     const transformedGenderData = transformData(genderData || [])
@@ -156,7 +152,7 @@ export default function Graphs() {
         <div>
             {/* Controls for selecting lender, partner, and date range */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
-                <Select value={lender} onValueChange={(v) => setLender(v)}>
+                <Select onValueChange={(v) => setLender(v)} value={lender}>
                     <SelectTrigger className="bg-white w-[350px]">
                         <SelectValue placeholder="Select Lender" />
                     </SelectTrigger>
@@ -181,7 +177,7 @@ export default function Graphs() {
                         <SelectItem value="Zype">Zype</SelectItem>
                     </SelectContent>
                 </Select>
-                <Select value={partner} onValueChange={(v) => setPartner(v)}>
+                <Select onValueChange={(v) => setPartner(v)} value={partner}>
                     <SelectTrigger className="bg-white w-[350px]">
                         <SelectValue placeholder="Select Partner" />
                     </SelectTrigger>
@@ -191,7 +187,7 @@ export default function Graphs() {
                         <SelectItem value="MoneyTap">MoneyTap</SelectItem>
                     </SelectContent>
                 </Select>
-                <Select value={datetype} onValueChange={(v) => setDatetype(v)}>
+                <Select onValueChange={(v) => setDatetype(v)} value={datetype}>
                     <SelectTrigger className="bg-white w-[150px]">
                         <SelectValue placeholder="Date Type" />
                     </SelectTrigger>
@@ -202,14 +198,7 @@ export default function Graphs() {
                 </Select>
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -224,15 +213,8 @@ export default function Graphs() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
                 <Button onClick={refetchAll} variant="outline">
@@ -245,31 +227,10 @@ export default function Graphs() {
             </div>
             {/* Display bar charts for age, employment, and gender distributions */}
             <div className="flex flex-wrap gap-4">
-                <BarChart
-                    data={transformedAgeData}
-                    title="Age Distribution"
-                    config={ageConfig}
-                    loading={isFetchingAge}
-                />
-                <BarChart
-                    data={transformedEmploymentData}
-                    title="Employment Distribution"
-                    config={employmentConfig}
-                    loading={isFetchingEmployment}
-                />
-                <BarChart
-                    data={transformedGenderData}
-                    title="Gender Distribution"
-                    config={genderConfig}
-                    loading={isFetchingGender}
-                />
-                <BarChart
-                    data={transformedArdData}
-                    multi={false}
-                    title="Total ARD"
-                    config={ardConfig}
-                    loading={isFetchingARD}
-                />
+                <BarChart config={ageConfig} data={transformedAgeData} loading={isFetchingAge} title="Age Distribution" />
+                <BarChart config={employmentConfig} data={transformedEmploymentData} loading={isFetchingEmployment} title="Employment Distribution" />
+                <BarChart config={genderConfig} data={transformedGenderData} loading={isFetchingGender} title="Gender Distribution" />
+                <BarChart config={ardConfig} data={transformedArdData} loading={isFetchingARD} multi={false} title="Total ARD" />
             </div>
         </div>
     );

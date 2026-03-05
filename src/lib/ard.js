@@ -2,38 +2,50 @@
 // biome-ignore-all lint/suspicious/useIterableCallbackReturn: script file
 // biome-ignore-all lint/suspicious/noAssignInExpressions: script file
 
-import mongoose from "mongoose";
 import Table from "cli-table3";
-import User from "./users.ts";
+import mongoose from "mongoose";
 import { connectToMongoDB } from "../../lib/db.ts";
+import User from "./users.ts";
+
 const DEBUG = false;
 
 function formatNumberIndianStyle(number) {
     const x = number.toString().split(".");
     let lastThree = x[0].substring(x[0].length - 3);
     const otherNumbers = x[0].substring(0, x[0].length - 3);
-    if (otherNumbers !== "") lastThree = "," + lastThree;
+    if (otherNumbers !== "") lastThree = `,${lastThree}`;
     const result = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-    return x.length > 1 ? result + "." + x[1] : result;
+    return x.length > 1 ? `${result}.${x[1]}` : result;
 }
 
 // prettier-ignore
 export const lenderConditions = {
     bharatloan: [
-	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
-	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
-	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+        { case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+        { case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+        { case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] },
+            then: "Rejected",
+        },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] },
+            then: "Rejected",
+        },
+        { case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+        { case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
     ],
 
     brightloan: [
         { case: { $eq: ["$Message", "Customer Already Exist"] }, then: "Deduped" },
         { case: { $eq: ["$Message", "Lead Created Successfully"] }, then: "Accepted" },
-        { case: { $eq: [ "$Message", "Lead Creation Failed, Please try again after some time. Eligibility is not match" ] }, then: "Rejected" },
+        {
+            case: {
+                $eq: ["$Message", "Lead Creation Failed, Please try again after some time. Eligibility is not match"],
+            },
+            then: "Rejected",
+        },
         { case: { $eq: ["$Error", "Age must be between 21 and 56 years."] }, then: "Errors" },
     ],
 
@@ -45,7 +57,12 @@ export const lenderConditions = {
     creditlinks: [
         { case: { $eq: ["$message", "Not eligible"] }, then: "Rejected" },
         { case: { $eq: ["$message", "The lead is already created."] }, then: "Deduped" },
-        { case: { $and: [ { $ne: [ "$leadId", null ] }, { $or: [ { $eq: [ "$message", null ] }, { $not: [ "$message" ] } ] } ] }, then: "Accepted" },
+        {
+            case: {
+                $and: [{ $ne: ["$leadId", null] }, { $or: [{ $eq: ["$message", null] }, { $not: ["$message"] }] }],
+            },
+            then: "Accepted",
+        },
         { case: { $eq: ["$message", "Eligible"] }, then: "Accepted" },
         { case: { $eq: ["$message", "Lead created successfully."] }, then: "Accepted" },
     ],
@@ -67,8 +84,18 @@ export const lenderConditions = {
     ],
 
     fatakpay_pl: [
-        { case: { $and: [ { $ne: [ { $type: "$max_eligibility_amount" }, "missing" ] }, { $ne: [ "$max_eligibility_amount", null ] } ] }, then: "Accepted" },
-        { case: { $and: [ { $ne: [ { $type: "$data.max_eligibility_amount" }, "missing" ] }, { $ne: [ "$data.max_eligibility_amount", null ] } ] }, then: "Accepted" },
+        {
+            case: {
+                $and: [{ $ne: [{ $type: "$max_eligibility_amount" }, "missing"] }, { $ne: ["$max_eligibility_amount", null] }],
+            },
+            then: "Accepted",
+        },
+        {
+            case: {
+                $and: [{ $ne: [{ $type: "$data.max_eligibility_amount" }, "missing"] }, { $ne: ["$data.max_eligibility_amount", null] }],
+            },
+            then: "Accepted",
+        },
         { case: { $eq: ["$message", "Lead already exists"] }, then: "Deduped" },
         { case: { $eq: ["$message", "User already exists in the system."] }, then: "Deduped" },
         { case: { $eq: ["$message", "Loan Application already exists"] }, then: "Deduped" },
@@ -78,8 +105,6 @@ export const lenderConditions = {
         { case: { $eq: ["$status.message", "Lead created successfully"] }, then: "Accepted" },
         { case: { $eq: ["$status.message", "Lead already exists with given user identifiers"] }, then: "Deduped" },
     ],
-
-
 
     kamakshi: [
         { case: { $eq: ["$msg", "Lead created successfully."] }, then: "Accepted" },
@@ -110,15 +135,21 @@ export const lenderConditions = {
         { case: { $eq: ["$error", "Unable to process the request"] }, then: "Errors" },
     ],
 
-    loan112 : [
-	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
-	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
-	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+    loan112: [
+        { case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+        { case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+        { case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] },
+            then: "Rejected",
+        },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] },
+            then: "Rejected",
+        },
+        { case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+        { case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
     ],
 
     loantap: [
@@ -132,7 +163,12 @@ export const lenderConditions = {
     ],
 
     moneyview2: [
-        { case: { $gt: [ { $cond: { if: { $isArray: "$offerObjects" }, then: { $size: "$offerObjects" }, else: 0 } }, 0 ] }, then: "Accepted" },
+        {
+            case: {
+                $gt: [{ $cond: { if: { $isArray: "$offerObjects" }, then: { $size: "$offerObjects" }, else: 0 } }, 0],
+            },
+            then: "Accepted",
+        },
         { case: { $eq: ["$message", "Duplicate lead found in MV"] }, then: "Deduped" },
         { case: { $eq: ["$message", "dedupe found"] }, then: "Deduped" },
         { case: { $eq: ["$message", "Lead has been expired."] }, then: "Rejected" },
@@ -153,8 +189,31 @@ export const lenderConditions = {
     moneyview: [
         { case: { $in: ["$message", ["Duplicate lead found in MV", "dedupe found"]] }, then: "Deduped" },
         { case: { $in: ["$message", ["Lead has been expired.", "Lead has been rejected."]] }, then: "Rejected" },
-        { case: { $in: [ "$message", [ "No dedupe found", "Invalid employment type", "Invalid Age", "Invalid PAN", "Invalid or Missing phone number", "Invalid education level", "Invalid data to get offer for lead", "Server call failed. Please try again.", "Error while verification of lead", "Loan Application status is invalid.", "Error in fetching offers" ] ] }, then: "Errors" },
-        { case: { $gt: [ { $cond: [ { $isArray: "$offerObjects" }, { $size: "$offerObjects" }, 0 ] }, 0 ] }, then: "Accepted" },
+        {
+            case: {
+                $in: [
+                    "$message",
+                    [
+                        "No dedupe found",
+                        "Invalid employment type",
+                        "Invalid Age",
+                        "Invalid PAN",
+                        "Invalid or Missing phone number",
+                        "Invalid education level",
+                        "Invalid data to get offer for lead",
+                        "Server call failed. Please try again.",
+                        "Error while verification of lead",
+                        "Loan Application status is invalid.",
+                        "Error in fetching offers",
+                    ],
+                ],
+            },
+            then: "Errors",
+        },
+        {
+            case: { $gt: [{ $cond: [{ $isArray: "$offerObjects" }, { $size: "$offerObjects" }, 0] }, 0] },
+            then: "Accepted",
+        },
     ],
 
     mpocket: [
@@ -169,25 +228,74 @@ export const lenderConditions = {
     ],
 
     myflot: [
-        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Fresh_Lead" ] } ] }, then: "Accepted" },
-        { case: { $and: [ { $eq: [ "$data.status", "new" ] }, { $eq: [ "$data.leadStatus", "Rejected" ] } ] }, then: "Rejected" },
-        { case: { $eq: [ "$status", "existing" ] }, then: "Deduped" },
-        { case: { $or: [ { $eq: [ "$message", "Some error occurred" ] }, { $eq: [ "$message", "System is under maintenance Please try after some time :)" ] } ] }, then: "Errors" },
-        { case: { $or: [ { $eq: [ "$message", "Invalid occupation" ] }, { $eq: [ "$message", "Invalid monthly income" ] }, { $eq: [ "$message", "Invalid or missing pincode" ] } ] }, then: "Errors" },
+        {
+            case: { $and: [{ $eq: ["$data.status", "new"] }, { $eq: ["$data.leadStatus", "Fresh_Lead"] }] },
+            then: "Accepted",
+        },
+        {
+            case: { $and: [{ $eq: ["$data.status", "new"] }, { $eq: ["$data.leadStatus", "Rejected"] }] },
+            then: "Rejected",
+        },
+        { case: { $eq: ["$status", "existing"] }, then: "Deduped" },
+        {
+            case: {
+                $or: [{ $eq: ["$message", "Some error occurred"] }, { $eq: ["$message", "System is under maintenance Please try after some time :)"] }],
+            },
+            then: "Errors",
+        },
+        {
+            case: {
+                $or: [
+                    { $eq: ["$message", "Invalid occupation"] },
+                    { $eq: ["$message", "Invalid monthly income"] },
+                    { $eq: ["$message", "Invalid or missing pincode"] },
+                ],
+            },
+            then: "Errors",
+        },
     ],
 
     payme: [
-        { case: { $or: [ { $eq: [ "$message", "Signed-in Successfully" ] }, { $eq: [ "$message", "Limit get successfully" ] }, { $eq: [ "$message", "Document status get api worked well!!" ] } ] }, then: "Accepted" },
-        { case: { $or: [ { $eq: [ "$message", "user_found" ] }, { $eq: [ "$message", "User register api stucked into exception!!" ] } ] }, then: "Deduped" },
+        {
+            case: {
+                $or: [
+                    { $eq: ["$message", "Signed-in Successfully"] },
+                    { $eq: ["$message", "Limit get successfully"] },
+                    { $eq: ["$message", "Document status get api worked well!!"] },
+                ],
+            },
+            then: "Accepted",
+        },
+        {
+            case: {
+                $or: [{ $eq: ["$message", "user_found"] }, { $eq: ["$message", "User register api stucked into exception!!"] }],
+            },
+            then: "Deduped",
+        },
         { case: { $eq: ["$message", "user_not_found"] }, then: "Rejected" },
-        { case: { $or: [ { $eq: [ "$detail", "Request was throttled. Expected available in 1 second." ] }, { $eq: [ "$error", "Please Enter Valid Email" ] } ] }, then: "Errors" },
+        {
+            case: {
+                $or: [{ $eq: ["$detail", "Request was throttled. Expected available in 1 second."] }, { $eq: ["$error", "Please Enter Valid Email"] }],
+            },
+            then: "Errors",
+        },
     ],
 
     ramfin: [
-        { case: { $eq: [ "$dedupe", "Success" ] }, then: "Accepted" },
-        { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $ne: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Accepted" },
+        { case: { $eq: ["$dedupe", "Success"] }, then: "Accepted" },
+        {
+            case: {
+                $and: [{ $eq: ["$msg", "Success"] }, { $ne: ["$updated_status.message", "This customer is not associated with you."] }],
+            },
+            then: "Accepted",
+        },
         { case: { $eq: ["$status", "Dedupe"] }, then: "Deduped" },
-        { case: { $and: [ { $eq: [ "$msg", "Success" ] }, { $eq: [ "$updated_status.message", "This customer is not associated with you." ] } ] }, then: "Rejected" },
+        {
+            case: {
+                $and: [{ $eq: ["$msg", "Success"] }, { $eq: ["$updated_status.message", "This customer is not associated with you."] }],
+            },
+            then: "Rejected",
+        },
         { case: { $regexMatch: { input: "$message", regex: /Issue/i } }, then: "Rejected" },
         { case: { $eq: ["$message", "The pancard field is required."] }, then: "Rejected" },
         { case: { $eq: ["$message", "Too Many Attempts."] }, then: "Errors" },
@@ -196,25 +304,37 @@ export const lenderConditions = {
     ],
 
     rupee112: [
-	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
-	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
-	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+        { case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+        { case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+        { case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] },
+            then: "Rejected",
+        },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] },
+            then: "Rejected",
+        },
+        { case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+        { case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
     ],
 
     rupeeontime: [
-	{ case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
-	{ case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
-	{ case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
-	{ case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
+        { case: { $eq: ["$message", "Accepted Successfully"] }, then: "Accepted" },
+        { case: { $eq: ["$error", "Customer Already Exist"] }, then: "Deduped" },
+        { case: { $eq: ["$message", "Data not accepted as eligibility not matched"] }, then: "Rejected" },
+        { case: { $eq: ["$message", "The Email field is required."] }, then: "Rejected" },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field cannot exceed 7 characters in length."] },
+            then: "Rejected",
+        },
+        {
+            case: { $eq: ["$message", "The Monthly Salary field must be at least 5 characters in length."] },
+            then: "Rejected",
+        },
+        { case: { $eq: ["$error", "Age must be between 21 and 56 years."] }, then: "Rejected" },
+        { case: { $eq: ["$error", "Monthly Salary must be at least 25,000."] }, then: "Rejected" },
     ],
 
     salarynow: [
@@ -232,7 +352,12 @@ export const lenderConditions = {
         { case: { $eq: ["$message", "Lead created successfully"] }, then: "Accepted" },
         { case: { $eq: ["$message", "socket hang up"] }, then: "Errors" },
         { case: { $eq: ["$message", "read ECONNRESET"] }, then: "Errors" },
-        { case: { $eq: [ "$message", "Client network socket disconnected before secure TLS connection was established" ] }, then: "Errors" },
+        {
+            case: {
+                $eq: ["$message", "Client network socket disconnected before secure TLS connection was established"],
+            },
+            then: "Errors",
+        },
         { case: { $eq: ["$message", "write ETIMEDOUT"] }, then: "Errors" },
         { case: { $eq: ["$message", "write EPIPE"] }, then: "Errors" },
         { case: { $regexMatch: { input: "$message", regex: /(Request failed)/i } }, then: "Errors" },
@@ -242,7 +367,12 @@ export const lenderConditions = {
         { case: { $eq: ["$Message", "Lead generated successfully."] }, then: "Accepted" },
         { case: { $eq: ["$Message", "Eligibility Failed"] }, then: "Rejected" },
         { case: { $eq: ["$Message", "Monthly income is not eligible for the loan."] }, then: "Rejected" },
-        { case: { $eq: [ "$Message", "You are not eligible for the loan as there is an active loan with the same PAN number." ] }, then: "Deduped" },
+        {
+            case: {
+                $eq: ["$Message", "You are not eligible for the loan as there is an active loan with the same PAN number."],
+            },
+            then: "Deduped",
+        },
     ],
 
     spheet: [
@@ -251,10 +381,58 @@ export const lenderConditions = {
     ],
 
     vivifi: [
-      { case: { $eq: ["$1.Message", "Application Accepted"] }, then: "Accepted" },
-      { case: { $gt: [{ $size: { $setIntersection: [{ $ifNull: ["$errorMessage.Message", []] }, ["Email already exist", "Pan already exist", "Already Have an Account With the provided Email", "Phone number already exist", "Profile already exist"]] } }, 0] }, then: "Deduped" },
-      { case: { $gt: [{ $size: { $setIntersection: [{ $ifNull: ["$errorMessage.Message", []] }, ["Lead rejected!", "Lead rejected."]] } }, 0] }, then: "Rejected" },
-      { case: { $gt: [{ $size: { $setIntersection: [{ $ifNull: ["$errorMessage.Message", []] }, ["Missing Email", "Invalid PanNumber", "Invalid DateOfBirth", "Invalid Email"]] } }, 0] }, then: "Errors" }
+        { case: { $eq: ["$1.Message", "Application Accepted"] }, then: "Accepted" },
+        {
+            case: {
+                $gt: [
+                    {
+                        $size: {
+                            $setIntersection: [
+                                { $ifNull: ["$errorMessage.Message", []] },
+                                [
+                                    "Email already exist",
+                                    "Pan already exist",
+                                    "Already Have an Account With the provided Email",
+                                    "Phone number already exist",
+                                    "Profile already exist",
+                                ],
+                            ],
+                        },
+                    },
+                    0,
+                ],
+            },
+            then: "Deduped",
+        },
+        {
+            case: {
+                $gt: [
+                    {
+                        $size: {
+                            $setIntersection: [{ $ifNull: ["$errorMessage.Message", []] }, ["Lead rejected!", "Lead rejected."]],
+                        },
+                    },
+                    0,
+                ],
+            },
+            then: "Rejected",
+        },
+        {
+            case: {
+                $gt: [
+                    {
+                        $size: {
+                            $setIntersection: [
+                                { $ifNull: ["$errorMessage.Message", []] },
+                                ["Missing Email", "Invalid PanNumber", "Invalid DateOfBirth", "Invalid Email"],
+                            ],
+                        },
+                    },
+                    0,
+                ],
+            },
+            then: "Errors",
+        },
     ],
 
     zype: [
@@ -271,16 +449,49 @@ export const lenderConditions = {
     ],
 };
 
-
-
 // prettier-ignore
 const lenderAIPConfig = [
-    { name: "CreditLinks", minAge: 22, maxAge: 55, minSalary: 15_000, active: true, employment: "Both", pincodeType: "N" },
-    { name: "FatakPay", minAge: 21, maxAge: 55, minSalary: 21_000, active: true, employment: "Salaried", pincodeType: "B", pincodeName: "Fatak" },
+    {
+        name: "CreditLinks",
+        minAge: 22,
+        maxAge: 55,
+        minSalary: 15_000,
+        active: true,
+        employment: "Both",
+        pincodeType: "N",
+    },
+    {
+        name: "FatakPay",
+        minAge: 21,
+        maxAge: 55,
+        minSalary: 21_000,
+        active: true,
+        employment: "Salaried",
+        pincodeType: "B",
+        pincodeName: "Fatak",
+    },
     { name: "MPocket", minAge: 18, maxAge: 60, minSalary: 15_000, active: true, employment: "Both", pincodeType: "N" },
     { name: "RamFin", minAge: 21, maxAge: 58, minSalary: 18_000, active: true, employment: "Both", pincodeType: "N" },
-    { name: "SmartCoin", minAge: 21, maxAge: 45, minSalary: 18_000, active: true, employment: "Both", pincodeType: "R", pincodeName: "SmartCoin" },
-    { name: "Zype", minAge: 21, maxAge: 45, minSalary: 17_000, active: true, employment: "Salaried", pincodeType: "B", pincodeName: "Zype" },
+    {
+        name: "SmartCoin",
+        minAge: 21,
+        maxAge: 45,
+        minSalary: 18_000,
+        active: true,
+        employment: "Both",
+        pincodeType: "R",
+        pincodeName: "SmartCoin",
+    },
+    {
+        name: "Zype",
+        minAge: 21,
+        maxAge: 45,
+        minSalary: 17_000,
+        active: true,
+        employment: "Salaried",
+        pincodeType: "B",
+        pincodeName: "Zype",
+    },
 ];
 
 // Core function to get lender stats
@@ -295,20 +506,12 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
     const endDate = new Date(endDateStr);
     DEBUG && console.log(startDate, endDate);
 
-    const db = conn.db
+    const db = conn.db;
     const collections = await db.listCollections().toArray();
 
     const accountCollections = collections.map((c) => c.name).filter((name) => name.endsWith("-accounts"));
 
-    const freshRelevantLenders = new Set([
-        "zype",
-        "fatakpay",
-        "mpocket",
-        "smartcoin",
-        "ramfin",
-        "creditlinks",
-        "moneyview",
-    ]);
+    const freshRelevantLenders = new Set(["zype", "fatakpay", "mpocket", "smartcoin", "ramfin", "creditlinks", "moneyview"]);
     let freshLeads = [];
 
     const now = new Date();
@@ -316,10 +519,7 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
     yesterday.setDate(now.getDate() - 1);
 
     if (fresh) {
-        const freshLeadsDocs = await User.find(
-            { latestPartnerDate: { $gte: startDate, $lt: endDate } },
-            { phone: 1, _id: 0 },
-        );
+        const freshLeadsDocs = await User.find({ latestPartnerDate: { $gte: startDate, $lt: endDate } }, { phone: 1, _id: 0 });
 
         freshLeads = freshLeadsDocs.map((doc) => doc.phone);
     }
@@ -361,7 +561,7 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
         }
 
         const lender = selectedLenders[0];
-        const collName = lender + "-accounts";
+        const collName = `${lender}-accounts`;
 
         const data = await db.collection(collName).aggregate(aggPipelinePerDay(lender)).toArray();
 
@@ -400,13 +600,7 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
                 if (fresh && config) {
                     let aipQuery;
                     if (config.pincodeName) {
-                        aipQuery = await buildAIPMatchQuery(
-                            config.minAge,
-                            config.maxAge,
-                            config.minIncome,
-                            config.pincodeName,
-                            config.pincodeType,
-                        );
+                        aipQuery = await buildAIPMatchQuery(config.minAge, config.maxAge, config.minIncome, config.pincodeName, config.pincodeType);
                     } else {
                         aipQuery = await buildAIPMatchQuery(config.minAge, config.maxAge, config.minIncome);
                     }
@@ -416,9 +610,7 @@ export async function getLenderStats(startDateStr, endDateStr, options = {}) {
                                 $and: [
                                     { phone: { $in: freshLeads } },
                                     {
-                                        ...(config.employment.toLowerCase() !== "both"
-                                            ? { employment: config.employment }
-                                            : {}),
+                                        ...(config.employment.toLowerCase() !== "both" ? { employment: config.employment } : {}),
                                     },
                                     ...aipQuery,
                                 ],
@@ -479,7 +671,7 @@ function displayResults(statsData) {
             ]);
         });
 
-        DEBUG && console.log("\n" + table.toString());
+        DEBUG && console.log(`\n${table.toString()}`);
         DEBUG && console.log(`Total time taken: ${statsData.meta.executionTime} seconds`);
         return;
     }
@@ -491,10 +683,7 @@ function displayResults(statsData) {
     DEBUG && console.log("\n📅 Date range:", statsData.dateRange.start, "→", statsData.dateRange.end);
 
     if (statsData.options.fresh) {
-        DEBUG &&
-            console.log(
-                `🔄 Fresh mode is ON – using partnerHistory to filter users. ${statsData.options.beta ? "(beta)" : ""}`,
-            );
+        DEBUG && console.log(`🔄 Fresh mode is ON – using partnerHistory to filter users. ${statsData.options.beta ? "(beta)" : ""}`);
         DEBUG && console.log(`⭐ Total Fresh Leads: ${formatNumberIndianStyle(statsData.options.freshLeadsCount)}`);
     }
 
@@ -516,7 +705,7 @@ function displayResults(statsData) {
         ]);
     });
 
-    DEBUG && console.log("\n" + table.toString());
+    DEBUG && console.log(`\n${table.toString()}`);
     DEBUG && console.log(`Total time taken: ${statsData.meta.executionTime} seconds`);
 }
 
@@ -623,9 +812,7 @@ Examples:
     const startDate = args[0];
     const endDate = args[1];
     const selectedLendersArg = args[2] && !args[2].startsWith("--") ? args[2] : null;
-    const selectedLenders = selectedLendersArg
-        ? selectedLendersArg.split(",").map((l) => l.trim().toLowerCase())
-        : null;
+    const selectedLenders = selectedLendersArg ? selectedLendersArg.split(",").map((l) => l.trim().toLowerCase()) : null;
 
     const freshArg = args.find((arg) => arg.startsWith("--fresh="));
     const fresh = freshArg ? freshArg.split("=")[1] === "true" : false;

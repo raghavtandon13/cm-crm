@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 
@@ -448,9 +448,7 @@ export function LenderCharts() {
 
     return (
         <>
-            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>
-                Accepted Leads per Lender &#8628;
-            </h1>
+            <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>Accepted Leads per Lender &#8628;</h1>
             <Card className="max-w-full">
                 <CardHeader className="p-4">
                     <CardTitle className="text-sm">Accepted Leads</CardTitle>
@@ -460,10 +458,10 @@ export function LenderCharts() {
                     <div className="flex gap-2 mb-4 flex-wrap">
                         {Object.keys(lenders).map((lender) => (
                             <button
-                                key={lender}
                                 className={cn(buttonVariants({ variant: "outline" }), {
                                     "bg-gray-200": visibleLenders[lender],
                                 })}
+                                key={lender}
                                 onClick={() => toggleLenderVisibility(lender)}
                             >
                                 {lender}
@@ -476,7 +474,7 @@ export function LenderCharts() {
                             })}
                             onClick={() => {
                                 const allVisible = Object.values(visibleLenders).every(Boolean);
-                                const newVisibility = Object.keys(visibleLenders).reduce((acc:any, lender) => {
+                                const newVisibility = Object.keys(visibleLenders).reduce((acc: any, lender) => {
                                     acc[lender] = !allVisible;
                                     return acc;
                                 }, {});
@@ -486,7 +484,7 @@ export function LenderCharts() {
                             {Object.values(visibleLenders).every(Boolean) ? "None" : "All"}
                         </button>
                     </div>
-                    <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                    <ChartContainer className="h-[250px] w-full" config={chartConfig}>
                         <LineChart
                             accessibilityLayer
                             data={filteredChartData}
@@ -496,25 +494,19 @@ export function LenderCharts() {
                             }}
                         >
                             <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="week"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={4}
-                                tickFormatter={(value) => value}
-                            />
+                            <XAxis axisLine={false} dataKey="week" tickFormatter={(value) => value} tickLine={false} tickMargin={4} />
                             <YAxis />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                            <ChartTooltip content={<ChartTooltipContent />} cursor={false} />
                             {Object.keys(visibleLenders).map(
                                 (lender) =>
                                     visibleLenders[lender] && (
                                         <Line
-                                            key={lender}
                                             dataKey={lender}
-                                            type="natural"
+                                            dot={true}
+                                            key={lender}
                                             stroke={chartConfig[lender].color} // Use the assigned color
                                             strokeWidth={3}
-                                            dot={true}
+                                            type="natural"
                                         />
                                     ),
                             )}

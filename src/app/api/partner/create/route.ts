@@ -6,8 +6,8 @@ DSA can create  subDSA. then role id should be 3 for subdsa
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { NextResponse, NextRequest } from "next/server";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -18,12 +18,9 @@ export async function POST(req: NextRequest) {
     const { id } = jwt.verify(token, secret) as { id: string };
     const dsa = await db.partner.findUnique({ where: { id }, include: { role: true } });
     const boss = await db.agent.findUnique({ where: { id }, include: { role: true } });
-    if (!dsa && !boss)
-        return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
-    if (!!boss && boss.role.title !== "BOSS")
-        return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
-    if (!!dsa && dsa.role.title !== "DSA")
-        return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    if (!dsa && !boss) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
+    if (!!boss && boss.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    if (!!dsa && dsa.role.title !== "DSA") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
 
     // testing
     // const boss = true;
@@ -46,7 +43,7 @@ export async function POST(req: NextRequest) {
         const newPartner = await db.partner.create({
             data: {
                 email: body.email,
-                name: body.firstName + " " + body.lastName,
+                name: `${body.firstName} ${body.lastName}`,
                 password: hashedPassword,
                 roleId: roleId,
                 ...(dsa && { parentId: dsa.id }),
@@ -54,7 +51,7 @@ export async function POST(req: NextRequest) {
             include: { role: true },
         });
 
-        const token = jwt.sign({ id: newPartner.id, email: newPartner.email }, secret, { expiresIn: "10h" });
+        const _token = jwt.sign({ id: newPartner.id, email: newPartner.email }, secret, { expiresIn: "10h" });
         const response = NextResponse.json({ status: "success", message: "Partner created successfully" });
         return response;
     } catch (error) {

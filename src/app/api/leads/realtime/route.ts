@@ -1,5 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
-import User from "@/lib/users";
+import { type NextRequest, NextResponse } from "next/server";
 import { connectToMongoDB } from "../../../../../lib/db";
 
 export async function GET(_req: NextRequest) {

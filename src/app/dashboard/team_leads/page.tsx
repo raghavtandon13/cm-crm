@@ -1,18 +1,18 @@
 "use client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { CalendarIcon, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useUser } from "@/context/UserContext";
 import fromAPI from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { CalendarIcon, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 
 function formatDate(utcDateStr: any) {
     const utcDate = new Date(utcDateStr);
@@ -58,7 +58,7 @@ interface AgentData {
 
 export default function MyLeads() {
     const user = useUser();
-    let qa = user?.role?.title === "QA";
+    const qa = user?.role?.title === "QA";
 
     const [searchPhone, setSearchPhone] = useState("");
     const [searchResult, setSearchResult] = useState("");
@@ -140,15 +140,7 @@ export default function MyLeads() {
     });
 
     const statusMutation = useMutation({
-        mutationFn: async ({
-            assignmentId,
-            status,
-            subStatus,
-        }: {
-            assignmentId: string;
-            status: string;
-            subStatus: string;
-        }) => {
+        mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
             await fromAPI.post("/agents/assignments/change", {
                 assignmentId,
                 status,
@@ -165,11 +157,7 @@ export default function MyLeads() {
         },
     });
 
-    const handleStatusChangeLocal = (
-        e: React.ChangeEvent<HTMLSelectElement>,
-        type: "status" | "subStatus",
-        lead: Assignment,
-    ) => {
+    const handleStatusChangeLocal = (e: React.ChangeEvent<HTMLSelectElement>, type: "status" | "subStatus", lead: Assignment) => {
         const value = e.target.value;
         if (type === "status") {
             statusMutation.mutate({ assignmentId: lead.assignmentId, status: value, subStatus: lead.subStatus });
@@ -178,8 +166,7 @@ export default function MyLeads() {
         }
     };
 
-    const handleTransfer = (assignmentId: string, newAgentId: string) =>
-        transferMutation.mutate({ assignmentId, newAgentId });
+    const handleTransfer = (assignmentId: string, newAgentId: string) => transferMutation.mutate({ assignmentId, newAgentId });
     const handleDelete = (assignmentId: string) => deleteMutation.mutate({ assignmentId });
 
     const agentsMapValue = agentsMap();
@@ -197,12 +184,9 @@ export default function MyLeads() {
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
                                 id="date"
                                 variant="outline"
-                                className={cn(
-                                    "w-[300px] justify-start text-left font-normal",
-                                    !date && "text-muted-foreground",
-                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -218,15 +202,8 @@ export default function MyLeads() {
                                 )}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                                initialFocus
-                                mode="range"
-                                defaultMonth={date?.from}
-                                selected={date}
-                                onSelect={setDate}
-                                numberOfMonths={2}
-                            />
+                        <PopoverContent align="start" className="w-auto p-0">
+                            <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                         </PopoverContent>
                     </Popover>
                     <Button onClick={() => refetch()} variant="outline">
@@ -239,30 +216,28 @@ export default function MyLeads() {
                 </div>
                 {!qa && (
                     <Input
-                        type="text"
-                        placeholder="Search by phone TL"
-                        value={searchPhone}
-                        onChange={(e) => setSearchPhone(e.target.value)}
                         className="mb-2 p-2 border rounded"
+                        onChange={(e) => setSearchPhone(e.target.value)}
+                        placeholder="Search by phone TL"
+                        type="text"
+                        value={searchPhone}
                     />
                 )}
                 {qa && (
                     <div className="flex">
                         <Input
                             className="w-4 bg-white"
-                            type="text"
-                            placeholder="Search by phone QA"
-                            value={searchPhone}
                             onChange={(e) => setSearchPhone(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && searchPhone.length === 10) {
-                                    const result = allAssignmentsValue.find(
-                                        (asg) => asg.userPhone === String(searchPhone),
-                                    );
+                                    const result = allAssignmentsValue.find((asg) => asg.userPhone === String(searchPhone));
                                     if (result) setSearchResult(`${result.agentName}`);
                                     else setSearchResult("No results found");
                                 }
                             }}
+                            placeholder="Search by phone QA"
+                            type="text"
+                            value={searchPhone}
                             // className="mb-2 p-2 border rounded"
                         />
                         <div className="mt-2 ml-2">{searchResult && <div>{searchResult}</div>}</div>
@@ -307,20 +282,13 @@ export default function MyLeads() {
                         <TableBody>
                             {filteredAssignments.map((asg) => (
                                 <TableRow key={asg.assignmentId}>
-                                    <TableCell className="text-center border-r border-gray-200">
-                                        {asg.userPhone}
-                                    </TableCell>
+                                    <TableCell className="text-center border-r border-gray-200">{asg.userPhone}</TableCell>
                                     {/* <TableCell className="text-center">{asg.userEmail}</TableCell> */}
                                     <TableCell className="text-left border-r border-gray-200">{asg.userName}</TableCell>
-                                    <TableCell className="text-left border-r border-gray-200">
-                                        {formatDate(asg.assignedAt)}
-                                    </TableCell>
+                                    <TableCell className="text-left border-r border-gray-200">{formatDate(asg.assignedAt)}</TableCell>
                                     <TableCell className="text-left border-r border-gray-200 pointer">
-                                        <select
-                                            onChange={(e) => handleStatusChangeLocal(e, "status", asg)}
-                                            defaultValue={asg.status}
-                                        >
-                                            <option value="" disabled>
+                                        <select defaultValue={asg.status} onChange={(e) => handleStatusChangeLocal(e, "status", asg)}>
+                                            <option disabled value="">
                                                 Select Status
                                             </option>
                                             {Object.entries(statusMap).map(([status, value]) => (
@@ -331,11 +299,8 @@ export default function MyLeads() {
                                         </select>
                                     </TableCell>
                                     <TableCell className="text-left border-r border-gray-200 pointer">
-                                        <select
-                                            onChange={(e) => handleStatusChangeLocal(e, "subStatus", asg)}
-                                            defaultValue={asg.subStatus}
-                                        >
-                                            <option value="" disabled>
+                                        <select defaultValue={asg.subStatus} onChange={(e) => handleStatusChangeLocal(e, "subStatus", asg)}>
+                                            <option disabled value="">
                                                 Select Sub Status
                                             </option>
                                             {Object.entries(subStatusMap).map(([subStatus, value]) => (
@@ -345,15 +310,10 @@ export default function MyLeads() {
                                             ))}
                                         </select>
                                     </TableCell>
-                                    <TableCell className="text-right border-r border-gray-200">
-                                        {asg.agentName}
-                                    </TableCell>
+                                    <TableCell className="text-right border-r border-gray-200">{asg.agentName}</TableCell>
                                     <TableCell className="text-left border-r border-gray-200">
-                                        <select
-                                            onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)}
-                                            defaultValue=""
-                                        >
-                                            <option value="" disabled>
+                                        <select defaultValue="" onChange={(e) => handleTransfer(asg.assignmentId, e.target.value)}>
+                                            <option disabled value="">
                                                 Select Agent
                                             </option>
                                             {Array.from(agentsMapValue.entries()).map(([id, name]) => (
@@ -365,7 +325,7 @@ export default function MyLeads() {
                                     </TableCell>
                                     <TableCell className="text-left" onClick={() => handleDelete(asg.assignmentId)}>
                                         <Button variant="ghost">
-                                            <Trash2 strokeWidth={1} className="w-4" />
+                                            <Trash2 className="w-4" strokeWidth={1} />
                                         </Button>
                                     </TableCell>
                                 </TableRow>

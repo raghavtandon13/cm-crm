@@ -1,8 +1,8 @@
 //  WARN: DELETE THIS ROUTE, NOT NEEDED ANYMORE
 
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { NextResponse, NextRequest } from "next/server";
 
 const secret = process.env.JWT_SECRET as string;
 

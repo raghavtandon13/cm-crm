@@ -1,8 +1,8 @@
 // stats daywise
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import NodeCache from "node-cache";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
-import NodeCache from "node-cache";
 
 const cache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
 
@@ -18,7 +18,7 @@ async function count(
     const dt = datetype === "resp" ? "accounts.resp_date" : "createdAt";
     matchConditions[dt] = { $gte: new Date(start), $lte: new Date(end) };
     if (lender) matchConditions["accounts.name"] = lender;
-    if (partner) matchConditions["partner"] = partner;
+    if (partner) matchConditions.partner = partner;
 
     const pipeline: any[] = [
         { $match: matchConditions },
@@ -87,19 +87,13 @@ async function count(
                             // Conditions for Fibe
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Fibe"] },
-                                        { $eq: ["$accounts.res.reason", "customer lead created"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "customer lead created"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Fibe"] },
-                                        { $eq: ["$accounts.res.reason", "customer lead updated"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "customer lead updated"] }],
                                 },
                                 then: "Accepted",
                             },
@@ -119,268 +113,181 @@ async function count(
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Fibe"] },
-                                        { $eq: ["$accounts.res.reason", "customer already exists"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "customer already exists"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Fibe"] },
-                                        { $eq: ["$accounts.res.reason", "Duplicate request"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $eq: ["$accounts.res.reason", "Duplicate request"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Fibe"] },
-                                        { $ne: ["$accounts.res.errorMessage", null] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Fibe"] }, { $ne: ["$accounts.res.errorMessage", null] }],
                                 },
                                 then: "Errors",
                             },
                             // Conditions for RamFin
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "RamFin"] },
-                                        { $eq: ["$accounts.msg", "Lead created successfully."] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.msg", "Lead created successfully."] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "RamFin"] },
-                                        { $eq: ["$accounts.res.message", "Lead created successfully."] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.res.message", "Lead created successfully."] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "RamFin"] },
-                                        { $eq: ["$accounts.status", "Ineligible"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Ineligible"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "RamFin"] },
-                                        { $eq: ["$accounts.status", "Dedupe"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $eq: ["$accounts.status", "Dedupe"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "RamFin"] },
-                                        { $ne: ["$accounts.lead_status", null] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "RamFin"] }, { $ne: ["$accounts.lead_status", null] }],
                                 },
                                 then: "Accepted",
                             },
                             // Conditions for FatakPay
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "FatakPay"] },
-                                        { $eq: ["$accounts.status", "Eligible"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Eligible"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "FatakPay"] },
-                                        { $eq: ["$accounts.status", "Ineligible"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Ineligible"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "FatakPay"] },
-                                        { $eq: ["$accounts.status", "Deduped"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $eq: ["$accounts.status", "Deduped"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "FatakPay"] },
-                                        { $ne: ["$accounts.stage_name", null] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "FatakPay"] }, { $ne: ["$accounts.stage_name", null] }],
                                 },
                                 then: "Accepted",
                             },
                             // Conditions for SmartCoin
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "SmartCoin"] },
-                                        { $eq: ["$accounts.isDuplicateLead", "true"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "true"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "SmartCoin"] },
-                                        { $eq: ["$accounts.isDuplicateLead", "false"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.isDuplicateLead", "false"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "SmartCoin"] },
-                                        { $eq: ["$accounts.message", "Lead created successfully"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $eq: ["$accounts.message", "Lead created successfully"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "SmartCoin"] },
-                                        { $regexMatch: { input: "$accounts.message", regex: /(mandatory)/i } },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "SmartCoin"] }, { $regexMatch: { input: "$accounts.message", regex: /(mandatory)/i } }],
                                 },
                                 then: "Errors",
                             },
                             // Conditions for Zype
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Zype"] },
-                                        { $eq: ["$accounts.status", "ACCEPT"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "ACCEPT"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Zype"] },
-                                        { $eq: ["$accounts.message", "REJECT"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.message", "REJECT"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Zype"] },
-                                        { $eq: ["$accounts.status", "REJECT"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Zype"] }, { $eq: ["$accounts.status", "REJECT"] }],
                                 },
                                 then: "Rejected",
                             },
                             // Conditions for Cashe
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Cashe"] },
-                                        { $eq: ["$accounts.status", "pre_approved"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_approved"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Cashe"] },
-                                        { $eq: ["$accounts.status", "pre_qualified_low"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "pre_qualified_low"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Cashe"] },
-                                        { $eq: ["$accounts.status", "rejected"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.status", "rejected"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Cashe"] },
-                                        { $regexMatch: { input: "$accounts.res.status", regex: /(ERROR)/i } },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $regexMatch: { input: "$accounts.res.status", regex: /(ERROR)/i } }],
                                 },
                                 then: "Errors",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Cashe"] },
-                                        { $eq: ["$accounts.res.payload.status", "rejected"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Cashe"] }, { $eq: ["$accounts.res.payload.status", "rejected"] }],
                                 },
                                 then: "Rejected",
                             },
                             // Conditions for Mpocket
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Mpocket"] },
-                                        { $eq: ["$accounts.message", "User Eligible for Loan"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "User Eligible for Loan"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Mpocket"] },
-                                        { $eq: ["$accounts.message", "New User"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "New User"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Mpocket"] },
-                                        { $eq: ["$accounts.message", "Data Accepted Successfully"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "Data Accepted Successfully"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Mpocket"] },
-                                        { $eq: ["$accounts.message", "User Profile Rejected on System"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "User Profile Rejected on System"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "Mpocket"] },
-                                        { $eq: ["$accounts.message", "User Not Eligible for Loan"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "Mpocket"] }, { $eq: ["$accounts.message", "User Not Eligible for Loan"] }],
                                 },
                                 then: "Rejected",
                             },
@@ -389,10 +296,7 @@ async function count(
                                     $and: [
                                         { $eq: ["$accounts.name", "Mpocket"] },
                                         {
-                                            $or: [
-                                                { $eq: ["$accounts.message", null] },
-                                                { $not: ["$accounts.message"] },
-                                            ],
+                                            $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
                                         },
                                     ],
                                 },
@@ -404,10 +308,7 @@ async function count(
                                     $and: [
                                         { $eq: ["$accounts.name", "MoneyView"] },
                                         {
-                                            $or: [
-                                                { $eq: ["$accounts.message", null] },
-                                                { $not: ["$accounts.message"] },
-                                            ],
+                                            $or: [{ $eq: ["$accounts.message", null] }, { $not: ["$accounts.message"] }],
                                         },
                                     ],
                                 },
@@ -415,47 +316,32 @@ async function count(
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "MoneyView"] },
-                                        { $eq: ["$accounts.message", "Lead has been rejected."] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "Lead has been rejected."] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "MoneyView"] },
-                                        { $regexMatch: { input: "$accounts.message", regex: /(nvalid)/i } },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $regexMatch: { input: "$accounts.message", regex: /(nvalid)/i } }],
                                 },
                                 then: "Errors",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "MoneyView"] },
-                                        { $eq: ["$accounts.message", "Lead has been expired."] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "Lead has been expired."] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "MoneyView"] },
-                                        { $eq: ["$accounts.message", "success"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "MoneyView"] }, { $eq: ["$accounts.message", "success"] }],
                                 },
                                 then: "Accepted",
                             },
                             // Conditions for LoanTap
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LoanTap"] },
-                                        { $eq: ["$accounts.message", "Application created successfully"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LoanTap"] }, { $eq: ["$accounts.message", "Application created successfully"] }],
                                 },
                                 then: "Accepted",
                             },
@@ -463,28 +349,19 @@ async function count(
                             // CreditLinks CONDITIONS
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "CreditLinks"] },
-                                        { $eq: ["$accounts.message", "Not eligible"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "CreditLinks"] }, { $eq: ["$accounts.message", "Not eligible"] }],
                                 },
                                 then: "Rejected",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "CreditLinks"] },
-                                        { $ne: ["$accounts.leadId", null] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "CreditLinks"] }, { $ne: ["$accounts.leadId", null] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "CreditLinks"] },
-                                        { $eq: ["$accounts.message", "Eligible"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "CreditLinks"] }, { $eq: ["$accounts.message", "Eligible"] }],
                                 },
                                 then: "Accepted",
                             },
@@ -492,19 +369,13 @@ async function count(
                             // lendenclub CONDITIONS
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LenDenClub"] },
-                                        { $eq: ["$accounts.is_duplicate", true] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LenDenClub"] }, { $eq: ["$accounts.is_duplicate", true] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LenDenClub"] },
-                                        { $eq: ["$accounts.is_duplicate", false] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LenDenClub"] }, { $eq: ["$accounts.is_duplicate", false] }],
                                 },
                                 then: "Accepted",
                             },
@@ -512,28 +383,19 @@ async function count(
                             // LendingPlate CONDITIONS
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LendingPlate"] },
-                                        { $eq: ["$accounts.message", "Success"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LendingPlate"] }, { $eq: ["$accounts.message", "Success"] }],
                                 },
                                 then: "Accepted",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LendingPlate"] },
-                                        { $eq: ["$accounts.message", "Existing user"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LendingPlate"] }, { $eq: ["$accounts.message", "Existing user"] }],
                                 },
                                 then: "Deduped",
                             },
                             {
                                 case: {
-                                    $and: [
-                                        { $eq: ["$accounts.name", "LendingPlate"] },
-                                        { $eq: ["$accounts.message", "INELIGIBLE"] },
-                                    ],
+                                    $and: [{ $eq: ["$accounts.name", "LendingPlate"] }, { $eq: ["$accounts.message", "INELIGIBLE"] }],
                                 },
                                 then: "Rejected",
                             },

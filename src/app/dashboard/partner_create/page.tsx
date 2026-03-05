@@ -1,23 +1,16 @@
 "use client";
 
-import fromAPI from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { CMUser, Lead } from "@/lib/types";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { FormField } from "@/components/formField";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FormField } from "@/components/formField";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/otp";
+import fromAPI from "@/lib/api";
+import type { CMUser, Lead } from "@/lib/types";
 
 export default function Create() {
     const phone = useSearchParams().get("phone");
@@ -146,7 +139,7 @@ export default function Create() {
             setIsDialogOpen(false);
             reset();
             // router.push(`/dashboard/partner_leads`);
-            !!inject
+            inject
                 ? router.push(`/dashboard/partner_search?accountsOnly=true&phone=${data.phone}`)
                 : router.push(`/dashboard/partner_search?phone=${data.phone}`);
         },
@@ -159,20 +152,19 @@ export default function Create() {
     return (
         <>
             <div className="flex justify-between align-middle mt-4">
-                <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-0">
-                    {phone ? "Edit Existing Lead" : "Create New Lead"}
-                </h1>
+                <h1 className="mx-2 mt-0 text-xl font-semibold sm:mx-8 sm:mt-0">{phone ? "Edit Existing Lead" : "Create New Lead"}</h1>
             </div>
 
             {!isPhoneVerified ? (
-                <form onSubmit={handleSubmit(onPhoneSubmit)} className="mx-2 my-4 sm:mx-8">
+                <form className="mx-2 my-4 sm:mx-8" onSubmit={handleSubmit(onPhoneSubmit)}>
                     <div className="grid gap-4">
                         <FormField
                             className="w-[350px]"
+                            control={control}
+                            errors={errors}
                             label="Phone"
                             name="phone"
-                            errors={errors}
-                            control={control}
+                            placeholder="98XXXXXXXX"
                             rules={{
                                 required: "Phone is required",
                                 pattern: {
@@ -180,162 +172,143 @@ export default function Create() {
                                     message: "Phone number must be a 10-digit number.",
                                 },
                             }}
-                            placeholder="98XXXXXXXX"
                         />
-                        <Button type="submit" className="w-[100px] flex-1">
+                        <Button className="w-[100px] flex-1" type="submit">
                             Next
                         </Button>
                     </div>
                 </form>
             ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="mx-2 my-4 sm:mx-8">
+                <form className="mx-2 my-4 sm:mx-8" onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid gap-4">
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                             <FormField
+                                control={control}
+                                errors={errors}
                                 label="First name"
                                 name="firstName"
-                                control={control}
-                                errors={errors}
-                                rules={{ required: "First name is required" }}
                                 placeholder="Priya"
+                                rules={{ required: "First name is required" }}
                             />
                             <FormField
-                                label="Last name"
-                                name="lastName"
                                 control={control}
                                 errors={errors}
-                                rules={{ required: "Last name is required" }}
+                                label="Last name"
+                                name="lastName"
                                 placeholder="Sharma"
+                                rules={{ required: "Last name is required" }}
                             />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                             <FormField
+                                control={control}
                                 disabled
+                                errors={errors}
                                 label="Phone"
                                 name="phone"
-                                errors={errors}
-                                control={control}
+                                placeholder="98XXXXXXXX"
                                 rules={{
                                     required: "Phone is required",
                                     pattern: { value: /^\d{10}$/, message: "Phone number must be a 10-digit number." },
                                 }}
-                                placeholder="98XXXXXXXX"
                             />
                             <FormField
-                                label="Email"
-                                name="email"
                                 control={control}
                                 errors={errors}
+                                label="Email"
+                                name="email"
+                                placeholder="m@example.com"
                                 rules={{ required: "Email is required" }}
                                 type="email"
-                                placeholder="m@example.com"
                             />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                             <FormField
-                                label="Date of Birth"
-                                name="dob"
                                 control={control}
                                 errors={errors}
+                                label="Date of Birth"
+                                name="dob"
                                 rules={{ required: "Date of Birth is required" }}
                                 type="date"
                             />
                             <FormField
-                                label="Gender"
-                                name="gender"
                                 control={control}
                                 errors={errors}
-                                placeholder="Select your gender"
-                                rules={{ required: "Gender is required" }}
+                                label="Gender"
+                                name="gender"
                                 options={[
                                     { value: "MALE", label: "Male" },
                                     { value: "FEMALE", label: "Female" },
                                 ]}
+                                placeholder="Select your gender"
+                                rules={{ required: "Gender is required" }}
                             />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
+                            <FormField control={control} errors={errors} label="Address" name="address" placeholder="Enter your address" />
                             <FormField
-                                label="Address"
-                                name="address"
                                 control={control}
                                 errors={errors}
-                                placeholder="Enter your address"
-                            />
-                            <FormField
                                 label="Pincode"
                                 name="pincode"
-                                control={control}
-                                errors={errors}
+                                placeholder="Enter your area's pincode"
                                 rules={{
                                     required: "Pincode is required",
                                     pattern: { value: /^\d{6}$/, message: "Pincode must be a 6-digit number." },
                                 }}
-                                placeholder="Enter your area's pincode"
                             />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
+                            <FormField control={control} errors={errors} label="City" name="city" placeholder="Enter your city" />
                             <FormField
-                                label="City"
-                                name="city"
                                 control={control}
                                 errors={errors}
-                                placeholder="Enter your city"
-                            />
-                            <FormField
                                 label="State"
                                 name="state"
-                                errors={errors}
-                                control={control}
                                 options={indiaStates.map((state) => ({ value: state, label: state }))}
                             />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                             <FormField
-                                label="Employment Type"
-                                name="empType"
                                 control={control}
                                 errors={errors}
-                                rules={{ required: "Employment Type is required" }}
+                                label="Employment Type"
+                                name="empType"
                                 options={[
                                     { value: "Salaried", label: "Salaried" },
                                     { value: "Self-employed", label: "Self Employed" },
                                     { value: "No-employment", label: "Non Employed" },
                                 ]}
+                                rules={{ required: "Employment Type is required" }}
                             />
-                            <FormField
-                                label="Company Name"
-                                name="company"
-                                control={control}
-                                errors={errors}
-                                placeholder="Enter company name"
-                            />
+                            <FormField control={control} errors={errors} label="Company Name" name="company" placeholder="Enter company name" />
                         </div>
 
                         <div className="grid grid-rows-1 gap-4 sm:grid-cols-2">
                             <FormField
-                                label="Salary"
-                                name="salary"
                                 control={control}
                                 errors={errors}
+                                label="Salary"
+                                name="salary"
+                                placeholder="Enter Salary"
                                 rules={{
                                     required: "Salary is required",
                                     pattern: { value: /^\d+$/, message: "Salary must be a number." },
                                 }}
-                                placeholder="Enter Salary"
                             />
 
                             <FormField
-                                label="PAN"
-                                name="pan"
                                 control={control}
                                 errors={errors}
-                                rules={{ required: "PAN is required" }}
+                                label="PAN"
+                                name="pan"
                                 placeholder="Enter PAN"
+                                rules={{ required: "PAN is required" }}
                             />
                         </div>
 
@@ -343,8 +316,6 @@ export default function Create() {
                             <div className="hidden w-1/2 sm:flex"></div>
                             <div className="flex w-full gap-4 sm:w-1/2">
                                 <Button
-                                    type="button"
-                                    variant="destructive"
                                     className="w-full flex-1"
                                     onClick={() =>
                                         reset({
@@ -359,22 +330,13 @@ export default function Create() {
                                             company: "",
                                         })
                                     }
+                                    type="button"
+                                    variant="destructive"
                                 >
                                     Reset
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    className="w-full flex-1"
-                                    disabled={isPending}
-                                    onClick={() => setInject(true)}
-                                >
-                                    {isPending
-                                        ? phone
-                                            ? "Updating..."
-                                            : "Creating..."
-                                        : phone
-                                          ? "Update Lead"
-                                          : "Create Lead"}
+                                <Button className="w-full flex-1" disabled={isPending} onClick={() => setInject(true)} type="submit">
+                                    {isPending ? (phone ? "Updating..." : "Creating...") : phone ? "Update Lead" : "Create Lead"}
                                 </Button>
                             </div>
                         </div>
@@ -382,7 +344,7 @@ export default function Create() {
                 </form>
             )}
 
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Enter OTP</DialogTitle>

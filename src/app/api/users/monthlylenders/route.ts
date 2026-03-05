@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
 
@@ -36,20 +36,7 @@ async function getPartnerDataForLast3Months() {
                                     $concat: [
                                         {
                                             $arrayElemAt: [
-                                                [
-                                                    "Jan",
-                                                    "Feb",
-                                                    "Mar",
-                                                    "Apr",
-                                                    "May",
-                                                    "Jun",
-                                                    "Jul",
-                                                    "Aug",
-                                                    "Sept",
-                                                    "Oct",
-                                                    "Nov",
-                                                    "Dec",
-                                                ],
+                                                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"],
                                                 { $subtract: ["$$item.month", 1] },
                                             ],
                                         },

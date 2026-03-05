@@ -1,6 +1,6 @@
-import { NextResponse, NextRequest } from "next/server";
+import type { Agent } from "@prisma/client";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { Agent } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
     try {
@@ -63,16 +63,13 @@ export async function GET(req: NextRequest) {
         const endDate = req.nextUrl.searchParams.get("endDate");
 
         if (!startDate || !endDate) {
-            return NextResponse.json(
-                { status: "failure", message: "startDate or endDate not provided" },
-                { status: 400 },
-            );
+            return NextResponse.json({ status: "failure", message: "startDate or endDate not provided" }, { status: 400 });
         }
 
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
             return NextResponse.json({ status: "failure", message: "Invalid date format" }, { status: 400 });
         }
 
@@ -132,10 +129,7 @@ export async function GET(req: NextRequest) {
 
             return NextResponse.json({ status: "success", data });
         } else {
-            return NextResponse.json(
-                { status: "failure", message: "Provide either 'agentid' or 'full=true'" },
-                { status: 400 },
-            );
+            return NextResponse.json({ status: "failure", message: "Provide either 'agentid' or 'full=true'" }, { status: 400 });
         }
 
         const attendanceData = await db.agentAttendance.findMany({

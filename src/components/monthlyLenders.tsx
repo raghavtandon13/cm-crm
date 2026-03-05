@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 // Define types for the data structure
 interface LenderMetrics {
@@ -18,7 +18,7 @@ const fetchMonthlyLenders = async (): Promise<LenderData> => {
             throw new Error("Network response was not ok");
         }
         return response.json();
-    } catch (error) {
+    } catch (_error) {
         throw new Error("Failed to fetch monthly lenders data");
     }
 };
@@ -48,7 +48,7 @@ export default function MonthlyLenders() {
                 .map(
                     ([lenderName, lenderData]: [string, LenderMetrics]) =>
                         lenderData && (
-                            <div key={lenderName} className="mb-8">
+                            <div className="mb-8" key={lenderName}>
                                 <h2 className="text-2xl font-bold mb-4">{lenderName}</h2>
                                 <Table>
                                     <TableBody>

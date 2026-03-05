@@ -1,5 +1,5 @@
-import fromAPI from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import fromAPI from "@/lib/api";
 import { NumberTicker } from "./magicui/number-ticker";
 
 export function RealtimeStats() {
@@ -13,10 +13,5 @@ export function RealtimeStats() {
     });
 
     if (isPending) return <></>;
-    return (
-        <NumberTicker
-            value={realTimeCount}
-            className="whitespace-pre-wrap text-8xl font-medium tracking-tighter text-black dark:text-white"
-        />
-    );
+    return <NumberTicker className="whitespace-pre-wrap text-8xl font-medium tracking-tighter text-black dark:text-white" value={realTimeCount} />;
 }

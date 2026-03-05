@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { NextResponse, NextRequest } from "next/server";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -13,8 +13,7 @@ export async function GET(req: NextRequest) {
 
         const partner = await db.partner.findUnique({ where: { id }, include: { role: true } });
         const agent = await db.agent.findUnique({ where: { id }, include: { role: true } });
-        if (!partner && !agent)
-            return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
+        if (!partner && !agent) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
         const user = partner || agent;
 
         if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });

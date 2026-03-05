@@ -1,17 +1,4 @@
-import {
-    BookUser,
-    Database,
-    Download,
-    Library,
-    LineChart,
-    type LucideIcon,
-    Search,
-    Sparkles,
-    UserPlus,
-    UserRound,
-    Users,
-    Biohazard,
-} from "lucide-react";
+import { Biohazard, BookUser, Database, Download, Library, LineChart, type LucideIcon, Search, Sparkles, UserPlus, UserRound, Users } from "lucide-react";
 
 export type RoleTitle = "BOSS" | "OE" | "TE" | "TL" | "QA" | "HR" | "DSA" | "SUBDSA" | "INDIV";
 

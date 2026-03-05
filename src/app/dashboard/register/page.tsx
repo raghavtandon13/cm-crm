@@ -1,20 +1,15 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/context/UserContext";
 import fromAPI from "@/lib/api";
-import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 // Shared Form Component
 function UserForm({
@@ -38,20 +33,20 @@ function UserForm({
                         <Label htmlFor="firstName">First name</Label>
                         <Input
                             id="firstName"
+                            onChange={(e) => setFormData((prev: any) => ({ ...prev, firstName: e.target.value }))}
                             placeholder="Priya"
-                            value={formData.firstName}
-                            onChange={(e) => setFormData((prev:any) => ({ ...prev, firstName: e.target.value }))}
                             required
+                            value={formData.firstName}
                         />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="lastName">Last name</Label>
                         <Input
                             id="lastName"
+                            onChange={(e) => setFormData((prev: any) => ({ ...prev, lastName: e.target.value }))}
                             placeholder="Sharma"
-                            value={formData.lastName}
-                            onChange={(e) => setFormData((prev:any) => ({ ...prev, lastName: e.target.value }))}
                             required
+                            value={formData.lastName}
                         />
                     </div>
                 </div>
@@ -59,24 +54,24 @@ function UserForm({
                     <Label htmlFor="email">Email</Label>
                     <Input
                         id="email"
-                        type="email"
+                        onChange={(e) => setFormData((prev: any) => ({ ...prev, email: e.target.value }))}
                         placeholder="m@example.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData((prev:any) => ({ ...prev, email: e.target.value }))}
                         required
+                        type="email"
+                        value={formData.email}
                     />
                 </div>
                 <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
                         id="password"
+                        onChange={(e) => setFormData((prev: any) => ({ ...prev, password: e.target.value }))}
+                        required
                         type="password"
                         value={formData.password}
-                        onChange={(e) => setFormData((prev:any) => ({ ...prev, password: e.target.value }))}
-                        required
                     />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button className="w-full" disabled={loading} type="submit">
                     {loading ? "Creating..." : submitLabel}
                 </Button>
             </div>
@@ -112,13 +107,7 @@ function AgentForm() {
                 <CardDescription>Enter your information to create an account</CardDescription>
             </CardHeader>
             <CardContent>
-                <UserForm
-                    onSubmit={handleSubmit}
-                    loading={loading}
-                    formData={formData}
-                    setFormData={setFormData}
-                    submitLabel="Create Agent"
-                />
+                <UserForm formData={formData} loading={loading} onSubmit={handleSubmit} setFormData={setFormData} submitLabel="Create Agent" />
             </CardContent>
         </Card>
     );
@@ -171,7 +160,7 @@ function DsaForm() {
                     <Label className="mb-1 block">Select Role</Label>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full text-left">
+                            <Button className="w-full text-left" variant="outline">
                                 {formData.role === "INDIV" ? "INDIV (Individual)" : "DSA"}
                             </Button>
                         </DropdownMenuTrigger>
@@ -192,13 +181,7 @@ function DsaForm() {
                     </DropdownMenu>
                 </div>
 
-                <UserForm
-                    onSubmit={handleSubmit}
-                    loading={loading}
-                    formData={formData}
-                    setFormData={setFormData}
-                    submitLabel="Create DSA"
-                />
+                <UserForm formData={formData} loading={loading} onSubmit={handleSubmit} setFormData={setFormData} submitLabel="Create DSA" />
             </CardContent>
         </Card>
     );
@@ -214,7 +197,7 @@ export default function RegisterationForm() {
     return (
         <main className="flex min-h-[90vh] flex-col items-center justify-between pt-24 sm:p-24">
             <div className="mx-auto max-w-sm w-full">
-                <Tabs defaultValue="agent" className="w-full">
+                <Tabs className="w-full" defaultValue="agent">
                     <TabsList className="bg-transparent w-full justify-center">
                         <TabsTrigger value="agent">Agent</TabsTrigger>
                         <TabsTrigger value="dsa">DSA</TabsTrigger>

@@ -1,5 +1,6 @@
 import { jwtVerify } from "jose";
 import { db } from "../../lib/db";
+
 const secret = process.env.JWT_SECRET as string;
 
 export default async function getUser(token: string) {

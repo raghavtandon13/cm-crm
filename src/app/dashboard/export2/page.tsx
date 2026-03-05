@@ -1,20 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 import { format } from "date-fns";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type Filters = {
@@ -121,7 +115,7 @@ export default function ExportPage() {
                 <Label>Presets</Label>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full bg-white text-left font-normal">
+                        <Button className="w-full bg-white text-left font-normal" variant="outline">
                             Select Preset
                         </Button>
                     </DropdownMenuTrigger>
@@ -142,53 +136,30 @@ export default function ExportPage() {
             <div className="grid grid-cols-2 gap-x-4 gap-y-6 items-end">
                 <Label className="space-y-2">
                     <span>Min Age</span>
-                    <Input
-                        name="minAge"
-                        value={filters.minAge}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
+                    <Input className="bg-white" name="minAge" onChange={handleChange} type="number" value={filters.minAge} />
                 </Label>
 
                 <Label className="space-y-2">
                     <span>Max Age</span>
-                    <Input
-                        name="maxAge"
-                        value={filters.maxAge}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
+                    <Input className="bg-white" name="maxAge" onChange={handleChange} type="number" value={filters.maxAge} />
                 </Label>
 
                 <Label className="space-y-2">
                     <span>Min Income</span>
-                    <Input
-                        name="minIncome"
-                        value={filters.minIncome}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
+                    <Input className="bg-white" name="minIncome" onChange={handleChange} type="number" value={filters.minIncome} />
                 </Label>
 
                 <div className="space-y-2">
                     <Label>Employment</Label>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
+                            <Button className="w-full bg-white text-left font-normal" variant="outline">
                                 {filters.employment}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-full">
                             {["Salaried", "Self-employed"].map((type) => (
-                                <DropdownMenuItem
-                                    key={type}
-                                    onClick={() =>
-                                        setFilters((prev) => ({ ...prev, employment: type as Filters["employment"] }))
-                                    }
-                                >
+                                <DropdownMenuItem key={type} onClick={() => setFilters((prev) => ({ ...prev, employment: type as Filters["employment"] }))}>
                                     {type}
                                 </DropdownMenuItem>
                             ))}
@@ -198,20 +169,14 @@ export default function ExportPage() {
 
                 <Label className="space-y-2">
                     <span>Limit</span>
-                    <Input
-                        name="limit"
-                        value={filters.limit}
-                        onChange={handleChange}
-                        type="number"
-                        className="bg-white"
-                    />
+                    <Input className="bg-white" name="limit" onChange={handleChange} type="number" value={filters.limit} />
                 </Label>
 
                 <div className="space-y-2">
                     <Label>Pincode Collection</Label>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
+                            <Button className="w-full bg-white text-left font-normal" variant="outline">
                                 {filters.pincodeCollection || "Select Collection"}
                             </Button>
                         </DropdownMenuTrigger>
@@ -220,18 +185,11 @@ export default function ExportPage() {
                             {isLoading && <DropdownMenuItem disabled>Loading...</DropdownMenuItem>}
                             {isError && <DropdownMenuItem disabled>Error loading</DropdownMenuItem>}
                             {data?.pincode.map((col) => (
-                                <DropdownMenuItem
-                                    key={col}
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: col }))}
-                                >
+                                <DropdownMenuItem key={col} onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: col }))}>
                                     {col}
                                 </DropdownMenuItem>
                             ))}
-                            <DropdownMenuItem
-                                onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: "" }))}
-                            >
-                                None
-                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setFilters((prev) => ({ ...prev, pincodeCollection: "" }))}>None</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -241,21 +199,13 @@ export default function ExportPage() {
                         <Label>Pincode Matching</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full bg-white text-left font-normal">
+                                <Button className="w-full bg-white text-left font-normal" variant="outline">
                                     {filters.pincodeMatching === "R" ? "Include (R)" : "Exclude (B)"}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-full">
-                                <DropdownMenuItem
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "R" }))}
-                                >
-                                    Include (R)
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "B" }))}
-                                >
-                                    Exclude (B)
-                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "R" }))}>Include (R)</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setFilters((prev) => ({ ...prev, pincodeMatching: "B" }))}>Exclude (B)</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -265,15 +215,15 @@ export default function ExportPage() {
                     <Label>Start Date</Label>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
+                            <Button className="w-full bg-white text-left font-normal" variant="outline">
                                 {filters.startDate ? format(filters.startDate, "PPP") : "Pick a date"}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={filters.startDate || undefined}
                                 onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
+                                selected={filters.startDate || undefined}
                             />
                         </PopoverContent>
                     </Popover>
@@ -283,21 +233,21 @@ export default function ExportPage() {
                     <Label>End Date</Label>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full bg-white text-left font-normal">
+                            <Button className="w-full bg-white text-left font-normal" variant="outline">
                                 {filters.endDate ? format(filters.endDate, "PPP") : "Pick a date"}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={filters.endDate || undefined}
                                 onSelect={(date) => setFilters((prev) => ({ ...prev, startDate: date ?? null }))}
+                                selected={filters.endDate || undefined}
                             />
                         </PopoverContent>
                     </Popover>
                 </div>
             </div>
-            <Button onClick={handleExport} className="mt-6 w-full text-white bg-black hover:bg-gray-800">
+            <Button className="mt-6 w-full text-white bg-black hover:bg-gray-800" onClick={handleExport}>
                 Export CSV
             </Button>
         </div>

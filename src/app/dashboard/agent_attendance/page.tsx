@@ -1,19 +1,19 @@
 "use client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { DataTable } from "@/components/dataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import fromAPI from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { format, startOfMonth, eachDayOfInterval } from "date-fns";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { eachDayOfInterval, format, startOfMonth } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { useUser } from "@/context/UserContext";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import type { DateRange } from "react-day-picker";
+import { DataTable } from "@/components/dataTable";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@/context/UserContext";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function UserAttendance() {
     const user = useUser();
@@ -31,9 +31,7 @@ export default function UserAttendance() {
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(
-                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user?.id}`,
-            );
+            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&agentid=${user?.id}`);
             return response.data.data; // Access the `data` array directly
         },
     });
@@ -92,11 +90,11 @@ export default function UserAttendance() {
             <div className="flex items-center justify-center h-96">
                 Error loading data.{" "}
                 <button
+                    className="ml-2 text-blue-500 hover:underline"
                     onClick={() => {
                         refetch();
                         refetchLeave();
                     }}
-                    className="ml-2 text-blue-500 hover:underline"
                 >
                     Retry
                 </button>
@@ -149,18 +147,12 @@ export default function UserAttendance() {
         {
             accessorKey: "startDate",
             header: "Start Date",
-            cell: ({ row }) => (
-                <div className="min-w-[100px] text-left">
-                    {format(new Date(row.getValue("startDate")), "yyyy-MM-dd")}
-                </div>
-            ),
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("startDate")), "yyyy-MM-dd")}</div>,
         },
         {
             accessorKey: "endDate",
             header: "End Date",
-            cell: ({ row }) => (
-                <div className="min-w-[100px] text-left">{format(new Date(row.getValue("endDate")), "yyyy-MM-dd")}</div>
-            ),
+            cell: ({ row }) => <div className="min-w-[100px] text-left">{format(new Date(row.getValue("endDate")), "yyyy-MM-dd")}</div>,
         },
         {
             accessorKey: "reason",
@@ -179,14 +171,7 @@ export default function UserAttendance() {
             <div className="font-semibold flex gap-4 mb-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -201,15 +186,8 @@ export default function UserAttendance() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
                 <Button onClick={() => refetch()} variant="outline">
@@ -219,7 +197,7 @@ export default function UserAttendance() {
                         <Search className="w-4" />
                     )}
                 </Button>
-                <Button variant="outline" onClick={() => setDialogOpen(true)}>
+                <Button onClick={() => setDialogOpen(true)} variant="outline">
                     Ask for leave
                 </Button>
             </div>
@@ -236,23 +214,18 @@ export default function UserAttendance() {
                     <div className="text-center mt-8">No leave requests available.</div>
                 )}
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
                 <DialogContent className="min-w-max">
                     <DialogHeader>
                         <DialogTitle>Request Leave</DialogTitle>
                     </DialogHeader>
-                    <Calendar mode="range" selected={leaveDate} onSelect={setLeaveDate} numberOfMonths={2} />
-                    <Textarea
-                        placeholder="Reason for leave"
-                        value={leaveReason}
-                        onChange={(e) => setLeaveReason(e.target.value)}
-                        className="mt-4"
-                    />
+                    <Calendar mode="range" numberOfMonths={2} onSelect={setLeaveDate} selected={leaveDate} />
+                    <Textarea className="mt-4" onChange={(e) => setLeaveReason(e.target.value)} placeholder="Reason for leave" value={leaveReason} />
                     <DialogFooter>
                         <Button onClick={() => setDialogOpen(false)} variant="outline">
                             Cancel
                         </Button>
-                        <Button onClick={submitLeaveRequest} disabled={!leaveDate || !leaveReason}>
+                        <Button disabled={!leaveDate || !leaveReason} onClick={submitLeaveRequest}>
                             Submit
                         </Button>
                     </DialogFooter>

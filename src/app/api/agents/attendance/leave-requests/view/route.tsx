@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../../../lib/db";
 
 export async function GET() {
@@ -21,8 +21,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     const { leaveReqId, decision } = await req.json();
 
-    if (!leaveReqId || !decision)
-        return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
+    if (!leaveReqId || !decision) return NextResponse.json({ status: "failure", messgae: "leaveReqId and decision are required." });
 
     try {
         // if startDate and endDate is same then leave is only for one day but if they are different then leave is for multiple days
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
             );
         }
         return NextResponse.json({ status: "success", data: updatedLeaveRequest });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ status: "failure", message: "Error updating leave request" });
     }
 }

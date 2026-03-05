@@ -19,7 +19,7 @@ import { Button, buttonVariants } from "./ui/button";
 
 export default function UserProfile() {
     const user = useUser();
-    const [confirm, setConfirm] = useState(true);
+    const [confirm, _setConfirm] = useState(true);
     const [pass, setPass] = useState("");
 
     const handlePasswordChange = async () => {
@@ -64,11 +64,8 @@ export default function UserProfile() {
                                 <AlertDialogTitle>Change Password</AlertDialogTitle>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
-                                <AlertDialogAction
-                                    onClick={handlePasswordChange}
-                                    className={buttonVariants({ variant: "default" })}
-                                >
+                                <Input onChange={(e) => setPass(e.target.value)} type="password" value={pass} />
+                                <AlertDialogAction className={buttonVariants({ variant: "default" })} onClick={handlePasswordChange}>
                                     Submit
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -88,10 +85,7 @@ export default function UserProfile() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={handleLogout}
-                                className={buttonVariants({ variant: "destructive" })}
-                            >
+                            <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={handleLogout}>
                                 Log Out
                             </AlertDialogAction>
                         </AlertDialogFooter>

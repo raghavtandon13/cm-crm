@@ -1,7 +1,7 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import fromAPI from "@/lib/api";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
-import fromAPI from "@/lib/api";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         await User.updateOne({ phone }, { phoneOtp: otp, phoneOtpExpire: otpExpire }, { upsert: true });
 
         return NextResponse.json({ message: "OTP sent successfully" });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
     }
 }
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
         // OTP is valid, proceed with further actions (e.g., authentication)
         return NextResponse.json({ message: "OTP verified successfully" });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: "Failed to verify OTP" }, { status: 500 });
     }
 }

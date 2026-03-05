@@ -1,18 +1,16 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
-import fromAPI from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import * as React from "react";
-import { addDays, format, startOfMonth } from "date-fns";
+import { format, startOfMonth } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 // export const fetchcache = 'force-no-store';
 export function LeadsTable() {
@@ -53,14 +51,7 @@ export function LeadsTable() {
                 {/* Date selector */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -75,20 +66,13 @@ export function LeadsTable() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
 
                 {/* Partner selector */}
-                <Select value={partner} onValueChange={setPartner}>
+                <Select onValueChange={setPartner} value={partner}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Partner" />
                     </SelectTrigger>
@@ -99,7 +83,7 @@ export function LeadsTable() {
                 </Select>
 
                 {/* Name (Lender) selector */}
-                <Select value={name} onValueChange={setName}>
+                <Select onValueChange={setName} value={name}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Lender" />
                     </SelectTrigger>
@@ -111,7 +95,7 @@ export function LeadsTable() {
                 </Select>
 
                 {/* Period selector */}
-                <Select value={period} onValueChange={setPeriod}>
+                <Select onValueChange={setPeriod} value={period}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Period" />
                     </SelectTrigger>

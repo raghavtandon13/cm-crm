@@ -1,10 +1,10 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../../lib/db";
-import jwt from "jsonwebtoken";
-const secret = process.env.JWT_SECRET as string;
+
+const _secret = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
-    const token = req.headers.get("Authorization")?.split(" ")[1];
+    const _token = req.headers.get("Authorization")?.split(" ")[1];
     const { assignmentId, agentId } = await req.json();
     try {
         // Getting Agent

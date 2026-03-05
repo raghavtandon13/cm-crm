@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 
@@ -63,10 +63,10 @@ export function LenderCharts({ data, title }) {
                     <div className="flex gap-2 mb-4 flex-wrap">
                         {Object.keys(lenders).map((lender) => (
                             <button
-                                key={lender}
                                 className={cn(buttonVariants({ variant: "outline" }), {
                                     "bg-gray-200": visibleLenders[lender],
                                 })}
+                                key={lender}
                                 onClick={() => toggleLenderVisibility(lender)}
                             >
                                 {lender}
@@ -89,7 +89,7 @@ export function LenderCharts({ data, title }) {
                             {Object.values(visibleLenders).every(Boolean) ? "None" : "All"}
                         </button>
                     </div>
-                    <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                    <ChartContainer className="h-[250px] w-full" config={chartConfig}>
                         <LineChart
                             accessibilityLayer
                             data={filteredChartData}
@@ -99,25 +99,19 @@ export function LenderCharts({ data, title }) {
                             }}
                         >
                             <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="week"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={4}
-                                tickFormatter={(value) => value}
-                            />
+                            <XAxis axisLine={false} dataKey="week" tickFormatter={(value) => value} tickLine={false} tickMargin={4} />
                             <YAxis />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                            <ChartTooltip content={<ChartTooltipContent />} cursor={false} />
                             {Object.keys(visibleLenders).map(
                                 (lender) =>
                                     visibleLenders[lender] && (
                                         <Line
-                                            key={lender}
                                             dataKey={lender}
-                                            type="natural"
+                                            dot={true}
+                                            key={lender}
                                             stroke={chartConfig[lender].color} // Use the assigned color
                                             strokeWidth={3}
-                                            dot={true}
+                                            type="natural"
                                         />
                                     ),
                             )}

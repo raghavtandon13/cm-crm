@@ -1,11 +1,11 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { RefreshCcw } from "lucide-react";
 import { DataTable } from "@/components/dataTable";
 import { Button, buttonVariants } from "@/components/ui/button";
 import fromAPI from "@/lib/api";
-import { CMUser } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
-import { RefreshCcw } from "lucide-react";
+import type { CMUser } from "@/lib/types";
 
 export const columns: ColumnDef<CMUser>[] = [
     { accessorKey: "name", header: () => <div className=" text-left">Name</div> },
@@ -48,24 +48,22 @@ export function NewWebUsersTable() {
     if (data === null || data.length === 0) return <h1>No data available</h1>;
 
     return (
-        <>
-            <div className="my-2">
-                <div className="flex justify-between items-center mt-4 mb-2">
-                    <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>New Website Users</h1>
-                    <Button onClick={() => refetch()} variant="outline">
-                        {" "}
-                        {isFetching ? (
-                            "Refetching..."
-                        ) : (
-                            <>
-                                {" "}
-                                <RefreshCcw className="w-4 h-5 mr-2" /> <span>Refetch</span>{" "}
-                            </>
-                        )}
-                    </Button>
-                </div>
-                <DataTable columns={columns} data={data} />
+        <div className="my-2">
+            <div className="flex justify-between items-center mt-4 mb-2">
+                <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>New Website Users</h1>
+                <Button onClick={() => refetch()} variant="outline">
+                    {" "}
+                    {isFetching ? (
+                        "Refetching..."
+                    ) : (
+                        <>
+                            {" "}
+                            <RefreshCcw className="w-4 h-5 mr-2" /> <span>Refetch</span>{" "}
+                        </>
+                    )}
+                </Button>
             </div>
-        </>
+            <DataTable columns={columns} data={data} />
+        </div>
     );
 }

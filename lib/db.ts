@@ -2,7 +2,8 @@
 
 import { PrismaClient } from "@prisma/client";
 
-import mongoose, { Connection } from "mongoose";
+import mongoose, { type Connection } from "mongoose";
+
 let cachedConnection: Connection | null = null;
 let cachedConnectionLS: Connection | null = null;
 

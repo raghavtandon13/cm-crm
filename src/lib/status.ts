@@ -57,7 +57,7 @@ async function ramfin_status(phone: string): Promise<any> {
         }
         const scstatusdata = await scresponse.json();
         return scstatusdata;
-    } catch (error) {
+    } catch (_error) {
         return { error: "error in smartcoin_status" };
     }
 }
@@ -143,14 +143,7 @@ async function moneytap_status(user: any): Promise<any> {
 
 export async function get_status(user: any): Promise<any> {
     try {
-        const statusfunctions = [
-            mv_status(user),
-            ramfin_status(user.phone),
-            moneytap_status(user),
-            fibe_status(user),
-            cashe_status(user),
-            mpkt_status(user),
-        ];
+        const statusfunctions = [mv_status(user), ramfin_status(user.phone), moneytap_status(user), fibe_status(user), cashe_status(user), mpkt_status(user)];
         const results = await Promise.all(statusfunctions);
         return {
             moneyview: results[0],

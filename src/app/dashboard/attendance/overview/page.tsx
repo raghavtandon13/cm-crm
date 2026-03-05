@@ -1,17 +1,17 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { DataTable } from "@/components/dataTable";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import fromAPI from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { useMemo, useState } from "react";
-import { DateRange } from "react-day-picker";
 
 export default function Overview() {
     const [date, setDate] = useState<DateRange | undefined>({
@@ -25,9 +25,7 @@ export default function Overview() {
     const { data, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(
-                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&overview=true`,
-            );
+            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&overview=true`);
             return response.data.data;
         },
     });
@@ -59,7 +57,7 @@ export default function Overview() {
                 if (ignoreKeys.has(key)) continue;
 
                 const value = Number(agent[key]);
-                if (!isNaN(value)) {
+                if (!Number.isNaN(value)) {
                     totals[key] = (totals[key] || 0) + value;
                 }
             }
@@ -73,14 +71,7 @@ export default function Overview() {
             <div className="font-semibold flex gap-4 mb-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -95,15 +86,8 @@ export default function Overview() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
             </div>
@@ -114,11 +98,7 @@ export default function Overview() {
                     <p className="ml-4">Fetching agent attendance data...</p>
                 </div>
             ) : (
-                <DataTable
-                    columns={summaryColumns}
-                    data={[...data, getSummaryRow(data)]}
-                    name="attendanceSummaryTable"
-                />
+                <DataTable columns={summaryColumns} data={[...data, getSummaryRow(data)]} name="attendanceSummaryTable" />
             )}
         </>
     );

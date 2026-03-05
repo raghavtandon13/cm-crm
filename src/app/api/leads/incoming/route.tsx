@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../lib/db";
 
@@ -76,20 +76,7 @@ async function incoming(startDay: string, endDay: string, filters: any = {}) {
                                                 $concat: [
                                                     {
                                                         $arrayElemAt: [
-                                                            [
-                                                                "Jan",
-                                                                "Feb",
-                                                                "Mar",
-                                                                "Apr",
-                                                                "May",
-                                                                "Jun",
-                                                                "Jul",
-                                                                "Aug",
-                                                                "Sept",
-                                                                "Oct",
-                                                                "Nov",
-                                                                "Dec",
-                                                            ],
+                                                            ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"],
                                                             { $subtract: ["$$item.month", 1] },
                                                         ],
                                                     },
@@ -116,8 +103,7 @@ export async function POST(_req: NextRequest) {
     try {
         const { startDay, endDay } = await _req.json();
         // Set default values
-        const startDate =
-            startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
+        const startDate = startDay || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
         const endDate = endDay || new Date().toISOString().split("T")[0];
 
         await connectToMongoDB();

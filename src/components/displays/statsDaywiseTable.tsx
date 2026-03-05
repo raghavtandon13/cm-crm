@@ -1,19 +1,19 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { DataTable } from "../dataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import fromAPI from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button, buttonVariants } from "@/components/ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
 import { format, startOfMonth } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { CsvExportModal } from "../exportModal";
+import type { DateRange } from "react-day-picker";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { DataTable } from "../dataTable";
+import { CsvExportModal } from "../exportModal";
 
 export type LenderData = {
     lender: string | null;
@@ -62,10 +62,7 @@ export function StatsDaywiseTable() {
             });
         } else if (type === "manual" && manualStartDate && manualEndDate) {
             return data.map((lenderData) => {
-                const manualCounts: Record<
-                    string,
-                    { Accepted: number; Rejected: number; Deduped: number; Rest: number }
-                > = {};
+                const manualCounts: Record<string, { Accepted: number; Rejected: number; Deduped: number; Rest: number }> = {};
                 lenderData.partnerStatuses.forEach((ps) => {
                     ps.counts.forEach(({ status, dates }) => {
                         const s = status as "Accepted" | "Rejected" | "Deduped" | "Rest";
@@ -106,7 +103,7 @@ export function StatsDaywiseTable() {
             accessorKey: "Accepted",
             header: () => <div className="text-left">Accepted</div>,
             cell: ({ row }) => {
-                const cellValue = row.original["Accepted"];
+                const cellValue = row.original.Accepted;
                 const location = {
                     dates: date,
                     lender: row.original.lender,
@@ -145,12 +142,9 @@ export function StatsDaywiseTable() {
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
                                 id="date"
                                 variant="outline"
-                                className={cn(
-                                    "w-[300px] justify-start text-left font-normal",
-                                    !date && "text-muted-foreground",
-                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -166,21 +160,11 @@ export function StatsDaywiseTable() {
                                 )}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                                initialFocus
-                                mode="range"
-                                defaultMonth={date?.from}
-                                selected={date}
-                                onSelect={setDate}
-                                numberOfMonths={2}
-                            />
+                        <PopoverContent align="start" className="w-auto p-0">
+                            <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                         </PopoverContent>
                     </Popover>
-                    <Select
-                        onValueChange={(value) => setAggregationType(value as "total" | "manual")}
-                        defaultValue="total"
-                    >
+                    <Select defaultValue="total" onValueChange={(value) => setAggregationType(value as "total" | "manual")}>
                         <SelectTrigger className="w-[180px] bg-white">
                             <SelectValue placeholder="Select aggregation type" />
                         </SelectTrigger>
@@ -190,49 +174,43 @@ export function StatsDaywiseTable() {
                         </SelectContent>
                     </Select>
                     {aggregationType === "manual" && (
-                        <>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        id="manualDateRange"
-                                        variant="outline"
-                                        className={cn(
-                                            "w-[300px] justify-start text-left font-normal",
-                                            !manualStartDate && !manualEndDate && "text-muted-foreground",
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {manualStartDate && manualEndDate ? (
-                                            <>
-                                                {format(manualStartDate, "yyyy-MM-dd")} -{" "}
-                                                {format(manualEndDate, "yyyy-MM-dd")}
-                                            </>
-                                        ) : (
-                                            <span>Pick a date range</span>
-                                        )}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        initialFocus
-                                        mode="range"
-                                        defaultMonth={manualStartDate}
-                                        selected={{ from: manualStartDate, to: manualEndDate }}
-                                        onSelect={(range) => {
-                                            setManualStartDate(range?.from);
-                                            setManualEndDate(range?.to);
-                                        }}
-                                        disabled={(date) => date < new Date(startDate) || date > new Date(endDate)}
-                                        numberOfMonths={2}
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    className={cn(
+                                        "w-[300px] justify-start text-left font-normal",
+                                        !manualStartDate && !manualEndDate && "text-muted-foreground",
+                                    )}
+                                    id="manualDateRange"
+                                    variant="outline"
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {manualStartDate && manualEndDate ? (
+                                        <>
+                                            {format(manualStartDate, "yyyy-MM-dd")} - {format(manualEndDate, "yyyy-MM-dd")}
+                                        </>
+                                    ) : (
+                                        <span>Pick a date range</span>
+                                    )}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-auto p-0">
+                                <Calendar
+                                    defaultMonth={manualStartDate}
+                                    disabled={(date) => date < new Date(startDate) || date > new Date(endDate)}
+                                    initialFocus
+                                    mode="range"
+                                    numberOfMonths={2}
+                                    onSelect={(range) => {
+                                        setManualStartDate(range?.from);
+                                        setManualEndDate(range?.to);
+                                    }}
+                                    selected={{ from: manualStartDate, to: manualEndDate }}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     )}
-                    <Select
-                        onValueChange={(value) => setPartnerStatusFilter(value as "new" | "dedupe" | "all")}
-                        defaultValue="all"
-                    >
+                    <Select defaultValue="all" onValueChange={(value) => setPartnerStatusFilter(value as "new" | "dedupe" | "all")}>
                         <SelectTrigger className="w-[180px] bg-white">
                             <SelectValue placeholder="Select partner status" />
                         </SelectTrigger>
@@ -258,7 +236,7 @@ export function StatsDaywiseTable() {
                 ) : isError ? (
                     <div className="flex items-center justify-center h-96">
                         Error loading data.{" "}
-                        <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                        <button className="ml-2 text-blue-500 hover:underline" onClick={() => refetch()}>
                             Retry
                         </button>
                     </div>
@@ -268,12 +246,12 @@ export function StatsDaywiseTable() {
             </div>
             {modalData && (
                 <CsvExportModal
-                    usage="statsTable"
                     cellValue={modalData.cellValue}
                     location={modalData.location}
                     onClose={() => {
                         setModalData(null);
                     }}
+                    usage="statsTable"
                 />
             )}
         </>

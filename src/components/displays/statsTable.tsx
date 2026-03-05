@@ -1,17 +1,17 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { DataTable } from "../dataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import fromAPI from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button, buttonVariants } from "@/components/ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
 import { format, startOfMonth } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
+import type { DateRange } from "react-day-picker";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { DataTable } from "../dataTable";
 import { CsvExportModal } from "../exportModal";
 
 export type LenderData = {
@@ -46,10 +46,7 @@ export function StatsTable() {
                   counts.forEach(({ status, count }: { status: any; count: any }) => (statusMap[status] = count));
                   return { lender: lender || "N/A", ...statusMap };
               })
-              .filter(
-                  ({ Accepted, Rejected, Deduped }: { Accepted: any; Rejected: any; Deduped: any }) =>
-                      Accepted !== 0 || Rejected !== 0 || Deduped !== 0,
-              )
+              .filter(({ Accepted, Rejected, Deduped }: { Accepted: any; Rejected: any; Deduped: any }) => Accepted !== 0 || Rejected !== 0 || Deduped !== 0)
         : [];
 
     const columns: ColumnDef<(typeof formattedData)[0]>[] = [
@@ -62,7 +59,7 @@ export function StatsTable() {
             accessorKey: "Accepted",
             header: () => <div className="text-left">Accepted</div>,
             cell: ({ row }) => {
-                const cellValue = row.original["Accepted"];
+                const cellValue = row.original.Accepted;
                 const location = {
                     dates: date,
                     lender: row.original.lender,
@@ -94,19 +91,14 @@ export function StatsTable() {
     return (
         <>
             <div className="my-2">
-                <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>
-                    Accepted Rejected Dedupe Lender Stats &#8628;
-                </h1>
+                <h1 className={cn(buttonVariants({ variant: "card" }), "font-semibold w-full mb-1")}>Accepted Rejected Dedupe Lender Stats &#8628;</h1>
                 <div className="font-semibold flex gap-4 ">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
                                 id="date"
                                 variant="outline"
-                                className={cn(
-                                    "w-[300px] justify-start text-left font-normal",
-                                    !date && "text-muted-foreground",
-                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {date?.from ? (
@@ -122,15 +114,8 @@ export function StatsTable() {
                                 )}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                                initialFocus
-                                mode="range"
-                                defaultMonth={date?.from}
-                                selected={date}
-                                onSelect={setDate}
-                                numberOfMonths={2}
-                            />
+                        <PopoverContent align="start" className="w-auto p-0">
+                            <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                         </PopoverContent>
                     </Popover>
                     <Button onClick={() => refetch()} variant="outline">
@@ -149,7 +134,7 @@ export function StatsTable() {
                 ) : isError ? (
                     <div className="flex items-center justify-center h-96">
                         Error loading data.{" "}
-                        <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                        <button className="ml-2 text-blue-500 hover:underline" onClick={() => refetch()}>
                             Retry
                         </button>
                     </div>
@@ -159,12 +144,12 @@ export function StatsTable() {
             </div>
             {modalData && (
                 <CsvExportModal
-                    usage="statsTable"
                     cellValue={modalData.cellValue}
                     location={modalData.location}
                     onClose={() => {
                         setModalData(null);
                     }}
+                    usage="statsTable"
                 />
             )}
         </>

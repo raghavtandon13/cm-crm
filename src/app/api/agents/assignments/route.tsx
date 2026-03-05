@@ -1,6 +1,7 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../lib/db";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import { db } from "../../../../../lib/db";
+
 const secret = process.env.JWT_SECRET as string;
 
 export async function GET(req: NextRequest) {

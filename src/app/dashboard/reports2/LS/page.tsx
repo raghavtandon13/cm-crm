@@ -21,9 +21,9 @@ function formatNumberIndianStyle(number: number | string) {
     const x = number.toString().split(".");
     let lastThree = x[0].substring(x[0].length - 3);
     const otherNumbers = x[0].substring(0, x[0].length - 3);
-    if (otherNumbers !== "") lastThree = "," + lastThree;
+    if (otherNumbers !== "") lastThree = `,${lastThree}`;
     const result = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-    return x.length > 1 ? result + "." + x[1] : result;
+    return x.length > 1 ? `${result}.${x[1]}` : result;
 }
 
 // ARD report page: Only runs on button press, not automatically
@@ -55,7 +55,7 @@ export default function Reports() {
     const renderLoadingSkeleton = () => (
         <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="w-full h-8" />
+                <Skeleton className="w-full h-8" key={i} />
             ))}
         </div>
     );
@@ -104,45 +104,33 @@ export default function Reports() {
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                className={cn("justify-start text-left font-normal", !dateRange.from && "text-muted-foreground")}
                                 id="date"
                                 variant="outline"
-                                className={cn(
-                                    "justify-start text-left font-normal",
-                                    !dateRange.from && "text-muted-foreground",
-                                )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {dateRange.from && dateRange.to
-                                    ? `${format(dateRange.from, "yyyy MMM dd")} → ${format(
-                                          dateRange.to,
-                                          "yyyy MMM dd",
-                                      )}`
+                                    ? `${format(dateRange.from, "yyyy MMM dd")} → ${format(dateRange.to, "yyyy MMM dd")}`
                                     : "Pick date range"}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent align="start" className="w-auto p-0">
                             <Calendar
-                                mode="range"
-                                selected={dateRange}
-                                onSelect={(range) =>
-                                    setDateRange(range ?? { from: new Date(), to: addDays(new Date(), 1) })
-                                }
                                 fromDate={twoMonthsAgo}
-                                toDate={today}
                                 initialFocus
+                                mode="range"
+                                onSelect={(range) => setDateRange(range ?? { from: new Date(), to: addDays(new Date(), 1) })}
+                                selected={dateRange}
+                                toDate={today}
                             />
                         </PopoverContent>
                     </Popover>
-                    <Button onClick={() => ardMutation.mutate()} disabled={isPending} variant="outline">
+                    <Button disabled={isPending} onClick={() => ardMutation.mutate()} variant="outline">
                         {isPending ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
                         {isPending ? "Running" : "Run"}
                     </Button>
 
-                    {computedTime && !isPending && (
-                        <div className="ml-auto pr-4 text-sm text-muted-foreground mt-1">
-                            Report fetched at {computedTime}
-                        </div>
-                    )}
+                    {computedTime && !isPending && <div className="ml-auto pr-4 text-sm text-muted-foreground mt-1">Report fetched at {computedTime}</div>}
                 </div>
             </div>
 
@@ -152,7 +140,7 @@ export default function Reports() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <span className="text-red-600">LoanSparrow</span>Lender Summary
-                        <Link href="/dashboard/reports2/" className="ml-auto">
+                        <Link className="ml-auto" href="/dashboard/reports2/">
                             <Button size="sm" variant="outline">
                                 CredMantra →
                             </Button>
@@ -160,7 +148,7 @@ export default function Reports() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as "total" | "fresh")}>
+                    <Tabs onValueChange={(val) => setActiveTab(val as "total" | "fresh")} value={activeTab}>
                         <div className="flex flex-row items-center">
                             <TabsList>
                                 <TabsTrigger value="total">Total</TabsTrigger>
@@ -186,7 +174,7 @@ export default function Reports() {
                             {isPending ? (
                                 renderLoadingSkeleton()
                             ) : result ? (
-                                renderLenderTable(lenders.filter((l: any) => true))
+                                renderLenderTable(lenders.filter((_l: any) => true))
                             ) : (
                                 <div className="text-muted-foreground">Run the report to see data.</div>
                             )}

@@ -2,17 +2,11 @@
 // data = { dates: { start: "2024-07-01", end: "2024-07-20" } }
 
 "use client";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { DataTable } from "@/components/dataTable";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const data = [
     {
@@ -155,11 +149,7 @@ export const columns: ColumnDef<LenderData>[] = [
             const columnFilterValue = column.getFilterValue();
             return (
                 <div className="flex text-left">
-                    <select
-                        className="mr-2 rounded border"
-                        onChange={(e) => column.setFilterValue(e.target.value)}
-                        value={columnFilterValue?.toString()}
-                    >
+                    <select className="mr-2 rounded border" onChange={(e) => column.setFilterValue(e.target.value)} value={columnFilterValue?.toString()}>
                         <option value="">*</option>
                         <option value="ON">ON</option>
                         <option value="OFF">OFF</option>
@@ -226,16 +216,14 @@ export const columns: ColumnDef<LenderData>[] = [
         id: "actions",
         cell: ({ row }) => (
             <DropdownMenu>
-                <DropdownMenuTrigger className="mr-[-20px]" asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
+                <DropdownMenuTrigger asChild className="mr-[-20px]">
+                    <Button className="h-8 w-8 p-0" variant="ghost">
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(JSON.stringify(row.original))}>
-                        Copy Lender Data
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(JSON.stringify(row.original))}>Copy Lender Data</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         ),
@@ -245,19 +233,17 @@ export const columns: ColumnDef<LenderData>[] = [
 function Sort({ column }: { column: any }) {
     return (
         <ArrowUpDown
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="mx-2 h-4 w-4 cursor-pointer rounded border hover:bg-slate-200"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         />
     );
 }
 
 export function Table1() {
     return (
-        <>
-            <div className="my-2">
-                <DataTable columns={columns} data={data} name="table1" />
-            </div>
-        </>
+        <div className="my-2">
+            <DataTable columns={columns} data={data} name="table1" />
+        </div>
     );
 }
 

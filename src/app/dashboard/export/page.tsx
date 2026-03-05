@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const uploadCsv = async ({ file, aggType }: { file: File; aggType: "smartcoin" | "moneyview" | "phone" }) => {
+type AggType = "smartcoin" | "moneyview" | "payme" | "phone";
+
+const uploadCsv = async ({ file, aggType }: { file: File; aggType: AggType }) => {
     const formData = new FormData();
     formData.append("file", file);
     const res = await fetch("/api/temp", { method: "POST", headers: { "x-agg-type": aggType }, body: formData });
@@ -31,8 +33,6 @@ const uploadCsv = async ({ file, aggType }: { file: File; aggType: "smartcoin" |
     return { aggCount: aggCount ? aggCount : 0 };
 };
 
-type AggType = "smartcoin" | "moneyview" | "phone";
-
 export default function TempPage() {
     const [file, setFile] = useState<File | null>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -50,7 +50,7 @@ export default function TempPage() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
-        if (selectedFile && selectedFile.name.endsWith(".csv")) {
+        if (selectedFile?.name.endsWith(".csv")) {
             setFile(selectedFile);
         } else if (selectedFile) {
             toast.error("Please select a valid CSV file");
@@ -73,7 +73,7 @@ export default function TempPage() {
         setDragActive(false);
 
         const droppedFile = e.dataTransfer.files?.[0];
-        if (droppedFile && droppedFile.name.endsWith(".csv")) {
+        if (droppedFile?.name.endsWith(".csv")) {
             setFile(droppedFile);
         } else if (droppedFile) {
             toast.error("Please drop a valid CSV file");
@@ -103,8 +103,8 @@ export default function TempPage() {
                     <div
                         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"} `}
                         onDragEnter={handleDrag}
-                        onDragOver={handleDrag}
                         onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
                         onDrop={handleDrop}
                     >
                         <div className="flex flex-col items-center gap-4 pointer-events-none">
@@ -113,9 +113,7 @@ export default function TempPage() {
                                     <FileText className="h-12 w-12 text-green-600" />
                                     <div>
                                         <p className="font-medium">{file.name}</p>
-                                        <p className="text-sm text-gray-500">
-                                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                                        </p>
+                                        <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                                     </div>
                                 </>
                             ) : (
@@ -130,12 +128,7 @@ export default function TempPage() {
                         </div>
 
                         {/* Hidden File Input */}
-                        <Input
-                            type="file"
-                            accept=".csv"
-                            onChange={handleFileChange}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
+                        <Input accept=".csv" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} type="file" />
                     </div>
                     {/* Upload Progress */}
                     {uploadMutation.isPending && (
@@ -144,7 +137,7 @@ export default function TempPage() {
                                 <span>Processing CSV...</span>
                                 <span>{progress}%</span>
                             </div>
-                            <Progress value={progress} className="w-full" />
+                            <Progress className="w-full" value={progress} />
                         </div>
                     )}
 
@@ -164,9 +157,7 @@ export default function TempPage() {
                             <CheckCircle className="h-5 w-5 text-green-600" />
                             <div>
                                 <p className="font-medium text-green-800">Upload Successful</p>
-                                <p className="text-sm text-green-600">
-                                    Processed {uploadMutation.data?.aggCount ?? 0} records
-                                </p>
+                                <p className="text-sm text-green-600">Processed {uploadMutation.data?.aggCount ?? 0} records</p>
                             </div>
                         </div>
                     )}
@@ -190,27 +181,24 @@ export default function TempPage() {
                     {/* Upload Button */}
                     <div className="flex justify-end gap-2">
                         <div className="flex items-center gap-2">
-                            <Select
-                                value={aggType}
-                                onValueChange={(value) => setAggType(value as AggType)}
-                                disabled={uploadMutation.isPending}
-                            >
+                            <Select disabled={uploadMutation.isPending} onValueChange={(value) => setAggType(value as AggType)} value={aggType}>
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Select aggregation" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="smartcoin">Smartcoin</SelectItem>
                                     <SelectItem value="moneyview">MoneyView</SelectItem>
+                                    <SelectItem value="payme">PayMe</SelectItem>
                                     <SelectItem value="phone">Phone</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         {file && (
-                            <Button onClick={() => setFile(null)} variant="outline" disabled={uploadMutation.isPending}>
+                            <Button disabled={uploadMutation.isPending} onClick={() => setFile(null)} variant="outline">
                                 Clear
                             </Button>
                         )}
-                        <Button onClick={handleUpload} disabled={!file || uploadMutation.isPending}>
+                        <Button disabled={!file || uploadMutation.isPending} onClick={handleUpload}>
                             {uploadMutation.isPending ? "Processing..." : "Upload CSV"}
                         </Button>
                     </div>

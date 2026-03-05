@@ -1,10 +1,10 @@
 "use client";
-import fromAPI from "@/lib/api";
-import { Assignment, CMUser } from "@/lib/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { toast } from "sonner";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import fromAPI from "@/lib/api";
+import type { Assignment, CMUser } from "@/lib/types";
 
 function formatDate(utcDateStr: any) {
     const utcDate = new Date(utcDateStr);
@@ -34,15 +34,7 @@ const subStatusMap = {
 function useHandleStatusChange() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({
-            assignmentId,
-            status,
-            subStatus,
-        }: {
-            assignmentId: string;
-            status: string;
-            subStatus: string;
-        }) => {
+        mutationFn: async ({ assignmentId, status, subStatus }: { assignmentId: string; status: string; subStatus: string }) => {
             await fromAPI.post("/assignments/change", {
                 assignmentId,
                 status,
@@ -86,8 +78,8 @@ function Lead({ lead }: { lead: Assignment }) {
                 <TableCell className="text-center">{cmuser.phone}</TableCell>
                 <TableCell className="text-center">{formatDate(lead.assignedAt)}</TableCell>
                 <TableCell className="text-left pointer">
-                    <select onChange={(e) => handleStatusChangeLocal(e, "status")} defaultValue={lead.status}>
-                        <option value="" disabled>
+                    <select defaultValue={lead.status} onChange={(e) => handleStatusChangeLocal(e, "status")}>
+                        <option disabled value="">
                             Select Status
                         </option>
                         {Object.entries(statusMap).map(([status, value]) => (
@@ -98,8 +90,8 @@ function Lead({ lead }: { lead: Assignment }) {
                     </select>
                 </TableCell>
                 <TableCell className="text-left pointer">
-                    <select onChange={(e) => handleStatusChangeLocal(e, "subStatus")} defaultValue={lead.subStatus}>
-                        <option value="" disabled>
+                    <select defaultValue={lead.subStatus} onChange={(e) => handleStatusChangeLocal(e, "subStatus")}>
+                        <option disabled value="">
                             Select Sub Status
                         </option>
                         {Object.entries(subStatusMap).map(([subStatus, value]) => (
@@ -147,7 +139,11 @@ export default function MyLeads() {
                             <TableCell className="text-slate-600 text-left">Sub Status</TableCell>
                         </TableRow>
                     </TableBody>
-                    <TableBody>{asgs?.map((asg) => <Lead key={asg.id} lead={asg} />)}</TableBody>
+                    <TableBody>
+                        {asgs?.map((asg) => (
+                            <Lead key={asg.id} lead={asg} />
+                        ))}
+                    </TableBody>
                 </Table>
             </div>
         </>

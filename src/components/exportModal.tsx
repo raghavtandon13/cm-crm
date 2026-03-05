@@ -2,27 +2,17 @@
 import { useState } from "react";
 import {
     AlertDialog,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogFooter,
-    AlertDialogTitle,
-    AlertDialogDescription,
     AlertDialogAction,
     AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
-export function CsvExportModal({
-    cellValue,
-    location,
-    usage,
-    onClose,
-}: {
-    cellValue: number;
-    location: any;
-    usage: string;
-    onClose: () => void;
-}) {
+export function CsvExportModal({ cellValue, location, usage, onClose }: { cellValue: number; location: any; usage: string; onClose: () => void }) {
     const [loading, setLoading] = useState(false);
 
     const handleExport = async () => {
@@ -88,14 +78,10 @@ export function CsvExportModal({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onClose} disabled={loading}>
+                    <AlertDialogCancel disabled={loading} onClick={onClose}>
                         Close
                     </AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={handleExport}
-                        disabled={loading}
-                        className={cn("btn-primary", { "opacity-50 cursor-not-allowed": loading })}
-                    >
+                    <AlertDialogAction className={cn("btn-primary", { "opacity-50 cursor-not-allowed": loading })} disabled={loading} onClick={handleExport}>
                         {loading ? "Exporting..." : "Start Export"}
                     </AlertDialogAction>
                 </AlertDialogFooter>

@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../../lib/db";
 
 export async function GET(req: NextRequest) {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
             },
         });
         return NextResponse.json({ status: "success", data: newLeaveRequest });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ status: "failure", message: "Error creating leave request" });
     }
 }

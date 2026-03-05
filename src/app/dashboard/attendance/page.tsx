@@ -30,9 +30,7 @@ export default function Attendance() {
     const { data, isError, isPending, refetch, isFetching } = useQuery({
         queryKey: ["attendance", startDate, endDate],
         queryFn: async () => {
-            const response = await fromAPI.get(
-                `/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`,
-            );
+            const response = await fromAPI.get(`/agents/attendance?startDate=${startDate}&endDate=${endDate}&full=true`);
             return response.data.data;
         },
     });
@@ -105,7 +103,7 @@ export default function Attendance() {
         return (
             <div className="flex items-center justify-center h-96">
                 Error loading data.{" "}
-                <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                <button className="ml-2 text-blue-500 hover:underline" onClick={() => refetch()}>
                     Retry
                 </button>
             </div>
@@ -117,9 +115,7 @@ export default function Attendance() {
         end: new Date(endDate),
     }).map((date) => format(date, "yyyy-MM-dd"));
 
-    const filteredData = data.filter(
-        (agent: any) => agent.active === true && Object.keys(agent.attendance || {}).length >= 0,
-    );
+    const filteredData = data.filter((agent: any) => agent.active === true && Object.keys(agent.attendance || {}).length >= 0);
 
     const formattedData = filteredData.map((agent: any) => {
         const attendance = dates.reduce((acc: any, date) => {
@@ -152,22 +148,20 @@ export default function Attendance() {
                 return (
                     <div className="flex items-center gap-2">
                         <Button
-                            variant="outline"
                             className={cn({
                                 "bg-red-100 text-red-500 border-red-500": currentType === "ABSENT",
                                 "bg-orange-100 text-orange-500 border-orange-500": currentType === "UPL",
                                 "bg-yellow-100 text-yellow-500 border-yellow-500": currentType === "WEEK_OFF",
                                 "bg-gray-100 text-gray-500 border-gray-500": currentType === "HALF_DAY",
                             })}
-                            size="sm"
                             onClick={() => openDialog(agentid, date, currentType)}
+                            size="sm"
+                            variant="outline"
                         >
                             {currentType || "+"}
                         </Button>
                         {comment && (
                             <Button
-                                variant="ghost"
-                                size="sm"
                                 onClick={() =>
                                     setDialogData({
                                         open: true,
@@ -177,7 +171,9 @@ export default function Attendance() {
                                         comment,
                                     })
                                 }
+                                size="sm"
                                 title="View Comment"
+                                variant="ghost"
                             >
                                 💬
                             </Button>
@@ -229,18 +225,18 @@ export default function Attendance() {
                 return (
                     <div className="flex items-center gap-2">
                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleLeaveRequestDecision(leaveReqId, "APPROVED")}
                             disabled={row.original.status !== "PENDING"}
+                            onClick={() => handleLeaveRequestDecision(leaveReqId, "APPROVED")}
+                            size="sm"
+                            variant="outline"
                         >
                             Approve
                         </Button>
                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleLeaveRequestDecision(leaveReqId, "REJECTED")}
                             disabled={row.original.status !== "PENDING"}
+                            onClick={() => handleLeaveRequestDecision(leaveReqId, "REJECTED")}
+                            size="sm"
+                            variant="outline"
                         >
                             Reject
                         </Button>
@@ -255,14 +251,7 @@ export default function Attendance() {
             <div className="font-semibold flex gap-4 mb-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -277,15 +266,8 @@ export default function Attendance() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
                 <Button onClick={() => refetch()} variant="outline">
@@ -295,10 +277,7 @@ export default function Attendance() {
                         <Search className="w-4" />
                     )}
                 </Button>
-                <Link
-                    className={cn(buttonVariants({ variant: "secondary" }), "font-semibold mb-1")}
-                    href="/dashboard/attendance/overview"
-                >
+                <Link className={cn(buttonVariants({ variant: "secondary" }), "font-semibold mb-1")} href="/dashboard/attendance/overview">
                     Overview -{">"}{" "}
                 </Link>
             </div>
@@ -317,10 +296,7 @@ export default function Attendance() {
                 ) : leaveRequestsQuery.isError ? (
                     <div className="flex items-center justify-center h-96">
                         Error loading leave requests.{" "}
-                        <button
-                            onClick={() => leaveRequestsQuery.refetch()}
-                            className="ml-2 text-blue-500 hover:underline"
-                        >
+                        <button className="ml-2 text-blue-500 hover:underline" onClick={() => leaveRequestsQuery.refetch()}>
                             Retry
                         </button>
                     </div>
@@ -330,15 +306,12 @@ export default function Attendance() {
                     <div className="text-center mt-8">No leave requests available.</div>
                 )}
             </div>
-            <Dialog open={dialogData.open} onOpenChange={closeDialog}>
+            <Dialog onOpenChange={closeDialog} open={dialogData.open}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Update Attendance: {dialogData.date}</DialogTitle>
                     </DialogHeader>
-                    <Select
-                        onValueChange={(value) => setDialogData((prev: any) => ({ ...prev, atype: value }))}
-                        defaultValue={dialogData.atype || ""}
-                    >
+                    <Select defaultValue={dialogData.atype || ""} onValueChange={(value) => setDialogData((prev: any) => ({ ...prev, atype: value }))}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select Attendance Type" />
                         </SelectTrigger>
@@ -354,16 +327,16 @@ export default function Attendance() {
                         </SelectContent>
                     </Select>
                     <Textarea
+                        className="mt-4"
+                        onChange={(e) => setDialogData((prev: any) => ({ ...prev, comment: e.target.value }))}
                         placeholder="Optional Comment"
                         value={dialogData.comment}
-                        onChange={(e) => setDialogData((prev: any) => ({ ...prev, comment: e.target.value }))}
-                        className="mt-4"
                     />
                     <DialogFooter>
                         <Button onClick={closeDialog} variant="outline">
                             Cancel
                         </Button>
-                        <Button onClick={saveAttendance} disabled={!dialogData.atype}>
+                        <Button disabled={!dialogData.atype} onClick={saveAttendance}>
                             Save
                         </Button>
                     </DialogFooter>

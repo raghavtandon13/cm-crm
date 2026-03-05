@@ -1,5 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
 import User from "@/lib/users";
-import { NextRequest, NextResponse } from "next/server";
 import { connectToMongoDB } from "../../../../../../lib/db";
 
 // const secret = process.env.JWT_SECRET as string;
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const data = (await req.json()) as { phone: string };
-        let user = await User.findOne({ phone: data.phone });
+        const user = await User.findOne({ phone: data.phone });
         if (!user) return NextResponse.json({ status: "success", message: "new lead" }, { status: 201 });
         return NextResponse.json({ status: "failure", message: "duplicate lead" }, { status: 201 });
     } catch (error) {

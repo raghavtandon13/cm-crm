@@ -16,10 +16,7 @@ type NavItemProps = {
 function NavItem({ href, icon: Icon, label, collapsed }: NavItemProps) {
     const path = usePathname();
     return (
-        <Link
-            href={href}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${path === href ? "bg-slate-200" : "hover:bg-muted"}`}
-        >
+        <Link className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${path === href ? "bg-slate-200" : "hover:bg-muted"}`} href={href}>
             <Icon className="h-4 w-4" />
             {!collapsed && label}
         </Link>
@@ -39,25 +36,17 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
             >
                 <div className={`sticky top-0 p-4 flex flex-col ${collapsed ? "items-center" : ""}`}>
                     <button
-                        type="button"
-                        onClick={() => setCollapsed(!collapsed)}
                         className="flex items-center justify-center w-full mb-4 p-2 border rounded-lg"
+                        onClick={() => setCollapsed(!collapsed)}
+                        type="button"
                     >
                         {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                     </button>
                     <nav className="grid gap-2 text-sm font-medium">
                         {DASHBOARD_ROUTES.filter(
-                            (route) =>
-                                route.showInSidebar &&
-                                (user?.role?.title ? route.roles.includes(user.role.title as RoleTitle) : false),
+                            (route) => route.showInSidebar && (user?.role?.title ? route.roles.includes(user.role.title as RoleTitle) : false),
                         ).map((route) => (
-                            <NavItem
-                                key={route.path}
-                                href={route.path}
-                                icon={route.icon}
-                                label={route.label}
-                                collapsed={collapsed}
-                            />
+                            <NavItem collapsed={collapsed} href={route.path} icon={route.icon} key={route.path} label={route.label} />
                         ))}
                     </nav>
                 </div>

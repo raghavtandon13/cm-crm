@@ -1,17 +1,17 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../../lib/db";
-import User from "@/lib/users";
-import { connectToMongoDB } from "../../../../../../lib/db";
 import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
+import User from "@/lib/users";
+import { connectToMongoDB, db } from "../../../../../../lib/db";
+
 // import superjson from "superjson";
 
-function convertSpecialOperators(query: any):any {
+function convertSpecialOperators(query: any): any {
     if (Array.isArray(query)) {
         return query.map(convertSpecialOperators);
     } else if (query && typeof query === "object") {
         const newQuery: any = {};
         for (const key in query) {
-            if (query.hasOwnProperty(key)) {
+            if (Object.hasOwn(query, key)) {
                 if (key === "$date") {
                     return new Date(query[key]);
                 } else if (key === "$oid") {
@@ -61,17 +61,14 @@ export async function POST(_req: NextRequest) {
 
         // Validate that the pipeline is an array
         if (!Array.isArray(aggregationPipeline)) {
-            return NextResponse.json(
-                { error: "Invalid aggregation pipeline format. Must be an array." },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: "Invalid aggregation pipeline format. Must be an array." }, { status: 400 });
         }
 
         // Execute the aggregation pipeline
         const result = await User.aggregate(aggregationPipeline);
 
         return NextResponse.json(result, { status: 200 });
-    } catch (error:any) {
+    } catch (error: any) {
         console.error("Error executing query:", error);
 
         // More specific error handling

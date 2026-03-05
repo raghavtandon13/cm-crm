@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
             return NextResponse.json({ error: "Invalid date values" }, { status: 400 });
         }
 
@@ -44,23 +44,17 @@ export async function POST(request: NextRequest) {
 
         // Validate selectedLenders if provided
         if (selectedLenders && (!Array.isArray(selectedLenders) || selectedLenders.length === 0)) {
-            return NextResponse.json(
-                { error: "selectedLenders must be a non-empty array if provided" },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: "selectedLenders must be a non-empty array if provided" }, { status: 400 });
         }
 
         // Special validation for perday mode
         if (perday && (!selectedLenders || selectedLenders.length !== 1)) {
-            return NextResponse.json(
-                { error: "perday mode requires exactly one lender in selectedLenders" },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: "perday mode requires exactly one lender in selectedLenders" }, { status: 400 });
         }
 
         // Caching logic
-        const cacheKey = getCacheKey(startDate, endDate, { fresh, beta, selectedLenders, perday });
-        const now = Date.now();
+        const _cacheKey = getCacheKey(startDate, endDate, { fresh, beta, selectedLenders, perday });
+        const _now = Date.now();
         // // Purge expired cache entries
         // for (const [key, entry] of ardCacheLS.entries()) {
         //     if (now - entry.timestamp > ARD_CACHE_TTL_MS) {

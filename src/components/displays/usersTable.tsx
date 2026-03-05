@@ -1,12 +1,12 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { RefreshCcw } from "lucide-react";
+import { useState } from "react";
 import { DataTable } from "@/components/dataTable";
 import { Button, buttonVariants } from "@/components/ui/button";
 import fromAPI from "@/lib/api";
-import { CMUser } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
-import { RefreshCcw } from "lucide-react";
-import { useState } from "react";
+import type { CMUser } from "@/lib/types";
 
 export const columns: ColumnDef<CMUser>[] = [
     { accessorKey: "name", header: () => <div className=" text-left">Name</div> },
@@ -73,32 +73,30 @@ export function UsersTable() {
     if (data === null || data.length === 0) return <h1>No data available</h1>;
 
     return (
-        <>
-            <div className="my-2">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>New Users</h1>
-                    <div className={`${buttonVariants({ variant: "card" })} font-semibold`}>
-                        <Button disabled={page === 1} variant={"link"} onClick={() => setPage(page - 1)}>
-                            {"<"}
-                        </Button>
-                        {page}
-                        <Button variant={"link"} onClick={() => setPage(page + 1)}>
-                            {">"}
-                        </Button>
-                    </div>
-                    <Button onClick={() => refetch()} variant="outline">
-                        {isFetching ? (
-                            "Refetching..."
-                        ) : (
-                            <>
-                                <RefreshCcw className="w-4 h-5 mr-2" />
-                                <span>Refetch</span>
-                            </>
-                        )}
+        <div className="my-2">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className={`${buttonVariants({ variant: "card" })} font-semibold`}>New Users</h1>
+                <div className={`${buttonVariants({ variant: "card" })} font-semibold`}>
+                    <Button disabled={page === 1} onClick={() => setPage(page - 1)} variant={"link"}>
+                        {"<"}
+                    </Button>
+                    {page}
+                    <Button onClick={() => setPage(page + 1)} variant={"link"}>
+                        {">"}
                     </Button>
                 </div>
-                <DataTable columns={columns} data={data} />
+                <Button onClick={() => refetch()} variant="outline">
+                    {isFetching ? (
+                        "Refetching..."
+                    ) : (
+                        <>
+                            <RefreshCcw className="w-4 h-5 mr-2" />
+                            <span>Refetch</span>
+                        </>
+                    )}
+                </Button>
             </div>
-        </>
+            <DataTable columns={columns} data={data} />
+        </div>
     );
 }

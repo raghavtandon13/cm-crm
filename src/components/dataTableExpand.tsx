@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-    ColumnDef,
-    ColumnFiltersState,
-    SortingState,
-    VisibilityState,
+    type ColumnDef,
+    type ColumnFiltersState,
     flexRender,
     getCoreRowModel,
+    getExpandedRowModel,
     getFacetedUniqueValues,
     getFilteredRowModel,
     getSortedRowModel,
+    type SortingState,
     useReactTable,
-    getExpandedRowModel,
+    type VisibilityState,
 } from "@tanstack/react-table";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 const partnerColors: Record<string, string> = {
@@ -81,9 +81,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     );
                                 })}
@@ -94,7 +92,6 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    key={row.id}
                                     className={cn(
                                         "hover:bg-transparent!",
                                         row.original.overallTotal
@@ -104,39 +101,32 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                                               : "pl-8",
                                     )}
                                     data-state={row.getIsSelected() && "selected"}
+                                    key={row.id}
                                 >
                                     {row.getVisibleCells().map((cell) => {
                                         if (cell.column.id === "expander") {
                                             return (
-                                                <TableCell key={cell.id} className="w-4">
+                                                <TableCell className="w-4" key={cell.id}>
                                                     {row.getCanExpand() ? (
                                                         <Button
                                                             className="hover:bg-gray-50 bg-white"
-                                                            variant="ghost"
-                                                            size="sm"
                                                             onClick={row.getToggleExpandedHandler()}
+                                                            size="sm"
+                                                            variant="ghost"
                                                         >
-                                                            {row.getIsExpanded() ? (
-                                                                <ChevronDown className="h-4 w-4" />
-                                                            ) : (
-                                                                <ChevronRight className="h-4 w-4" />
-                                                            )}
+                                                            {row.getIsExpanded() ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                                         </Button>
                                                     ) : null}
                                                 </TableCell>
                                             );
                                         }
-                                        return (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        );
+                                        return <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>;
                                     })}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell className="h-24 text-center" colSpan={columns.length}>
                                     No results.
                                 </TableCell>
                             </TableRow>

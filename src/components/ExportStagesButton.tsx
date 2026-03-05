@@ -18,8 +18,8 @@ export default function ExportStagesButton() {
     };
 
     return (
-        <Button variant="ghost" className="flex items-center justify-center hover:bg-slate-200" onClick={handleExport}>
-            <FileDown strokeWidth={1.25} className="w-4" />
+        <Button className="flex items-center justify-center hover:bg-slate-200" onClick={handleExport} variant="ghost">
+            <FileDown className="w-4" strokeWidth={1.25} />
         </Button>
     );
 }

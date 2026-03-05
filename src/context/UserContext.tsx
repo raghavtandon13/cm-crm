@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
-import fromAPI from "@/lib/api";
-import { Agent } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
+import { createContext, type ReactNode, useContext } from "react";
+import fromAPI from "@/lib/api";
+import type { Agent } from "@/lib/types";
 
 const UserContext = createContext<Agent | undefined>(undefined);
 

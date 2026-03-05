@@ -1,22 +1,14 @@
 "use client";
-import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 import fromAPI from "@/lib/api";
-import { toast } from "sonner";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
 
 // Shared Form Component
 function UserForm({
@@ -40,20 +32,20 @@ function UserForm({
                         <Label htmlFor="firstName">First name</Label>
                         <Input
                             id="firstName"
+                            onChange={(e) => setFormData((prev: any) => ({ ...prev, firstName: e.target.value }))}
                             placeholder="Priya"
-                            value={formData.firstName}
-                            onChange={(e) => setFormData((prev:any) => ({ ...prev, firstName: e.target.value }))}
                             required
+                            value={formData.firstName}
                         />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="lastName">Last name</Label>
                         <Input
                             id="lastName"
+                            onChange={(e) => setFormData((prev: any) => ({ ...prev, lastName: e.target.value }))}
                             placeholder="Sharma"
-                            value={formData.lastName}
-                            onChange={(e) => setFormData((prev:any) => ({ ...prev, lastName: e.target.value }))}
                             required
+                            value={formData.lastName}
                         />
                     </div>
                 </div>
@@ -61,24 +53,24 @@ function UserForm({
                     <Label htmlFor="email">Email</Label>
                     <Input
                         id="email"
-                        type="email"
+                        onChange={(e) => setFormData((prev: any) => ({ ...prev, email: e.target.value }))}
                         placeholder="m@example.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData((prev:any) => ({ ...prev, email: e.target.value }))}
                         required
+                        type="email"
+                        value={formData.email}
                     />
                 </div>
                 <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
                         id="password"
+                        onChange={(e) => setFormData((prev: any) => ({ ...prev, password: e.target.value }))}
+                        required
                         type="password"
                         value={formData.password}
-                        onChange={(e) => setFormData((prev:any) => ({ ...prev, password: e.target.value }))}
-                        required
                     />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button className="w-full" disabled={loading} type="submit">
                     {loading ? "Creating..." : submitLabel}
                 </Button>
             </div>
@@ -125,13 +117,7 @@ function SubDsaForm({ onSuccess }: { onSuccess?: () => void }) {
 
     return (
         <div className="space-y-4">
-            <UserForm
-                onSubmit={handleSubmit}
-                loading={loading}
-                formData={formData}
-                setFormData={setFormData}
-                submitLabel="Create Sub DSA"
-            />
+            <UserForm formData={formData} loading={loading} onSubmit={handleSubmit} setFormData={setFormData} submitLabel="Create Sub DSA" />
         </div>
     );
 }
@@ -139,7 +125,7 @@ function SubDsaForm({ onSuccess }: { onSuccess?: () => void }) {
 export default function NewSubDsa() {
     const router = useRouter();
     const user = useUser();
-    
+
     const [dialogOpen, setDialogOpen] = useState(false);
 
     if (user?.role?.title === "OE") {
@@ -155,7 +141,7 @@ export default function NewSubDsa() {
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-xl font-semibold">Sub DSA Management</h1>
 
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="flex items-center gap-2">
                             <Plus className="h-4 w-4" />
@@ -165,9 +151,7 @@ export default function NewSubDsa() {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>Create Sub DSA Account</DialogTitle>
-                            <DialogDescription>
-                                Enter the information below to create a new Sub DSA account.
-                            </DialogDescription>
+                            <DialogDescription>Enter the information below to create a new Sub DSA account.</DialogDescription>
                         </DialogHeader>
                         <SubDsaForm onSuccess={handleSuccess} />
                     </DialogContent>

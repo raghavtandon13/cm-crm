@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { NextResponse, NextRequest } from "next/server";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -16,8 +16,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) return NextResponse.json({ status: "failure", message: "Invalid token provided" }, { status: 401 });
-    if (user.role.title !== "BOSS")
-        return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
+    if (user.role.title !== "BOSS") return NextResponse.json({ status: "failure", message: "Not Authorized" }, { status: 401 });
 
     try {
         const { email, firstName, lastName, password } = await req.json();
@@ -26,14 +25,14 @@ export async function POST(req: NextRequest) {
         const newAgent = await db.agent.create({
             data: {
                 email: email,
-                name: firstName + " " + lastName,
+                name: `${firstName} ${lastName}`,
                 password: hashedPassword,
                 roleId: "693a7b3d285364c8b2954510", // AGENT
             },
             include: { role: true },
         });
 
-        const token = jwt.sign({ id: newAgent.id, email: newAgent.email }, secret, { expiresIn: "10h" });
+        const _token = jwt.sign({ id: newAgent.id, email: newAgent.email }, secret, { expiresIn: "10h" });
         const response = NextResponse.json({ status: "success", message: "Agent created successfully" });
         return response;
     } catch (error) {

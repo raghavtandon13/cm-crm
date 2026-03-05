@@ -13,12 +13,7 @@ import {
     type VisibilityState,
 } from "@tanstack/react-table";
 import { useState } from "react";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import DateSearch from "./dateSearch";
 import { Button } from "./ui/button";
@@ -54,14 +49,14 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
             {name === "lenderARER" && (
                 <div className="flex items-center py-4">
                     <Input
+                        className="max-w-xs bg-white"
+                        onChange={(event) => table.getColumn("lender")?.setFilterValue(event.target.value)}
                         placeholder="Search Lenders ..."
                         value={(table.getColumn("lender")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) => table.getColumn("lender")?.setFilterValue(event.target.value)}
-                        className="max-w-xs bg-white"
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
+                            <Button className="ml-auto" variant="outline">
                                 Fields
                             </Button>
                         </DropdownMenuTrigger>
@@ -72,9 +67,9 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                                 .map((column) => {
                                     return (
                                         <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
                                             checked={column.getIsVisible()}
+                                            className="capitalize"
+                                            key={column.id}
                                             onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                         >
                                             {column.id}
@@ -88,15 +83,15 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
             {name === "table1" && (
                 <div className="flex items-center py-4">
                     <Input
+                        className="max-w-xs bg-white"
+                        onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
                         placeholder="Search Lenders ..."
                         value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-                        className="max-w-xs bg-white"
                     />
                     <DateSearch dates={dateprops} />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
+                            <Button className="ml-auto" variant="outline">
                                 Fields
                             </Button>
                         </DropdownMenuTrigger>
@@ -107,9 +102,9 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                                 .map((column) => {
                                     return (
                                         <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
                                             checked={column.getIsVisible()}
+                                            className="capitalize"
+                                            key={column.id}
                                             onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                         >
                                             {column.id}
@@ -132,9 +127,7 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                                             // style={index === 0 ? { minWidth: "80px" } : { minWidth: "150px" }}
                                             key={header.id}
                                         >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     );
                                 })}
@@ -144,7 +137,7 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                <TableRow data-state={row.getIsSelected() && "selected"} key={row.id}>
                                     {row.getVisibleCells().map((cell, index) => (
                                         <TableCell
                                             className={index === 0 ? "sticky left-0 z-10 bg-background" : ""}
@@ -158,7 +151,7 @@ export function DataTable<TData, TValue>({ columns, data, name }: DataTableProps
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell className="h-24 text-center" colSpan={columns.length}>
                                     No results.
                                 </TableCell>
                             </TableRow>

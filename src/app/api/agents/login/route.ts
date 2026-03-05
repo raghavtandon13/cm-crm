@@ -1,7 +1,7 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import { db } from "../../../../../lib/db";
 
 const secret = process.env.JWT_SECRET as string;
 
@@ -11,12 +11,10 @@ export async function POST(req: NextRequest) {
 
         // Getting Agent
         const user = await db.agent.findUnique({ where: { email } });
-        if (!user)
-            return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        if (!user) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
         const isMatch = await bcrypt.compare(pass, user.password);
-        if (!isMatch)
-            return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
+        if (!isMatch) return NextResponse.json({ status: "failure", message: "Invalid email or password" }, { status: 401 });
 
         const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: "10h" });
 

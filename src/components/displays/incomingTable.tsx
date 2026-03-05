@@ -1,18 +1,18 @@
 "use client";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import DataTable from "../dataTableExpand";
-import { ColumnDef } from "@tanstack/react-table";
-import fromAPI from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "../ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
 import { format, startOfMonth } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import fromAPI from "@/lib/api";
+import { cn } from "@/lib/utils";
+import DataTable from "../dataTableExpand";
 import { CsvExportModal } from "../exportModal";
+import { buttonVariants } from "../ui/button";
 
 export function IncomingLeadsTable() {
     const [page, _] = useState(1);
@@ -67,14 +67,7 @@ export function IncomingLeadsTable() {
                         <div className="cursor-pointer text-blue-500 hover:underline" onClick={handleClick}>
                             {cellValue.toLocaleString()}
                         </div>
-                        {showModal && (
-                            <CsvExportModal
-                                cellValue={cellValue}
-                                location={location}
-                                usage="incoming"
-                                onClose={() => {}}
-                            />
-                        )}
+                        {showModal && <CsvExportModal cellValue={cellValue} location={location} onClose={() => {}} usage="incoming" />}
                     </>
                 );
             },
@@ -117,7 +110,7 @@ export function IncomingLeadsTable() {
         return (
             <div className="flex items-center justify-center h-96">
                 Error loading data.{" "}
-                <button onClick={() => refetch()} className="ml-2 text-blue-500 hover:underline">
+                <button className="ml-2 text-blue-500 hover:underline" onClick={() => refetch()}>
                     Retry
                 </button>
             </div>
@@ -139,14 +132,7 @@ export function IncomingLeadsTable() {
                 {/* Date selector */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant="outline"
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground",
-                            )}
-                        >
+                        <Button className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")} id="date" variant="outline">
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {date?.from ? (
                                 date.to ? (
@@ -161,23 +147,12 @@ export function IncomingLeadsTable() {
                             )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
+                    <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar defaultMonth={date?.from} initialFocus mode="range" numberOfMonths={2} onSelect={setDate} selected={date} />
                     </PopoverContent>
                 </Popover>
                 <Button onClick={() => refetch()} variant="outline">
-                    {isFetching ? (
-                        <div className="animate-spin h-4 w-4 border-2 border-black-500 rounded-full border-t-transparent"></div>
-                    ) : (
-                        "Run"
-                    )}
+                    {isFetching ? <div className="animate-spin h-4 w-4 border-2 border-black-500 rounded-full border-t-transparent"></div> : "Run"}
                 </Button>
             </div>
             <DataTable columns={columns} data={transformedData} name="incomingLeads" />

@@ -67,9 +67,7 @@ async function ARDComponent({ account }: { account: any }) {
     return <div className={`px-2 rounded ml-2 font-semibold ${colorClass}`}>{status}</div>;
 }
 
-export default async function Phone(props: {
-    searchParams: Promise<{ phone: string; accountsOnly: string; account: string }>;
-}) {
+export default async function Phone(props: { searchParams: Promise<{ phone: string; accountsOnly: string; account: string }> }) {
     const searchParams = await props.searchParams;
     let phone = "";
     let accountsOnly = false;
@@ -96,9 +94,8 @@ export default async function Phone(props: {
         return (
             <div className="justify-center py-10 text-center">
                 <h1 className="text-2xl font-bold">NOT FOUND</h1>
-                <Link href={"/"} className="text-sm">
-                    Create New Lead for{" "}
-                    <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                <Link className="text-sm" href={"/"}>
+                    Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                 </Link>
             </div>
         );
@@ -106,7 +103,7 @@ export default async function Phone(props: {
 
     if (accountsOnly) {
         return res.accounts.map((account: any, index: any) => (
-            <div key={index} className="mx-auto mb-4 items-center justify-center rounded-xl bg-white px-4 py-8 shadow">
+            <div className="mx-auto mb-4 items-center justify-center rounded-xl bg-white px-4 py-8 shadow" key={index}>
                 <div className="px-4">
                     <p className="mb-4 -ml-2 w-max rounded bg-slate-200 px-1 text-2xl font-semibold ">{account.name}</p>
                     {Object.entries(account)
@@ -139,10 +136,7 @@ export default async function Phone(props: {
                     <div className="items-center justify-center">
                         <div className="flex justify-between py-10">
                             <h1 className="font-bold">Personal Details</h1>
-                            <Link
-                                className={`${buttonVariants({ variant: "outline" })}`}
-                                href={`/dashboard/create?phone=${phone}`}
-                            >
+                            <Link className={`${buttonVariants({ variant: "outline" })}`} href={`/dashboard/create?phone=${phone}`}>
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
@@ -175,9 +169,7 @@ export default async function Phone(props: {
                                                 <TableRow key={key}>
                                                     <TableCell className="font-medium">{key}</TableCell>
                                                     <TableCell className="max-w-xs truncate text-right">
-                                                        {typeof value === "object"
-                                                            ? JSON.stringify(value, null, 1)
-                                                            : value.toString()}
+                                                        {typeof value === "object" ? JSON.stringify(value, null, 1) : value.toString()}
                                                     </TableCell>
                                                 </TableRow>
                                             ),
@@ -206,7 +198,7 @@ export default async function Phone(props: {
 
                         <div className="space-y-6">
                             {res.details.partnerHistory.map((history: any, index: any) => (
-                                <div key={index} className="items-center justify-center">
+                                <div className="items-center justify-center" key={index}>
                                     <Table>
                                         <TableBody className="border border-gray-200 rounded-xl">
                                             {Object.entries(history)
@@ -217,9 +209,7 @@ export default async function Phone(props: {
                                                             <TableRow key={key}>
                                                                 <TableCell className="font-medium">{key}</TableCell>
                                                                 <TableCell className="max-w-xs truncate text-right">
-                                                                    {typeof value === "object"
-                                                                        ? JSON.stringify(value, null, 1)
-                                                                        : value.toString()}
+                                                                    {typeof value === "object" ? JSON.stringify(value, null, 1) : value.toString()}
                                                                 </TableCell>
                                                             </TableRow>
                                                         ),
@@ -233,14 +223,14 @@ export default async function Phone(props: {
 
                     <h1 className="py-10 font-bold">Account Details</h1>
                     {res.accounts.map((account: any, index: any) => (
-                        <div key={index} className="items-center justify-center pb-10">
-                            <Button variant="card" className="text-l w-full text-center font-semibold">
+                        <div className="items-center justify-center pb-10" key={index}>
+                            <Button className="text-l w-full text-center font-semibold" variant="card">
                                 <div className="flex w-full items-center justify-between">
                                     {account.name}
                                     <ARDComponent account={account} />
                                     <Link
-                                        href={`/dashboard/search?phone=${phone}&account=${account.name}`}
                                         className="ml-2"
+                                        href={`/dashboard/search?phone=${phone}&account=${account.name}`}
                                         title={`View ${account.name} History`}
                                     >
                                         <History className="h-4 w-4" />
@@ -272,9 +262,8 @@ export default async function Phone(props: {
             ) : (
                 <div className="justify-center py-10 text-center">
                     <h1 className="text-2xl font-bold">NOT FOUND</h1>
-                    <Link href={"/"} className="text-sm">
-                        Create New Lead for{" "}
-                        <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
+                    <Link className="text-sm" href={"/"}>
+                        Create New Lead for <span className=" text-cyan-500 underline decoration-wavy underline-offset-2">{phone}</span>
                     </Link>
                 </div>
             )}

@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import User from "@/lib/users";
 import { connectToMongoDB } from "../../../../../../lib/db";
 export const dynamic = "force-dynamic";

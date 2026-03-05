@@ -1,6 +1,6 @@
 "use client";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function UserSearch({ phone }: { phone: string }) {
     const handleSubmit = (e: any) => {
@@ -13,12 +13,12 @@ export default function UserSearch({ phone }: { phone: string }) {
         <form className="w-full items-center justify-center  pt-5" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2 sm:flex-row">
                 <Input
-                    type="tel"
-                    pattern="\d{10}"
-                    maxLength={10}
                     className="flex-[6] bg-white py-2 sm:py-1"
-                    placeholder="Search Phone Number"
                     defaultValue={phone}
+                    maxLength={10}
+                    pattern="\d{10}"
+                    placeholder="Search Phone Number"
+                    type="tel"
                 />
                 <Button className="flex-[1]" variant="default">
                     Search

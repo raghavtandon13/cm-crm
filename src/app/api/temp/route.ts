@@ -39,21 +39,19 @@ export async function POST(request: NextRequest) {
     }
 
     // ---- Run aggregation ----
-    let results: any[] = [];
 
-    switch (aggType) {
-        case "moneyview":
-            results = await mvAgg(ids);
-            break;
-        case "smartcoin":
-            results = await smAgg(ids);
-            break;
-        case "phone":
-            results = await phoneAgg(ids);
-            break;
-        default:
-            return NextResponse.json({ message: "Invalid or missing x-agg-type header" }, { status: 400 });
-    }
+    const aggregators = {
+        moneyview: mvAgg,
+        smartcoin: smAgg,
+        payme: paymeAgg,
+        phone: phoneAgg,
+    };
+
+    const aggFn = aggregators[aggType];
+
+    if (!aggFn) return NextResponse.json({ message: "Invalid or missing x-agg-type header" }, { status: 400 });
+
+    const results = await aggFn(ids);
 
     // ---- Stream JSON → CSV response ----
     const csvStream = format({ headers: true });
@@ -71,8 +69,8 @@ export async function POST(request: NextRequest) {
 }
 
 async function smAgg(ids: string[]) {
-    return mongoose.connection
-        .db!.collection("smartcoin-accounts")
+    return mongoose.connection.db
+        ?.collection("smartcoin-accounts")
         .aggregate([
             { $match: { leadId: { $in: ids } } },
             { $lookup: { from: "users", localField: "phone", foreignField: "phone", as: "user" } },
@@ -96,8 +94,8 @@ async function smAgg(ids: string[]) {
 }
 
 async function mvAgg(ids: string[]) {
-    return mongoose.connection
-        .db!.collection("moneyview-accounts")
+    return mongoose.connection.db
+        ?.collection("moneyview-accounts")
         .aggregate([
             { $match: { leadId: { $in: ids } } },
             { $lookup: { from: "users", localField: "phone", foreignField: "phone", as: "user" } },
@@ -120,9 +118,37 @@ async function mvAgg(ids: string[]) {
         .toArray();
 }
 
+async function paymeAgg(ids: string[]) {
+    const nIds = ids.map(Number);
+    return mongoose.connection.db
+        ?.collection("payme-accounts")
+        .aggregate([
+            { $match: { user_id: { $in: nIds } } },
+            { $lookup: { from: "users", localField: "phone", foreignField: "phone", as: "user" } },
+            { $unwind: "$user" },
+            {
+                $project: {
+                    _id: 0,
+                    leadId: 1,
+                    phone: "$user.phone",
+                    name: "$user.name",
+                    pincode: "$user.pincode",
+                    dob: "$user.dob",
+                    income: "$user.income",
+                    email: "$user.email",
+                    resp_date: "$resp_date",
+                    user_id: 1,
+                    pl_limit: "$data.0.pl_default_limit_dashboard.pl_limit",
+                    cibil_score: "$data.0.cibil_score",
+                },
+            },
+        ])
+        .toArray();
+}
+
 async function phoneAgg(ids: string[]) {
-    return mongoose.connection
-        .db!.collection("users")
+    return mongoose.connection.db
+        ?.collection("users")
         .aggregate([
             { $match: { phone: { $in: ids } } },
             {

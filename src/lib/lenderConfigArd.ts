@@ -98,17 +98,11 @@ export const lenderRules = {
     ramfin: [
         (obj) => obj.dedupe === "Success" && "Accepted",
 
-        (obj) =>
-            obj.msg === "Success" &&
-            obj.updated_status?.message !== "This customer is not associated with you." &&
-            "Accepted",
+        (obj) => obj.msg === "Success" && obj.updated_status?.message !== "This customer is not associated with you." && "Accepted",
 
         (obj) => obj.status === "Dedupe" && "Deduped",
 
-        (obj) =>
-            obj.msg === "Success" &&
-            obj.updated_status?.message === "This customer is not associated with you." &&
-            "Rejected",
+        (obj) => obj.msg === "Success" && obj.updated_status?.message === "This customer is not associated with you." && "Rejected",
 
         (obj) => /Issue/i.test(obj.message) && "Rejected",
         (obj) => obj.message === "The pancard field is required." && "Rejected",
@@ -130,9 +124,7 @@ export const lenderRules = {
 
         (obj) => obj.message === "socket hang up" && "Errors",
         (obj) => obj.message === "read ECONNRESET" && "Errors",
-        (obj) =>
-            obj.message === "Client network socket disconnected before secure TLS connection was established" &&
-            "Errors",
+        (obj) => obj.message === "Client network socket disconnected before secure TLS connection was established" && "Errors",
         (obj) => obj.message === "write ETIMEDOUT" && "Errors",
         (obj) => obj.message === "write EPIPE" && "Errors",
         (obj) => /Request failed/i.test(obj.message) && "Errors",
@@ -142,9 +134,7 @@ export const lenderRules = {
         (obj) => obj.Message === "Lead generated successfully." && "Accepted",
         (obj) => obj.Message === "Eligibility Failed" && "Rejected",
         (obj) => obj.Message === "Monthly income is not eligible for the loan." && "Rejected",
-        (obj) =>
-            obj.Message === "You are not eligible for the loan as there is an active loan with the same PAN number." &&
-            "Deduped",
+        (obj) => obj.Message === "You are not eligible for the loan as there is an active loan with the same PAN number." && "Deduped",
     ],
 
     zype: [

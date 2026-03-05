@@ -1,8 +1,10 @@
 // getting partner leads
-import { NextResponse, NextRequest } from "next/server";
-import User from "@/lib/users";
-import { db, connectToMongoDB } from "../../../../../lib/db";
+
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import User from "@/lib/users";
+import { connectToMongoDB, db } from "../../../../../lib/db";
+
 const secret = process.env.JWT_SECRET as string;
 
 export async function GET(req: NextRequest) {
@@ -13,8 +15,8 @@ export async function GET(req: NextRequest) {
         const { id } = jwt.verify(token, secret) as { id: string };
 
         const { searchParams } = new URL(req.url);
-        const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "10");
+        const page = parseInt(searchParams.get("page") || "1", 10);
+        const limit = parseInt(searchParams.get("limit") || "10", 10);
         console.log(page, limit);
 
         const partner = await db.partner.findUnique({ where: { id }, include: { role: true } });
@@ -37,9 +39,7 @@ export async function GET(req: NextRequest) {
                 db.partnerLeads.count({ where: { partnerId: partner?.id } }),
             ]);
         } else {
-            const subDsas = await db.partner
-                .findMany({ where: { parentId: partner?.id }, select: { id: true } })
-                .then((dsas) => dsas.map((dsa) => dsa.id));
+            const subDsas = await db.partner.findMany({ where: { parentId: partner?.id }, select: { id: true } }).then((dsas) => dsas.map((dsa) => dsa.id));
 
             [leadsRes, groupRes, countRes] = await Promise.allSettled([
                 db.partnerLeads.findMany({

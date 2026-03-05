@@ -1,8 +1,7 @@
 // db queries route
 
-import { NextResponse, NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../../lib/db";
-import { Query } from "@prisma/client";
 
 export async function GET(_req: NextRequest) {
     try {

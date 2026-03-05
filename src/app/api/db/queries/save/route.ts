@@ -1,7 +1,6 @@
 // app/api/db/queries/save/route.ts
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "../../../../../../lib/db";
-import { connectToMongoDB } from "../../../../../../lib/db";
+import { type NextRequest, NextResponse } from "next/server";
+import { connectToMongoDB, db } from "../../../../../../lib/db";
 
 export async function POST(_req: NextRequest) {
     await connectToMongoDB();
@@ -12,16 +11,13 @@ export async function POST(_req: NextRequest) {
         let aggregationPipeline;
         try {
             aggregationPipeline = JSON.parse(query);
-        } catch (error) {
+        } catch (_error) {
             return NextResponse.json({ error: "Invalid query format" }, { status: 400 });
         }
 
         // Validate that the pipeline is an array
         if (!Array.isArray(aggregationPipeline)) {
-            return NextResponse.json(
-                { error: "Invalid aggregation pipeline format. Must be an array." },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: "Invalid aggregation pipeline format. Must be an array." }, { status: 400 });
         }
 
         // Save the query

@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
-import { connectToMongoDB } from "../../lib/db";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
-import { Button } from "./ui/button";
-import { FileDown } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { connectToMongoDB } from "../../lib/db";
 import ExportStagesButton from "./ExportStagesButton";
 
 async function getData() {
@@ -25,7 +23,7 @@ async function getData() {
         return otpUsers;
     } catch (error: any) {
         console.error("Error fetching data:", error);
-        return "Error Occurred: " + error.message;
+        return `Error Occurred: ${error.message}`;
     }
 }
 
@@ -35,9 +33,7 @@ export async function StagesTable() {
         return <div className="justify-center py-10 text-center text-red-600">{otpUsers}</div>;
     }
     if (!otpUsers || otpUsers.length === 0) {
-        return (
-            <div className="justify-center py-10 text-center text-gray-500">No data found for the last 24 hours.</div>
-        );
+        return <div className="justify-center py-10 text-center text-gray-500">No data found for the last 24 hours.</div>;
     }
     return (
         <div className="p-6">
